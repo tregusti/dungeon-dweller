@@ -24,6 +24,11 @@ function showCursor() {
   process.stdout.write(SHOW_CURSOR)
 }
 
+function moveTo(x: number, y: number) {
+  // move cursor to (x,y) 0-indexed
+  process.stdout.write(`\x1B[${y + 1};${x + 1}H`)
+}
+
 function draw(cols: number, rows: number, px: number, py: number) {
   let output = ''
   for (let y = 0; y < rows; y++) {
@@ -73,6 +78,8 @@ function main() {
 
   process.stdin.resume()
   process.stdin.setEncoding('utf8')
+  let prevX = px
+  let prevY = py
   process.stdin.on('data', (chunk: string) => {
     switch (chunk) {
       case 'h':
@@ -91,8 +98,16 @@ function main() {
         cleanup()
         process.exit(0)
     }
-    clearScreen()
-    draw(cols, rows, px, py)
+    if (px !== prevX || py !== prevY) {
+      // redraw only changed cells
+      moveTo(prevX, prevY)
+      process.stdout.write('.')
+      moveTo(px, py)
+      process.stdout.write('@')
+      hideCursor()
+      prevX = px
+      prevY = py
+    }
   })
 }
 
