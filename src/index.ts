@@ -12,6 +12,8 @@ function checkSize(minCols: number, minRows: number) {
 
 import { ANSI } from './ansi'
 import Screen from './screen'
+import { Hero } from './Hero'
+import { Monster } from './Monster'
 
 function clearScreen() {
   process.stdout.write(ANSI.clearScreen)
@@ -30,8 +32,7 @@ function main() {
   checkSize(60, 25)
   const cols = 60
   const gameRows = 20
-  let px = Math.floor(cols / 2)
-  let py = Math.floor(gameRows / 2)
+  const hero = new Hero(Math.floor(cols / 2), Math.floor(gameRows / 2))
 
   // create screen buffer
   const screen = new Screen(cols, gameRows + 2) // +2 for status bar at row 21
@@ -43,10 +44,10 @@ function main() {
 
   // initial render
   screen.clear()
-  screen.setCell(px, py, '@')
+  screen.setCell(hero.x, hero.y, hero.char)
   for (let y = 0; y < gameRows; y++) {
     for (let x = 0; x < cols; x++) {
-      if (x !== px || y !== py) {
+      if (x !== hero.x || y !== hero.y) {
         screen.setCell(x, y, '.')
       }
     }
@@ -78,31 +79,21 @@ function main() {
 
   process.stdin.resume()
   process.stdin.setEncoding('utf8')
-  let prevX = px
-  let prevY = py
-  let turn = 0
+  let prevX = hero.x
+  let prevY = hero.y
   let tick = 0
-  const playerSpeed = 2
-  let playerNextTick = 0
-
-  type Monster = { x: number; y: number; char: string; speed: number; nextTick: number }
   const monsters: Monster[] = []
 
   const spawnMonster = () => {
-    // choose position not occupied by player or other monsters
+    // choose position not occupied by hero or other monsters
     let mx: number, my: number
     do {
       mx = Math.floor(Math.random() * cols)
       my = Math.floor(Math.random() * gameRows)
-    } while ((mx === px && my === py) || monsters.some((m) => m.x === mx && m.y === my))
-    // pick random character
-    const choices = ['x', 'm', 'M', '&', '£']
-    const ch = choices[Math.floor(Math.random() * choices.length)]
-    // assign default speed and schedule
-    const speed = 4
-    const mon: Monster = { x: mx, y: my, char: ch, speed, nextTick: tick + speed }
-    monsters.push(mon)
-    screen.setCell(mx, my, ch)
+    } while ((mx === hero.x && my === hero.y) || monsters.some((m) => m.x === mx && m.y === my))
+    const monster = new Monster(mx, my, tick)
+    monsters.push(monster)
+    screen.setCell(monster.x, monster.y, monster.char)
   }
 
   const processTick = () => {
@@ -117,16 +108,16 @@ function main() {
   }
 
   const handleMovement = (dx: number, dy: number) => {
-    if (tick >= playerNextTick) {
-      const nx = Math.max(0, Math.min(cols - 1, px + dx))
-      const ny = Math.max(0, Math.min(gameRows - 1, py + dy))
-      // apply movement only if position changes
-      if (nx !== px || ny !== py) {
-        px = nx
-        py = ny
-        turn++
-        playerNextTick = tick + playerSpeed
-        while (tick < playerNextTick) processTick()
+    if (tick >= hero.nextTick) {
+      const oldX = hero.x
+      const oldY = hero.y
+      if (hero.move(dx, dy, cols, gameRows)) {
+        // position changed; advance ticks until hero can move again
+        hero.nextTick = tick + hero.speed
+        while (tick < hero.nextTick) processTick()
+        // mark cells for potential collision check
+        prevX = oldX
+        prevY = oldY
       }
     }
   }
@@ -155,11 +146,11 @@ function main() {
         process.exit(0)
     }
 
-    if (px !== prevX || py !== prevY) {
+    if (hero.x !== prevX || hero.y !== prevY) {
       // check for collision with any monster
       for (let i = 0; i < monsters.length; i++) {
         const m = monsters[i]
-        if (px === m.x && py === m.y) {
+        if (hero.x === m.x && hero.y === m.y) {
           // remove monster
           monsters.splice(i, 1)
           break
@@ -168,13 +159,13 @@ function main() {
 
       // update buffer
       screen.setCell(prevX, prevY, '.')
-      screen.setCell(px, py, '@')
-      prevX = px
-      prevY = py
+      screen.setCell(hero.x, hero.y, hero.char)
+      prevX = hero.x
+      prevY = hero.y
     }
 
     // update status bar text (show turns and ticks)
-    const statusText = `Turns: ${turn} Ticks: ${tick}`.padEnd(60)
+    const statusText = `Turns: ${hero.turns} Ticks: ${tick}`.padEnd(60)
     for (let x = 0; x < cols; x++) {
       screen.setCell(x, gameRows + 1, statusText[x])
     }
