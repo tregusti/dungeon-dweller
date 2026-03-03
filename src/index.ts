@@ -80,6 +80,28 @@ function main() {
   process.stdin.setEncoding('utf8')
   let prevX = px
   let prevY = py
+  let turn = 0
+  let spawnTurn = Math.floor(Math.random() * 10) + 1
+  let foeX = 0
+  let foeY = 0
+  let foeActive = false
+  let foeSpawned = false
+
+  const trySpawnFoe = () => {
+    if (!foeSpawned && turn >= spawnTurn) {
+      // pick random position not occupied by player
+      do {
+        foeX = Math.floor(Math.random() * cols)
+        foeY = Math.floor(Math.random() * rows)
+      } while (foeX === px && foeY === py)
+      foeActive = true
+      foeSpawned = true
+      moveTo(foeX, foeY)
+      process.stdout.write('x')
+      hideCursor()
+    }
+  }
+
   process.stdin.on('data', (chunk: string) => {
     switch (chunk) {
       case 'h':
@@ -98,7 +120,18 @@ function main() {
         cleanup()
         process.exit(0)
     }
+
+    // increment turn and maybe spawn foe
+    turn++
+    trySpawnFoe()
+
     if (px !== prevX || py !== prevY) {
+      // check for collision with foe
+      if (foeActive && px === foeX && py === foeY) {
+        foeActive = false
+        // clear the cell (will be overwritten by @ below)
+      }
+
       // redraw only changed cells
       moveTo(prevX, prevY)
       process.stdout.write('.')
