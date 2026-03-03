@@ -29,6 +29,12 @@ function moveTo(x: number, y: number) {
   process.stdout.write(`\x1B[${y + 1};${x + 1}H`)
 }
 
+function drawStatusBar(turn: number) {
+  moveTo(0, 21)
+  process.stdout.write(`Turns: ${turn}`.padEnd(60))
+  hideCursor()
+}
+
 function draw(cols: number, rows: number, px: number, py: number) {
   let output = ''
   for (let y = 0; y < rows; y++) {
@@ -48,16 +54,17 @@ function draw(cols: number, rows: number, px: number, py: number) {
 // main
 function main() {
   checkSize(60, 25)
-  const cols = process.stdout.columns || 60
-  const rows = process.stdout.rows || 25
+  const cols = 60
+  const gameRows = 20
   let px = Math.floor(cols / 2)
-  let py = Math.floor(rows / 2)
+  let py = Math.floor(gameRows / 2)
 
   // initialize terminal: set raw mode and hide cursor
   process.stdin.setRawMode(true)
   hideCursor()
   clearScreen()
-  draw(cols, rows, px, py)
+  draw(cols, gameRows, px, py)
+  drawStatusBar(0)
 
   // cleanup on exit
   const cleanup = () => {
@@ -92,7 +99,7 @@ function main() {
       // pick random position not occupied by player
       do {
         foeX = Math.floor(Math.random() * cols)
-        foeY = Math.floor(Math.random() * rows)
+        foeY = Math.floor(Math.random() * gameRows)
       } while (foeX === px && foeY === py)
       foeActive = true
       foeSpawned = true
@@ -114,7 +121,7 @@ function main() {
         py = Math.max(0, py - 1)
         break
       case 'j':
-        py = Math.min(rows - 1, py + 1)
+        py = Math.min(gameRows - 1, py + 1)
         break
       case '\u0003': // ctrl-c
         cleanup()
@@ -141,6 +148,9 @@ function main() {
       prevX = px
       prevY = py
     }
+
+    // update status bar
+    drawStatusBar(turn)
   })
 }
 
