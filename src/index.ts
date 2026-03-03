@@ -25,33 +25,6 @@ function showCursor() {
   process.stdout.write(ANSI.showCursor)
 }
 
-function moveTo(x: number, y: number) {
-  // move cursor to (x,y) 0-indexed
-  process.stdout.write(`\x1B[${y + 1};${x + 1}H`)
-}
-
-function drawStatusBar(turn: number) {
-  moveTo(0, 21)
-  process.stdout.write(`Turns: ${turn}`.padEnd(60))
-  hideCursor()
-}
-
-function draw(cols: number, rows: number, px: number, py: number) {
-  let output = ''
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      if (x === px && y === py) {
-        output += '@' // player
-      } else {
-        output += '.' // floor
-      }
-    }
-    if (y < rows - 1) output += '\n'
-  }
-  process.stdout.write(output)
-  hideCursor()
-}
-
 // main
 function main() {
   checkSize(60, 25)
@@ -108,23 +81,23 @@ function main() {
   let prevX = px
   let prevY = py
   let turn = 0
-  let spawnTurn = Math.floor(Math.random() * 10) + 1
-  let foeX = 0
-  let foeY = 0
-  let foeActive = false
-  let foeSpawned = false
 
-  const trySpawnFoe = () => {
-    if (!foeSpawned && turn >= spawnTurn) {
-      // pick random position not occupied by player
-      do {
-        foeX = Math.floor(Math.random() * cols)
-        foeY = Math.floor(Math.random() * gameRows)
-      } while (foeX === px && foeY === py)
-      foeActive = true
-      foeSpawned = true
-      screen.setCell(foeX, foeY, 'x')
-    }
+  type Monster = { x: number; y: number; char: string }
+  const monsters: Monster[] = []
+
+  const spawnMonster = () => {
+    // choose position not occupied by player or other monsters
+    let mx: number, my: number
+    do {
+      mx = Math.floor(Math.random() * cols)
+      my = Math.floor(Math.random() * gameRows)
+    } while ((mx === px && my === py) || monsters.some((m) => m.x === mx && m.y === my))
+    // pick random character
+    const choices = ['x', 'm', 'M', '&', '£']
+    const ch = choices[Math.floor(Math.random() * choices.length)]
+    const mon: Monster = { x: mx, y: my, char: ch }
+    monsters.push(mon)
+    screen.setCell(mx, my, ch)
   }
 
   process.stdin.on('data', (chunk: string) => {
@@ -141,19 +114,28 @@ function main() {
       case 'j':
         py = Math.min(gameRows - 1, py + 1)
         break
+      case 'm':
+        spawnMonster()
+        // immediate render so user sees the monster even if player doesn't move
+        screen.render(hideCursor)
+        break
       case '\u0003': // ctrl-c
         cleanup()
         process.exit(0)
     }
 
-    // increment turn and maybe spawn foe
+    // increment turn
     turn++
-    trySpawnFoe()
 
     if (px !== prevX || py !== prevY) {
-      // check for collision with foe
-      if (foeActive && px === foeX && py === foeY) {
-        foeActive = false
+      // check for collision with any monster
+      for (let i = 0; i < monsters.length; i++) {
+        const m = monsters[i]
+        if (px === m.x && py === m.y) {
+          // remove monster
+          monsters.splice(i, 1)
+          break
+        }
       }
 
       // update buffer
