@@ -81,8 +81,11 @@ function main() {
   let prevX = px
   let prevY = py
   let turn = 0
+  let tick = 0
+  const playerSpeed = 2
+  let playerNextTick = 0
 
-  type Monster = { x: number; y: number; char: string }
+  type Monster = { x: number; y: number; char: string; speed: number; nextTick: number }
   const monsters: Monster[] = []
 
   const spawnMonster = () => {
@@ -95,37 +98,62 @@ function main() {
     // pick random character
     const choices = ['x', 'm', 'M', '&', '£']
     const ch = choices[Math.floor(Math.random() * choices.length)]
-    const mon: Monster = { x: mx, y: my, char: ch }
+    // assign default speed and schedule
+    const speed = 4
+    const mon: Monster = { x: mx, y: my, char: ch, speed, nextTick: tick + speed }
     monsters.push(mon)
     screen.setCell(mx, my, ch)
   }
 
+  const processTick = () => {
+    tick++
+    // advance monster internal timers; placeholder for future monster actions
+    for (const m of monsters) {
+      if (tick >= m.nextTick) {
+        m.nextTick = tick + m.speed
+        // future movement/AI would go here
+      }
+    }
+  }
+
+  const handleMovement = (dx: number, dy: number) => {
+    if (tick >= playerNextTick) {
+      const nx = Math.max(0, Math.min(cols - 1, px + dx))
+      const ny = Math.max(0, Math.min(gameRows - 1, py + dy))
+      // apply movement only if position changes
+      if (nx !== px || ny !== py) {
+        px = nx
+        py = ny
+        turn++
+        playerNextTick = tick + playerSpeed
+        while (tick < playerNextTick) processTick()
+      }
+    }
+  }
+
   process.stdin.on('data', (chunk: string) => {
     switch (chunk) {
+      // movement keys
       case 'h':
-        px = Math.max(0, px - 1)
+        handleMovement(-1, 0)
         break
       case 'l':
-        px = Math.min(cols - 1, px + 1)
+        handleMovement(1, 0)
         break
       case 'k':
-        py = Math.max(0, py - 1)
+        handleMovement(0, -1)
         break
       case 'j':
-        py = Math.min(gameRows - 1, py + 1)
+        handleMovement(0, 1)
         break
+      // actions
       case 'm':
         spawnMonster()
-        // immediate render so user sees the monster even if player doesn't move
-        screen.render(hideCursor)
         break
       case '\u0003': // ctrl-c
         cleanup()
         process.exit(0)
     }
-
-    // increment turn
-    turn++
 
     if (px !== prevX || py !== prevY) {
       // check for collision with any monster
@@ -145,8 +173,8 @@ function main() {
       prevY = py
     }
 
-    // update status bar text
-    const statusText = `Turns: ${turn}`.padEnd(60)
+    // update status bar text (show turns and ticks)
+    const statusText = `Turns: ${turn} Ticks: ${tick}`.padEnd(60)
     for (let x = 0; x < cols; x++) {
       screen.setCell(x, gameRows + 1, statusText[x])
     }
