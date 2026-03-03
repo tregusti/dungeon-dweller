@@ -1,0 +1,17 @@
+{
+  "name": "dungeon-dweller",
+  "version": "1.0.0",
+  "description": "A simple CLI dungeon-like game using TypeScript",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "prettier": "prettier --write \"src/**/*.ts\""
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "@types/node": "^20.6.2"
+  }
+}

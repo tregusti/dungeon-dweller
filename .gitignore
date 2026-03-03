@@ -1,0 +1,7 @@
+# Test
+coverage
+
+# Other stuff
+.DS_Store
+node_modules
+!node_modules/.gitkeep
