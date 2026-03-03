@@ -10,18 +10,19 @@ function checkSize(minCols: number, minRows: number) {
   }
 }
 
-import { CLEAR_SCREEN, HIDE_CURSOR, SHOW_CURSOR } from './ansi'
+import { ANSI } from './ansi'
+import Screen from './screen'
 
 function clearScreen() {
-  process.stdout.write(CLEAR_SCREEN)
+  process.stdout.write(ANSI.clearScreen)
 }
 
 function hideCursor() {
-  process.stdout.write(HIDE_CURSOR)
+  process.stdout.write(ANSI.hideCursor)
 }
 
 function showCursor() {
-  process.stdout.write(SHOW_CURSOR)
+  process.stdout.write(ANSI.showCursor)
 }
 
 function moveTo(x: number, y: number) {
@@ -59,12 +60,31 @@ function main() {
   let px = Math.floor(cols / 2)
   let py = Math.floor(gameRows / 2)
 
+  // create screen buffer
+  const screen = new Screen(cols, gameRows + 2) // +2 for status bar at row 21
+
   // initialize terminal: set raw mode and hide cursor
   process.stdin.setRawMode(true)
   hideCursor()
   clearScreen()
-  draw(cols, gameRows, px, py)
-  drawStatusBar(0)
+
+  // initial render
+  screen.clear()
+  screen.setCell(px, py, '@')
+  for (let y = 0; y < gameRows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (x !== px || y !== py) {
+        screen.setCell(x, y, '.')
+      }
+    }
+  }
+  // draw status bar background
+  for (let x = 0; x < cols; x++) {
+    screen.setCell(x, gameRows + 1, ' ')
+  }
+  // render initial state
+  process.stdout.write(ANSI.clearScreen + ANSI.home)
+  screen.render(hideCursor)
 
   // cleanup on exit
   const cleanup = () => {
@@ -103,9 +123,7 @@ function main() {
       } while (foeX === px && foeY === py)
       foeActive = true
       foeSpawned = true
-      moveTo(foeX, foeY)
-      process.stdout.write('x')
-      hideCursor()
+      screen.setCell(foeX, foeY, 'x')
     }
   }
 
@@ -136,21 +154,23 @@ function main() {
       // check for collision with foe
       if (foeActive && px === foeX && py === foeY) {
         foeActive = false
-        // clear the cell (will be overwritten by @ below)
       }
 
-      // redraw only changed cells
-      moveTo(prevX, prevY)
-      process.stdout.write('.')
-      moveTo(px, py)
-      process.stdout.write('@')
-      hideCursor()
+      // update buffer
+      screen.setCell(prevX, prevY, '.')
+      screen.setCell(px, py, '@')
       prevX = px
       prevY = py
     }
 
-    // update status bar
-    drawStatusBar(turn)
+    // update status bar text
+    const statusText = `Turns: ${turn}`.padEnd(60)
+    for (let x = 0; x < cols; x++) {
+      screen.setCell(x, gameRows + 1, statusText[x])
+    }
+
+    // render only changed cells
+    screen.render(hideCursor)
   })
 }
 

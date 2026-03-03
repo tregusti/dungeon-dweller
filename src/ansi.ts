@@ -1,5 +1,8 @@
 // ANSI escape sequences used by the game
 
-export const CLEAR_SCREEN = '\x1Bc'
-export const HIDE_CURSOR = '\x1B[?25l'
-export const SHOW_CURSOR = '\x1B[?25h'
+export const ANSI = {
+  clearScreen: '\x1B[2J',
+  home: '\x1B[H',
+  hideCursor: '\x1B[?25l',
+  showCursor: '\x1B[?25h',
+}
