@@ -8,22 +8,30 @@ export class Buffer {
   readonly z: number
   private current: string[][]
   private previous: string[][]
+  private fill: string
 
-  constructor(width: number, height: number, offsetX = 0, offsetY = 0, z = 0) {
+  constructor(width: number, height: number, offsetX = 0, offsetY = 0, z = 0, fill = ' ') {
     this.width = width
     this.height = height
     this.offsetX = offsetX
     this.offsetY = offsetY
     this.z = z
-    this.current = Array.from({ length: height }, () => Array(width).fill(' '))
+    this.fill = fill
+    this.current = Array.from({ length: height }, () => Array(width).fill(this.fill))
     this.previous = Array.from({ length: height }, () => Array(width).fill(' '))
   }
 
-  clear(fill = ' ') {
+  clear() {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        this.current[y][x] = fill
+        this.current[y][x] = this.fill
       }
+    }
+  }
+
+  resetCell(x: number, y: number) {
+    if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+      this.current[y][x] = this.fill
     }
   }
 

@@ -56,9 +56,9 @@ function main() {
   clearScreen()
 
   // initial render
-  dungeonBuffer.clear('.')
+  dungeonBuffer.clear()
   dungeonBuffer.setCell(hero.x, hero.y, hero.char)
-  statusBuffer.clear(' ')
+  statusBuffer.clear()
   // render initial state
   process.stdout.write(ANSI.clearScreen + ANSI.home)
   compositor.render()
@@ -126,7 +126,7 @@ function main() {
       }
 
       // update buffer
-      dungeonBuffer.setCell(prevX, prevY, '.') // restore floor char
+      dungeonBuffer.resetCell(prevX, prevY)
       dungeonBuffer.setCell(hero.x, hero.y, hero.char)
       prevX = hero.x
       prevY = hero.y
