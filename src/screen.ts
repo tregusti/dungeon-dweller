@@ -26,6 +26,15 @@ class Screen {
     }
   }
 
+  // Force the renderer to treat all cells as changed on next render
+  invalidatePrevious() {
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        this.previous[y][x] = '\0'
+      }
+    }
+  }
+
   setCell(x: number, y: number, char: string) {
     if (x >= 0 && x < this.cols && y >= 0 && y < this.rows) {
       this.current[y][x] = char
