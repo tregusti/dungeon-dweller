@@ -5,7 +5,7 @@ root = true
 
 [*]
 charset = utf-8
-max_line_length = 100
+max_line_length = 80
 end_of_line = lf
 indent_style = space
 indent_size = 2
