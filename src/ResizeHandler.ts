@@ -10,6 +10,9 @@ type ResizeHandlerEvents = {
   resize: [tooSmall: boolean]
 }
 
+const MIN_COLS = 60
+const MIN_ROWS = 25
+
 export class ResizeHandler extends EventEmitter<ResizeHandlerEvents> {
   attach() {
     // Register resize listener
@@ -20,7 +23,7 @@ export class ResizeHandler extends EventEmitter<ResizeHandlerEvents> {
     const c = process.stdout.columns || 0
     const r = process.stdout.rows || 0
 
-    if (c < 60 || r < 25) {
+    if (c < MIN_COLS || r < MIN_ROWS) {
       this.emit('resize', true)
       this.drawBox(c, r)
     } else {
@@ -33,9 +36,9 @@ export class ResizeHandler extends EventEmitter<ResizeHandlerEvents> {
 
     const content = [
       'Terminal too small',
-      `Need at least 60x25 — current: ${c}x${r}`,
+      `Need at least ${MIN_COLS}x${MIN_ROWS} — current: ${c}x${r}`,
       '',
-      'Resize the terminal to at least 60x25 to continue',
+      `Resize the terminal to at least ${MIN_COLS}x${MIN_ROWS} to continue`,
     ]
 
     // compute box dimensions
