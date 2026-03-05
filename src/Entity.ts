@@ -5,18 +5,24 @@ export class Entity {
   y: number
   char: string
   speed: number
-  nextTick: number
+  ticksUntilAct: number
 
-  constructor(x: number, y: number, char: string, speed: number, nextTick: number = 0) {
+  constructor(x: number, y: number, char: string, speed: number) {
     this.x = x
     this.y = y
     this.char = char
     this.speed = speed
-    this.nextTick = nextTick
+    this.ticksUntilAct = this.speed
   }
 
-  // Placeholder for future tick-based behavior
-  tick(): void {
-    // subclasses override this to handle actions at their scheduled tick
+  tick(): boolean {
+    this.ticksUntilAct--
+
+    if (this.ticksUntilAct <= 0) {
+      this.ticksUntilAct = this.speed
+      return true // ready to act
+    }
+
+    return false
   }
 }

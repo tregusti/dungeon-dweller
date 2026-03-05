@@ -1,11 +1,10 @@
-// Simple CLI game where the player can move around an open area using hjkl keys
-// verifies terminal size (60x25 minimum)
-
 function checkSize(minCols: number, minRows: number) {
   const cols = process.stdout.columns || 0
   const rows = process.stdout.rows || 0
   if (cols < minCols || rows < minRows) {
-    console.error(`Terminal too small: need at least ${minCols}x${minRows}, got ${cols}x${rows}`)
+    console.error(
+      `Terminal too small: need at least ${minCols}x${minRows}, got ${cols}x${rows}`,
+    )
     process.exit(1)
   }
 }
@@ -15,6 +14,7 @@ import { Buffer, Compositor } from './Buffer'
 import { ResizeHandler } from './ResizeHandler'
 import { Hero } from './Hero'
 import { Monster } from './Monster'
+import { EntityCollection } from './EntityCollection'
 
 function clearScreen() {
   process.stdout.write(ANSI.clearScreen)
@@ -37,23 +37,19 @@ function main() {
 
   // create buffers: dungeon and status bar
   const dungeonBuffer = new Buffer(cols, gameRows, 0, 0, 0)
-  const statusBuffer = new Buffer(cols, 1, 0, gameRows + 1, 1)
+  const statusBuffer = new Buffer(cols, 3, 0, gameRows + 1, 1)
   // compositor for all buffers
-  const compositor = new Compositor(cols, gameRows + 2, hideCursor)
+  const compositor = new Compositor(cols, gameRows + 2)
   compositor.setBuffers([dungeonBuffer, statusBuffer])
 
   // Redraw function for resize recovery
   function forceRedraw() {
+    process.stdout.write(ANSI.clearScreen + ANSI.home)
     dungeonBuffer.invalidatePrevious()
     statusBuffer.invalidatePrevious()
     compositor.invalidatePrevious()
     compositor.render()
   }
-
-  // initialize terminal: set raw mode and hide cursor
-  process.stdin.setRawMode(true)
-  hideCursor()
-  clearScreen()
 
   // initial render
   dungeonBuffer.clear()
@@ -82,15 +78,30 @@ function main() {
 
   let prevX = hero.x
   let prevY = hero.y
+  let gameEnabled = false
+
   // handle terminal resize
-  const resizeHandler = new ResizeHandler(showCursor, hideCursor, onInput, forceRedraw)
+  const resizeHandler = new ResizeHandler()
+  resizeHandler.on('resize', (tooSmall) => {
+    gameEnabled = !tooSmall
+    if (!tooSmall) {
+      forceRedraw()
+    }
+  })
   resizeHandler.attach()
 
-  // removed duplicate prevX/prevY declarations
   let tick = 0
-  const monsters: Monster[] = []
+  const entities = new EntityCollection(hero)
 
   function onInput(chunk: string) {
+    if (chunk === '\u0003') {
+      // ctrl-c
+      process.exit(0)
+    }
+    if (!gameEnabled) {
+      return
+    }
+
     switch (chunk) {
       // movement keys
       case 'h':
@@ -116,11 +127,11 @@ function main() {
 
     if (hero.x !== prevX || hero.y !== prevY) {
       // check for collision with any monster
-      for (let i = 0; i < monsters.length; i++) {
-        const m = monsters[i]
+      for (let i = 0; i < entities.monsters.length; i++) {
+        const m = entities.monsters[i]
         if (hero.x === m.x && hero.y === m.y) {
           // remove monster
-          monsters.splice(i, 1)
+          entities.removeMonster(m)
           break
         }
       }
@@ -142,8 +153,16 @@ function main() {
     compositor.render()
   }
 
+  // initialize terminal: set raw mode and hide cursor
+  hideCursor()
+  clearScreen()
   process.stdin.resume()
   process.stdin.setEncoding('utf8')
+  process.stdin.setRawMode(true)
+  process.stdin.on('data', onInput)
+
+  forceRedraw()
+  gameEnabled = true
 
   const spawnMonster = () => {
     // choose position not occupied by hero or other monsters
@@ -151,39 +170,63 @@ function main() {
     do {
       mx = Math.floor(Math.random() * cols)
       my = Math.floor(Math.random() * gameRows)
-    } while ((mx === hero.x && my === hero.y) || monsters.some((m) => m.x === mx && m.y === my))
-    const monster = new Monster(mx, my, tick)
-    monsters.push(monster)
+    } while (
+      (mx === hero.x && my === hero.y) ||
+      entities.monsters.some((m) => m.x === mx && m.y === my)
+    )
+    const monster = new Monster(mx, my)
+    entities.addMonster(monster)
     dungeonBuffer.setCell(monster.x, monster.y, monster.char)
   }
 
-  const processTick = () => {
+  /**
+   * Handle a game tick: advance time and update all entities. Entities have a
+   * speed that determines how many ticks must pass before they can act again.
+   * When an entity acts, its ticksUntilAct is reset based on its speed.
+   *
+   * @returns {boolean} Whether or not it is the heros turn to act.
+   */
+  function processTicks() {
     tick++
-    // advance monster internal timers; placeholder for future monster actions
-    for (const m of monsters) {
-      if (tick >= m.nextTick) {
-        m.nextTick = tick + m.speed
-        // future movement/AI would go here
+    for (const entity of entities.all) {
+      if (entity.tick()) {
+        // entity is ready to act
+
+        if (entity instanceof Monster) {
+          // simple random movement for monsters
+          // const dx = Math.floor(Math.random() * 3) - 1
+          // const dy = Math.floor(Math.random() * 3) - 1
+          // const nx = Math.max(0, Math.min(cols - 1, entity.x + dx))
+          // const ny = Math.max(0, Math.min(gameRows - 1, entity.y + dy))
+          // entity.act()
+        }
+
+        if (entity instanceof Hero) {
+          return true
+        }
       }
     }
   }
 
-  const handleMovement = (dx: number, dy: number) => {
-    if (tick >= hero.nextTick) {
-      const oldX = hero.x
-      const oldY = hero.y
-      if (hero.move(dx, dy, cols, gameRows)) {
-        // position changed; advance ticks until hero can move again
-        hero.nextTick = tick + hero.speed
-        while (tick < hero.nextTick) processTick()
-        // mark cells for potential collision check
-        prevX = oldX
-        prevY = oldY
-      }
-    }
-  }
+  function handleMovement(dx: number, dy: number) {
+    // Is this if really needed? All monster acting and movement is synchronous
+    // after the heros action. Only allow hero to act if ready
 
-  // input is now handled by onInput via ResizeHandler
+    // if (hero.ticksUntilAct === 0) {
+    const oldX = hero.x
+    const oldY = hero.y
+    if (hero.move(dx, dy, cols, gameRows)) {
+      // mark cells for potential collision check
+      dungeonBuffer.resetCell(oldX, oldY)
+      dungeonBuffer.setCell(hero.x, hero.y, hero.char)
+      prevX = oldX
+      prevY = oldY
+
+      // position changed; advance ticks until hero can act again
+    }
+    do {} while (processTicks())
+    // }
+  }
 }
 
 main()

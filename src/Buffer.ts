@@ -10,15 +10,22 @@ export class Buffer {
   private previous: string[][]
   private fill: string
 
-  constructor(width: number, height: number, offsetX = 0, offsetY = 0, z = 0, fill = ' ') {
+  constructor(
+    width: number,
+    height: number,
+    offsetX = 0,
+    offsetY = 0,
+    z = 0,
+    fill = ' ',
+  ) {
     this.width = width
     this.height = height
     this.offsetX = offsetX
     this.offsetY = offsetY
     this.z = z
     this.fill = fill
-    this.current = Array.from({ length: height }, () => Array(width).fill(this.fill))
-    this.previous = Array.from({ length: height }, () => Array(width).fill(' '))
+    this.previous = Array(height).fill(Array(width).fill(this.fill))
+    this.current = Array(height).fill(Array(width).fill(this.fill))
   }
 
   clear() {
@@ -83,13 +90,11 @@ export class Compositor {
   private screenWidth: number
   private screenHeight: number
   private previous: string[][]
-  private hideCursor: () => void
 
-  constructor(screenWidth: number, screenHeight: number, hideCursor: () => void) {
+  constructor(screenWidth: number, screenHeight: number) {
     this.screenWidth = screenWidth
     this.screenHeight = screenHeight
-    this.hideCursor = hideCursor
-    this.previous = Array.from({ length: screenHeight }, () => Array(screenWidth).fill(' '))
+    this.previous = Array(screenHeight).fill(Array(screenWidth).fill(' '))
   }
 
   setBuffers(buffers: Buffer[]) {
@@ -121,7 +126,7 @@ export class Compositor {
         }
       }
     }
-    this.hideCursor()
+
     // After rendering, update all buffer previous states
     for (const buf of this.buffers) buf.updatePrevious()
   }

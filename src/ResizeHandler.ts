@@ -1,28 +1,17 @@
 import { ANSI } from './ansi'
+import EventEmitter from 'events'
 
-export class ResizeHandler {
-  private showCursor: () => void
-  private hideCursor: () => void
-  private dataHandler: (chunk: string) => void
-  private redraw: () => void
-  private attached = false
+type ResizeHandlerEvents = {
+  /**
+   * Emitted when the terminal is resized. The listener receives a boolean
+   * indicating whether the terminal is too small to run the game (true if too
+   * small, false if large enough).
+   */
+  resize: [tooSmall: boolean]
+}
 
-  constructor(
-    showCursor: () => void,
-    hideCursor: () => void,
-    dataHandler: (chunk: string) => void,
-    redraw: () => void,
-  ) {
-    this.showCursor = showCursor
-    this.hideCursor = hideCursor
-    this.dataHandler = dataHandler
-    this.redraw = redraw
-  }
-
+export class ResizeHandler extends EventEmitter<ResizeHandlerEvents> {
   attach() {
-    // Initially attach the input handler (terminal is valid at startup)
-    process.stdin.on('data', this.dataHandler)
-    this.attached = true
     // Register resize listener
     process.stdout.on('resize', () => this.handleResize())
   }
@@ -32,24 +21,14 @@ export class ResizeHandler {
     const r = process.stdout.rows || 0
 
     if (c < 60 || r < 25) {
-      // Terminal too small: detach input handler
-      if (this.attached) {
-        process.stdin.removeListener('data', this.dataHandler)
-        this.attached = false
-      }
+      this.emit('resize', true)
       this.drawBox(c, r)
-    } else if (!this.attached) {
-      // Terminal recovered: reattach input handler
-      this.hideCursor()
-      process.stdout.write(ANSI.clearScreen + ANSI.home)
-      process.stdin.on('data', this.dataHandler)
-      this.attached = true
-      this.redraw()
+    } else {
+      this.emit('resize', false)
     }
   }
 
   private drawBox(c: number, r: number) {
-    this.showCursor()
     process.stdout.write(ANSI.clearScreen + ANSI.home)
 
     const content = [
@@ -82,6 +61,8 @@ export class ResizeHandler {
     }
 
     // draw bottom border
-    process.stdout.write(`\x1B[${startRow + boxHeight - 1};${startCol}H+${horiz}+`)
+    process.stdout.write(
+      `\x1B[${startRow + boxHeight - 1};${startCol}H+${horiz}+`,
+    )
   }
 }
