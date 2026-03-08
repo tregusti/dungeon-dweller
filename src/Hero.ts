@@ -4,12 +4,8 @@ export class Hero extends Entity {
   turns: number
 
   constructor(x: number, y: number) {
-    super(x, y, '@', 2) // speed 2: move every 2 ticks
+    super(x, y, '@', 20)
     this.turns = 0
-
-    // Hero starts ready to act, all other entities start with the default
-    // ticksUntilAct = speed
-    this.ticksUntilAct = 0
   }
 
   move(dx: number, dy: number, cols: number, gameRows: number): boolean {

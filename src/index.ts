@@ -1,103 +1,78 @@
-function checkSize(minCols: number, minRows: number) {
-  const cols = process.stdout.columns || 0
-  const rows = process.stdout.rows || 0
-  if (cols < minCols || rows < minRows) {
-    console.error(
-      `Terminal too small: need at least ${minCols}x${minRows}, got ${cols}x${rows}`,
-    )
-    process.exit(1)
-  }
-}
-
-import { ANSI } from './ansi'
-import { Buffer, Compositor } from './Buffer'
-import { ResizeHandler } from './ResizeHandler'
+import { Buffer } from './buffer/Buffer'
+import { BufferCompositor } from './buffer/BufferCompositor'
 import { Hero } from './Hero'
 import { Monster } from './Monster'
 import { EntityCollection } from './EntityCollection'
+import { Terminal } from './terminal/Terminal'
+import { Debug } from './Debug'
+import { flushBuffer } from './terminal/BufferWriter'
+import { Game } from './Game'
 
-function clearScreen() {
-  process.stdout.write(ANSI.clearScreen)
-}
+/*
+TODO:
+- Extract game logic into separate Game class
+- Add FloorSize, GameSize consts
+- Size type (x,y)
+- addBuffer method on compositor
+- Add a status class that manages the status bar buffer
+- move entities as property in game class?
+- Fix bug in BufferCompositor.
+*/
 
-function hideCursor() {
-  process.stdout.write(ANSI.hideCursor)
-}
+const game = new Game()
 
-function showCursor() {
-  process.stdout.write(ANSI.showCursor)
+const GameSize = {
+  width: 30,
+  height: 10,
 }
 
 // main
 function main() {
-  checkSize(60, 25)
-  const cols = 60
-  const gameRows = 20
-  const hero = new Hero(Math.floor(cols / 2), Math.floor(gameRows / 2))
+  const terminal = new Terminal(GameSize.width, GameSize.height)
+  Debug.setTerminal(terminal)
 
-  // create buffers: dungeon and status bar
-  const dungeonBuffer = new Buffer(cols, gameRows, 0, 0, 0)
-  const statusBuffer = new Buffer(cols, 3, 0, gameRows + 1, 1)
-  // compositor for all buffers
-  const compositor = new Compositor(cols, gameRows + 2)
+  const hero = new Hero(
+    Math.floor(GameSize.width / 2),
+    Math.floor(GameSize.height / 2),
+  )
+
+  const dungeonBuffer = new Buffer(GameSize.width, GameSize.height, 0, 0, 0)
+  const statusBuffer = new Buffer(GameSize.width, 3, 0, GameSize.height + 1, 1)
+  const compositor = new BufferCompositor(GameSize.width, GameSize.height)
+
   compositor.setBuffers([dungeonBuffer, statusBuffer])
 
-  // Redraw function for resize recovery
   function forceRedraw() {
-    process.stdout.write(ANSI.clearScreen + ANSI.home)
-    dungeonBuffer.invalidatePrevious()
-    statusBuffer.invalidatePrevious()
-    compositor.invalidatePrevious()
-    compositor.render()
+    terminal.clear()
+    flushBuffer(terminal, compositor)
   }
 
   // initial render
   dungeonBuffer.clear()
   dungeonBuffer.setCell(hero.x, hero.y, hero.char)
   statusBuffer.clear()
-  // render initial state
-  process.stdout.write(ANSI.clearScreen + ANSI.home)
-  compositor.render()
-
-  // cleanup on exit
-  const cleanup = () => {
-    showCursor()
-    process.stdin.setRawMode(false)
-    clearScreen()
-  }
-
-  process.on('exit', cleanup)
-  process.on('SIGINT', () => {
-    cleanup()
-    process.exit(0)
-  })
-  process.on('SIGTERM', () => {
-    cleanup()
-    process.exit(0)
-  })
 
   let prevX = hero.x
   let prevY = hero.y
   let gameEnabled = false
 
-  // handle terminal resize
-  const resizeHandler = new ResizeHandler()
-  resizeHandler.on('resize', (tooSmall) => {
-    gameEnabled = !tooSmall
-    if (!tooSmall) {
-      forceRedraw()
-    }
+  terminal.on('invalid', () => {
+    gameEnabled = false
   })
-  resizeHandler.attach()
 
-  let tick = 0
+  terminal.on('valid', () => {
+    forceRedraw()
+    gameEnabled = true
+  })
+
   const entities = new EntityCollection(hero)
 
   function onInput(chunk: string) {
     if (chunk === '\u0003') {
       // ctrl-c
-      process.exit(0)
+      terminal.exit()
     }
+
     if (!gameEnabled) {
       return
     }
@@ -120,9 +95,6 @@ function main() {
       case 'm':
         spawnMonster()
         break
-      case '\u0003': // ctrl-c
-        cleanup()
-        process.exit(0)
     }
 
     if (hero.x !== prevX || hero.y !== prevY) {
@@ -135,41 +107,30 @@ function main() {
           break
         }
       }
-
-      // update buffer
-      dungeonBuffer.resetCell(prevX, prevY)
-      dungeonBuffer.setCell(hero.x, hero.y, hero.char)
-      prevX = hero.x
-      prevY = hero.y
     }
 
     // update status bar buffer
-    const statusText = `Turns: ${hero.turns} Ticks: ${tick}`.padEnd(cols)
-    for (let x = 0; x < cols; x++) {
-      statusBuffer.setCell(x, 0, statusText[x])
-    }
-
-    // render all buffers in z-order
-    compositor.render()
+    const statusText = `Turns: ${hero.turns} Ticks: ${game.tick}`.padEnd(
+      GameSize.width,
+    )
+    statusBuffer.setText(0, 0, statusText)
+    flushBuffer(terminal, compositor)
   }
 
-  // initialize terminal: set raw mode and hide cursor
-  hideCursor()
-  clearScreen()
-  process.stdin.resume()
-  process.stdin.setEncoding('utf8')
-  process.stdin.setRawMode(true)
-  process.stdin.on('data', onInput)
+  terminal.on('input', onInput)
 
   forceRedraw()
   gameEnabled = true
+  while (!processTickUntilHeroActs()) {
+    game.advance()
+  }
 
   const spawnMonster = () => {
     // choose position not occupied by hero or other monsters
     let mx: number, my: number
     do {
-      mx = Math.floor(Math.random() * cols)
-      my = Math.floor(Math.random() * gameRows)
+      mx = Math.floor(Math.random() * GameSize.width)
+      my = Math.floor(Math.random() * GameSize.height)
     } while (
       (mx === hero.x && my === hero.y) ||
       entities.monsters.some((m) => m.x === mx && m.y === my)
@@ -186,8 +147,7 @@ function main() {
    *
    * @returns {boolean} Whether or not it is the heros turn to act.
    */
-  function processTicks() {
-    tick++
+  function processTickUntilHeroActs() {
     for (const entity of entities.all) {
       if (entity.tick()) {
         // entity is ready to act
@@ -209,23 +169,25 @@ function main() {
   }
 
   function handleMovement(dx: number, dy: number) {
-    // Is this if really needed? All monster acting and movement is synchronous
-    // after the heros action. Only allow hero to act if ready
-
-    // if (hero.ticksUntilAct === 0) {
     const oldX = hero.x
     const oldY = hero.y
-    if (hero.move(dx, dy, cols, gameRows)) {
+    if (hero.move(dx, dy, GameSize.width, GameSize.height)) {
       // mark cells for potential collision check
-      dungeonBuffer.resetCell(oldX, oldY)
+      dungeonBuffer.clearCell(oldX, oldY)
       dungeonBuffer.setCell(hero.x, hero.y, hero.char)
       prevX = oldX
       prevY = oldY
 
-      // position changed; advance ticks until hero can act again
+      // Debug.write(
+      //   `Hero from (${oldX}, ${oldY}) to (${hero.x}, ${hero.y})`.padEnd(
+      //     GameSize.width,
+      //   ),
+      // )
+      while (!processTickUntilHeroActs()) {
+        // advance time until it's the heros turn again
+        game.advance()
+      }
     }
-    do {} while (processTicks())
-    // }
   }
 }
 
