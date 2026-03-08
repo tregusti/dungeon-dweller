@@ -13,7 +13,6 @@ TODO:
 - Extract game logic into separate Game class
 - Add FloorSize, GameSize consts
 - Size type (x,y)
-- addBuffer method on compositor
 - Add a status class that manages the status bar buffer
 - move entities as property in game class?
 - Fix bug in BufferCompositor.
@@ -35,12 +34,26 @@ function main() {
     Math.floor(GameSize.width / 2),
     Math.floor(GameSize.height / 2),
   )
+  const entities = new EntityCollection(hero)
 
-  const dungeonBuffer = new Buffer(GameSize.width, GameSize.height, 0, 0, 0)
-  const statusBuffer = new Buffer(GameSize.width, 3, 0, GameSize.height + 1, 1)
   const compositor = new BufferCompositor(GameSize.width, GameSize.height)
 
-  compositor.setBuffers([dungeonBuffer, statusBuffer])
+  const dungeonBuffer = new Buffer({
+    width: GameSize.width,
+    height: GameSize.height,
+    offsetX: 0,
+    offsetY: 0,
+    z: 0,
+  })
+  const statusBuffer = new Buffer({
+    width: GameSize.width,
+    height: 3,
+    offsetX: 0,
+    offsetY: GameSize.height + 1,
+    z: 1,
+  })
+  compositor.add(dungeonBuffer)
+  compositor.add(statusBuffer)
 
   function forceRedraw() {
     terminal.clear()
@@ -64,8 +77,6 @@ function main() {
     forceRedraw()
     gameEnabled = true
   })
-
-  const entities = new EntityCollection(hero)
 
   function onInput(chunk: string) {
     if (chunk === '\u0003') {

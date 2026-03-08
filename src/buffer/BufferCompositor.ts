@@ -14,9 +14,26 @@ export class BufferCompositor {
     this.#previous = new Matrix(width, height)
   }
 
-  setBuffers(buffers: Buffer[]) {
+  /**
+   * Adds a buffer to the compositor. The buffer will be composited on top of
+   * the existing buffers based on its z-index.
+   *
+   * @param buffer The buffer to add.
+   * @returns The added buffer.
+   */
+  add(buffer: Buffer) {
+    this.#buffers.push(buffer)
     // Sort by z (lowest first)
-    this.#buffers = buffers.slice().sort((a, b) => a.z - b.z)
+    this.#buffers.sort((a, b) => a.z - b.z)
+    return buffer
+  }
+  /**
+   * Removes a buffer from the compositor.
+   *
+   * @param buffer The buffer to remove.
+   */
+  remove(buffer: Buffer) {
+    this.#buffers = this.#buffers.filter((b) => b !== buffer)
   }
 
   flush(callback: (composed: Matrix) => void) {

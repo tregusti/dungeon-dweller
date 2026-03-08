@@ -10,7 +10,19 @@ export class Buffer {
   readonly z: number
   private values: Matrix
 
-  constructor(width: number, height: number, offsetX = 0, offsetY = 0, z = 0) {
+  constructor({
+    width,
+    height,
+    offsetX = 0,
+    offsetY = 0,
+    z = 0,
+  }: {
+    width: number
+    height: number
+    offsetX?: number
+    offsetY?: number
+    z?: number
+  }) {
     this.width = width
     this.height = height
     this.offsetX = offsetX
