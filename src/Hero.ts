@@ -1,10 +1,11 @@
 import { Entity } from './Entity'
+import { Position } from './types'
 
 export class Hero extends Entity {
   turns: number
 
-  constructor(x: number, y: number) {
-    super(x, y, '@', 20)
+  constructor({ x, y }: Position) {
+    super({ x, y, char: '@', speed: 20 })
     this.turns = 0
   }
 

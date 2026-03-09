@@ -1,8 +1,8 @@
+import { Position } from '../types'
+
 type Entry = {
-  x: number
-  y: number
   char: Char
-}
+} & Position
 
 type Char = string | null
 

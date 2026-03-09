@@ -1,32 +1,19 @@
-// General-purpose buffer for any rectangular region of the screen
-
+import { Position, Position3D, Size } from '../types'
 import { Matrix } from './Matrix'
 
 export class Buffer {
   readonly width: number
   readonly height: number
-  readonly offsetX: number
-  readonly offsetY: number
+  readonly x: number
+  readonly y: number
   readonly z: number
   private values: Matrix
 
-  constructor({
-    width,
-    height,
-    offsetX = 0,
-    offsetY = 0,
-    z = 0,
-  }: {
-    width: number
-    height: number
-    offsetX?: number
-    offsetY?: number
-    z?: number
-  }) {
+  constructor({ width, height, x, y, z }: Size & Position3D) {
     this.width = width
     this.height = height
-    this.offsetX = offsetX
-    this.offsetY = offsetY
+    this.x = x
+    this.y = y
     this.z = z
     this.values = new Matrix(width, height)
   }
@@ -71,8 +58,8 @@ export class Buffer {
    *   of bounds, returns null.
    */
   getOffsetCell(globalX: number, globalY: number): string | null {
-    const x = globalX - this.offsetX
-    const y = globalY - this.offsetY
+    const x = globalX - this.x
+    const y = globalY - this.y
     if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
       return this.values.get(x, y)
     }

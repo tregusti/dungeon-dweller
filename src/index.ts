@@ -6,11 +6,11 @@ import { Terminal } from './terminal/Terminal'
 import { Debug } from './Debug'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Game } from './Game'
+import { Position } from './types'
 
 /*
 TODO:
 - Extract game logic into separate Game class
-- Size type (x,y)
 - Add a status class that manages the status bar buffer
 - move entities as property in game class?
 - Fix bug in BufferCompositor.
@@ -30,15 +30,15 @@ function main() {
   const dungeonBuffer = new Buffer({
     width: game.dungeon.width,
     height: game.dungeon.height,
-    offsetX: 0,
-    offsetY: 0,
+    x: 0,
+    y: 0,
     z: 0,
   })
   const statusBuffer = new Buffer({
     width: game.dungeon.width,
     height: 3,
-    offsetX: 0,
-    offsetY: game.dungeon.height + 1,
+    x: 0,
+    y: game.dungeon.height + 1,
     z: 1,
   })
   compositor.add(dungeonBuffer)
@@ -60,8 +60,7 @@ function main() {
   dungeonBuffer.setCell(game.hero.x, game.hero.y, game.hero.char)
   statusBuffer.clear()
 
-  let prevX = game.hero.x
-  let prevY = game.hero.y
+  let prevHeroPosition: Position = { x: game.hero.x, y: game.hero.y }
   let gameEnabled = false
 
   terminal.on('invalid', () => {
@@ -103,7 +102,10 @@ function main() {
         break
     }
 
-    if (game.hero.x !== prevX || game.hero.y !== prevY) {
+    if (
+      game.hero.x !== prevHeroPosition.x ||
+      game.hero.y !== prevHeroPosition.y
+    ) {
       // check for collision with any monster
       for (let i = 0; i < game.entities.monsters.length; i++) {
         const m = game.entities.monsters[i]
@@ -133,15 +135,17 @@ function main() {
 
   const spawnMonster = () => {
     // choose position not occupied by hero or other monsters
-    let mx: number, my: number
+    const position: Position = { x: 0, y: 0 }
     do {
-      mx = Math.floor(Math.random() * game.dungeon.width)
-      my = Math.floor(Math.random() * game.dungeon.height)
+      position.x = Math.floor(Math.random() * game.dungeon.width)
+      position.y = Math.floor(Math.random() * game.dungeon.height)
     } while (
-      (mx === game.hero.x && my === game.hero.y) ||
-      game.entities.monsters.some((m) => m.x === mx && m.y === my)
+      (position.x === game.hero.x && position.y === game.hero.y) ||
+      game.entities.monsters.some(
+        (m) => m.x === position.x && m.y === position.y,
+      )
     )
-    const monster = new Monster(mx, my)
+    const monster = new Monster(position)
     game.entities.addMonster(monster)
     dungeonBuffer.setCell(monster.x, monster.y, monster.char)
   }
@@ -175,17 +179,15 @@ function main() {
   }
 
   function handleMovement(dx: number, dy: number) {
-    const oldX = game.hero.x
-    const oldY = game.hero.y
+    const from: Position = { x: game.hero.x, y: game.hero.y }
     if (game.hero.move(dx, dy, game.dungeon.width, game.dungeon.height)) {
       // mark cells for potential collision check
-      dungeonBuffer.clearCell(oldX, oldY)
+      dungeonBuffer.clearCell(from.x, from.y)
       dungeonBuffer.setCell(game.hero.x, game.hero.y, game.hero.char)
-      prevX = oldX
-      prevY = oldY
+      prevHeroPosition = { x: from.x, y: from.y }
 
       // Debug.write(
-      //   `Hero from (${oldX}, ${oldY}) to (${game.hero.x}, ${game.hero.y})`.padEnd(
+      //   `Hero from (${from.x}, ${from.y}) to (${game.hero.x}, ${game.hero.y})`.padEnd(
       //     game.size.width,
       //   ),
       // )
