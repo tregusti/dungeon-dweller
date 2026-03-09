@@ -1,4 +1,6 @@
 import { DeepReadonly } from 'ts-essentials'
+import { EntityCollection } from './EntityCollection'
+import { Hero } from './Hero'
 
 type Size = {
   width: number
@@ -14,12 +16,21 @@ export class Game implements Readonly<Size> {
   readonly status: Readonly<Size>
   readonly width: number
   readonly height: number
+  /** Convenience property. Same as Game#entities.hero */
+  readonly hero: Hero
+
+  readonly entities: EntityCollection
 
   constructor({ dungeon, status }: GameOptions) {
     this.width = Math.max(dungeon.width, status.width)
     this.height = dungeon.height + status.height
     this.dungeon = dungeon
     this.status = status
+    this.hero = new Hero(
+      Math.floor(dungeon.width / 2),
+      Math.floor(dungeon.height / 2),
+    )
+    this.entities = new EntityCollection(this.hero)
   }
 
   private _tick = 0

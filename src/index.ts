@@ -2,7 +2,6 @@ import { Buffer } from './buffer/Buffer'
 import { BufferCompositor } from './buffer/BufferCompositor'
 import { Hero } from './Hero'
 import { Monster } from './Monster'
-import { EntityCollection } from './EntityCollection'
 import { Terminal } from './terminal/Terminal'
 import { Debug } from './Debug'
 import { flushBuffer } from './terminal/BufferWriter'
@@ -11,7 +10,6 @@ import { Game } from './Game'
 /*
 TODO:
 - Extract game logic into separate Game class
-- Add FloorSize, GameSize consts
 - Size type (x,y)
 - Add a status class that manages the status bar buffer
 - move entities as property in game class?
@@ -26,12 +24,6 @@ const game = new Game({
 function main() {
   const terminal = new Terminal(game.width, game.height)
   Debug.initialize({ terminal, game })
-
-  const hero = new Hero(
-    Math.floor(game.dungeon.width / 2),
-    Math.floor(game.dungeon.height / 2),
-  )
-  const entities = new EntityCollection(hero)
 
   const compositor = new BufferCompositor(game.width, game.height)
 
@@ -65,11 +57,11 @@ function main() {
 
   // initial render
   dungeonBuffer.clear()
-  dungeonBuffer.setCell(hero.x, hero.y, hero.char)
+  dungeonBuffer.setCell(game.hero.x, game.hero.y, game.hero.char)
   statusBuffer.clear()
 
-  let prevX = hero.x
-  let prevY = hero.y
+  let prevX = game.hero.x
+  let prevY = game.hero.y
   let gameEnabled = false
 
   terminal.on('invalid', () => {
@@ -111,20 +103,20 @@ function main() {
         break
     }
 
-    if (hero.x !== prevX || hero.y !== prevY) {
+    if (game.hero.x !== prevX || game.hero.y !== prevY) {
       // check for collision with any monster
-      for (let i = 0; i < entities.monsters.length; i++) {
-        const m = entities.monsters[i]
-        if (hero.x === m.x && hero.y === m.y) {
+      for (let i = 0; i < game.entities.monsters.length; i++) {
+        const m = game.entities.monsters[i]
+        if (game.hero.x === m.x && game.hero.y === m.y) {
           // remove monster
-          entities.removeMonster(m)
+          game.entities.removeMonster(m)
           break
         }
       }
     }
 
     // update status bar buffer
-    const statusText = `Turns: ${hero.turns} Ticks: ${game.tick}`.padEnd(
+    const statusText = `Turns: ${game.hero.turns} Ticks: ${game.tick}`.padEnd(
       game.dungeon.width,
     )
     statusBuffer.setText(0, 0, statusText)
@@ -146,11 +138,11 @@ function main() {
       mx = Math.floor(Math.random() * game.dungeon.width)
       my = Math.floor(Math.random() * game.dungeon.height)
     } while (
-      (mx === hero.x && my === hero.y) ||
-      entities.monsters.some((m) => m.x === mx && m.y === my)
+      (mx === game.hero.x && my === game.hero.y) ||
+      game.entities.monsters.some((m) => m.x === mx && m.y === my)
     )
     const monster = new Monster(mx, my)
-    entities.addMonster(monster)
+    game.entities.addMonster(monster)
     dungeonBuffer.setCell(monster.x, monster.y, monster.char)
   }
 
@@ -162,7 +154,7 @@ function main() {
    * @returns {boolean} Whether or not it is the heros turn to act.
    */
   function processTickUntilHeroActs() {
-    for (const entity of entities.all) {
+    for (const entity of game.entities.all) {
       if (entity.tick()) {
         // entity is ready to act
 
@@ -183,17 +175,17 @@ function main() {
   }
 
   function handleMovement(dx: number, dy: number) {
-    const oldX = hero.x
-    const oldY = hero.y
-    if (hero.move(dx, dy, game.dungeon.width, game.dungeon.height)) {
+    const oldX = game.hero.x
+    const oldY = game.hero.y
+    if (game.hero.move(dx, dy, game.dungeon.width, game.dungeon.height)) {
       // mark cells for potential collision check
       dungeonBuffer.clearCell(oldX, oldY)
-      dungeonBuffer.setCell(hero.x, hero.y, hero.char)
+      dungeonBuffer.setCell(game.hero.x, game.hero.y, game.hero.char)
       prevX = oldX
       prevY = oldY
 
       // Debug.write(
-      //   `Hero from (${oldX}, ${oldY}) to (${hero.x}, ${hero.y})`.padEnd(
+      //   `Hero from (${oldX}, ${oldY}) to (${game.hero.x}, ${game.hero.y})`.padEnd(
       //     game.size.width,
       //   ),
       // )
