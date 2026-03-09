@@ -18,42 +18,45 @@ TODO:
 - Fix bug in BufferCompositor.
 */
 
-const game = new Game()
+const game = new Game({
+  dungeon: { width: 30, height: 10 },
+  status: { width: 30, height: 3 },
+})
 
-const GameSize = {
-  width: 30,
-  height: 10,
-}
-
-// main
 function main() {
-  const terminal = new Terminal(GameSize.width, GameSize.height)
+  const terminal = new Terminal(game.width, game.height)
   Debug.setTerminal(terminal)
 
   const hero = new Hero(
-    Math.floor(GameSize.width / 2),
-    Math.floor(GameSize.height / 2),
+    Math.floor(game.dungeon.width / 2),
+    Math.floor(game.dungeon.height / 2),
   )
   const entities = new EntityCollection(hero)
 
-  const compositor = new BufferCompositor(GameSize.width, GameSize.height)
+  const compositor = new BufferCompositor(game.width, game.height)
 
   const dungeonBuffer = new Buffer({
-    width: GameSize.width,
-    height: GameSize.height,
+    width: game.dungeon.width,
+    height: game.dungeon.height,
     offsetX: 0,
     offsetY: 0,
     z: 0,
   })
   const statusBuffer = new Buffer({
-    width: GameSize.width,
+    width: game.dungeon.width,
     height: 3,
     offsetX: 0,
-    offsetY: GameSize.height + 1,
+    offsetY: game.dungeon.height + 1,
     z: 1,
   })
   compositor.add(dungeonBuffer)
   compositor.add(statusBuffer)
+
+  // IDEA:
+  // status manages its own buffer and implements the CompositorRegistrant interface
+  // which is a method that compositor invokes and passes the buffer to it when it's registered.
+  // const status = new Status({ game })
+  // compositor.register(status)
 
   function forceRedraw() {
     terminal.clear()
@@ -122,7 +125,7 @@ function main() {
 
     // update status bar buffer
     const statusText = `Turns: ${hero.turns} Ticks: ${game.tick}`.padEnd(
-      GameSize.width,
+      game.dungeon.width,
     )
     statusBuffer.setText(0, 0, statusText)
     flushBuffer(terminal, compositor)
@@ -140,8 +143,8 @@ function main() {
     // choose position not occupied by hero or other monsters
     let mx: number, my: number
     do {
-      mx = Math.floor(Math.random() * GameSize.width)
-      my = Math.floor(Math.random() * GameSize.height)
+      mx = Math.floor(Math.random() * game.dungeon.width)
+      my = Math.floor(Math.random() * game.dungeon.height)
     } while (
       (mx === hero.x && my === hero.y) ||
       entities.monsters.some((m) => m.x === mx && m.y === my)
@@ -182,7 +185,7 @@ function main() {
   function handleMovement(dx: number, dy: number) {
     const oldX = hero.x
     const oldY = hero.y
-    if (hero.move(dx, dy, GameSize.width, GameSize.height)) {
+    if (hero.move(dx, dy, game.dungeon.width, game.dungeon.height)) {
       // mark cells for potential collision check
       dungeonBuffer.clearCell(oldX, oldY)
       dungeonBuffer.setCell(hero.x, hero.y, hero.char)
@@ -191,7 +194,7 @@ function main() {
 
       // Debug.write(
       //   `Hero from (${oldX}, ${oldY}) to (${hero.x}, ${hero.y})`.padEnd(
-      //     GameSize.width,
+      //     game.size.width,
       //   ),
       // )
       while (!processTickUntilHeroActs()) {
