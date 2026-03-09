@@ -25,7 +25,7 @@ const game = new Game({
 
 function main() {
   const terminal = new Terminal(game.width, game.height)
-  Debug.setTerminal(terminal)
+  Debug.initialize({ terminal, game })
 
   const hero = new Hero(
     Math.floor(game.dungeon.width / 2),
