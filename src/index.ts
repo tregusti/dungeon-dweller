@@ -73,7 +73,7 @@ function main() {
   })
 
   function onInput(chunk: string) {
-    if (chunk === '\u0003') {
+    if (chunk === '\u0003' || chunk === 'q') {
       // ctrl-c
       terminal.exit()
     }
