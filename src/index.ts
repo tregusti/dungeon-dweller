@@ -26,24 +26,29 @@ function main() {
   const terminal = new Terminal(game.width, game.height)
   Debug.initialize({ terminal, game })
 
-  const compositor = new BufferCompositor(game.width, game.height)
+  const compositor = new BufferCompositor({
+    width: game.width,
+    height: game.height,
+  })
 
-  const dungeonBuffer = new Buffer({
-    width: game.dungeon.width,
-    height: game.dungeon.height,
+  const dungeonBuffer = compositor.add({
+    buffer: new Buffer({
+      width: game.dungeon.width,
+      height: game.dungeon.height,
+    }),
     x: 0,
     y: 0,
     z: 0,
   })
-  const statusBuffer = new Buffer({
-    width: game.dungeon.width,
-    height: 3,
+  const statusBuffer = compositor.add({
+    buffer: new Buffer({
+      width: game.dungeon.width,
+      height: 3,
+    }),
     x: 0,
     y: game.dungeon.height + 1,
     z: 1,
   })
-  compositor.add(dungeonBuffer)
-  compositor.add(statusBuffer)
 
   // IDEA:
   // status manages its own buffer and implements the CompositorRegistrant interface

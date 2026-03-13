@@ -1,18 +1,20 @@
+import { Position3D, Size } from '../types'
 import { Buffer, BufferEntry } from './Buffer'
 
 /**
  * TODO:
  *
- * - Move x, y, z from Buffer to BufferCompositor.
  * - Add the caching logic to BufferCompositor.
  */
 
+type CompositorEntry = Position3D & { buffer: Buffer }
+
 export class BufferCompositor {
-  #buffers: Buffer[] = []
+  #buffers: CompositorEntry[] = []
   #width: number
   #height: number
 
-  constructor(width: number, height: number) {
+  constructor({ width, height }: Size) {
     this.#width = width
     this.#height = height
   }
@@ -24,8 +26,18 @@ export class BufferCompositor {
    * @param buffer The buffer to add.
    * @returns The added buffer.
    */
-  add(buffer: Buffer) {
-    this.#buffers.push(buffer)
+  add({
+    buffer,
+    x,
+    y,
+    z,
+  }: {
+    buffer: Buffer
+    x: number
+    y: number
+    z: number
+  }) {
+    this.#buffers.push({ buffer, x, y, z })
     // Sort by z (lowest first)
     this.#buffers.sort((a, b) => a.z - b.z)
     return buffer
@@ -35,23 +47,19 @@ export class BufferCompositor {
     const composed = new Buffer({
       width: this.#width,
       height: this.#height,
-      x: 0,
-      y: 0,
-      z: 0,
     })
 
     for (let i = 0; i < this.#buffers.length; i++) {
-      const buf = this.#buffers[i]
-      const entries = buf.entries
-      entries.forEach(({ x, y, char }) => {
+      const ce = this.#buffers[i]
+      ce.buffer.entries.forEach(({ x, y, char }) => {
         // Add to composed buffer with offset
-        composed.set(x + buf.x, y + buf.y, char)
+        composed.set(x + ce.x, y + ce.y, char)
       })
     }
 
     callback(composed.entries)
 
     // Flush all buffers
-    this.#buffers.forEach((buf) => buf.markAsFlushed())
+    this.#buffers.forEach((buf) => buf.buffer.markAsFlushed())
   }
 }

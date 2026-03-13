@@ -1,4 +1,4 @@
-import { Position, Position3D, Size } from '../types'
+import { Position, Size } from '../types'
 
 type Char = string | null
 
@@ -14,17 +14,11 @@ export type BufferEntry = {
 export class Buffer {
   readonly width: number
   readonly height: number
-  readonly x: number
-  readonly y: number
-  readonly z: number
   private data: Array<Array<Cell>>
 
-  constructor({ width, height, x, y, z }: Size & Position3D) {
+  constructor({ width, height }: Size) {
     this.width = width
     this.height = height
-    this.x = x
-    this.y = y
-    this.z = z
     this.data = Array.from({ length: height }, () =>
       Array.from({ length: width }, () => ({ char: null, flush: false })),
     )
