@@ -1,5 +1,5 @@
-import { EntityCollection } from './EntityCollection'
-import { Hero } from './Hero'
+import { EntityCollection } from './entities/EntityCollection'
+import { Hero } from './entities/Hero'
 import { DeepReadonly, Size } from './types'
 
 type GameOptions = DeepReadonly<{

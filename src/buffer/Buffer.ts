@@ -1,5 +1,15 @@
 import { Position, Position3D, Size } from '../types'
-import { Matrix } from './Matrix'
+
+type Char = string | null
+
+type Cell = {
+  char: Char
+  flush: boolean
+}
+
+export type BufferEntry = {
+  char: Char
+} & Position
 
 export class Buffer {
   readonly width: number
@@ -7,7 +17,7 @@ export class Buffer {
   readonly x: number
   readonly y: number
   readonly z: number
-  private values: Matrix
+  private data: Array<Array<Cell>>
 
   constructor({ width, height, x, y, z }: Size & Position3D) {
     this.width = width
@@ -15,67 +25,99 @@ export class Buffer {
     this.x = x
     this.y = y
     this.z = z
-    this.values = new Matrix(width, height)
+    this.data = Array.from({ length: height }, () =>
+      Array.from({ length: width }, () => ({ char: null, flush: false })),
+    )
   }
 
-  clear() {
-    for (let y = 0; y < this.height; y++) {
+  /** Clears the entire buffer. */
+  clear(): void
+  /** Clears a specific line in the buffer. */
+  clear(line: number): void
+  /** Clears a specific cell in the buffer. */
+  clear(x: number, y: number): void
+  clear(...args: number[]) {
+    // Clear a line
+    if (args.length === 1) {
+      const [line] = args
       for (let x = 0; x < this.width; x++) {
-        this.clearCell(x, y)
+        this.set(x, line, null)
+      }
+
+      // Clear a cell
+    } else if (args.length === 2) {
+      const [x, y] = args
+      this.set(x, y, null)
+
+      // Clear entire buffer
+    } else {
+      for (let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.width; x++) {
+          this.set(x, y, null)
+        }
       }
     }
   }
 
-  clearCell(x: number, y: number) {
+  set(x: number, y: number, char: Char) {
     if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-      this.values.set(x, y, null)
+      this.data[y][x] = { char, flush: true }
     }
   }
 
-  setCell(x: number, y: number, char: string) {
-    if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-      this.values.set(x, y, char)
-    }
-  }
-
-  setLine(y: number, text: string) {
-    this.setText(0, y, text.padEnd(this.width))
-  }
-
-  setText(x: number, y: number, text: string) {
+  text(x: number, y: number, text: string) {
     for (let i = 0; i < text.length; i++) {
-      this.setCell(x + i, y, text[i])
+      this.set(x + i, y, text[i])
     }
   }
-
-  /**
-   * Get the character at the given global coordinates, accounting for buffer
-   * offset.
-   *
-   * @param globalX The horizontal position in the full game view .
-   * @param globalY The vertical position in the full game view.
-   * @returns The character at the given global coordinates. If no value or out
-   *   of bounds, returns null.
-   */
-  getOffsetCell(globalX: number, globalY: number): string | null {
-    const x = globalX - this.x
-    const y = globalY - this.y
-    if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-      return this.values.get(x, y)
-    }
-    // Out of bounds for this buffer
-    return null
+  line(y: number, text: string) {
+    this.text(0, y, text.padEnd(this.width))
   }
 
-  // For diff rendering: get current char at local coords
-  getCell(x: number, y: number) {
+  get(x: number, y: number): Char {
     if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-      return this.values.get(x, y)
+      return this.data[y][x].char
     }
     return null
   }
 
   markAsFlushed() {
-    this.values.markAsFlushed()
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        this.data[y][x].flush = false
+      }
+    }
+  }
+
+  get entries(): Readonly<BufferEntry>[] {
+    const entries: BufferEntry[] = []
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const cell = this.data[y][x]
+        if (cell.char !== null || cell.flush) {
+          entries.push({ x, y, char: cell.char })
+        }
+      }
+    }
+    return entries
+  }
+
+  get debug() {
+    const p = this.width + 'x' + this.height + ': '
+    return (
+      p +
+      this.data
+        .map((row) =>
+          row
+            .map((cell) => {
+              if (cell.char === null) {
+                return cell.flush ? ' ' : '·'
+              }
+              return cell.char
+            })
+            .join(''),
+        )
+        .join('\n')
+    )
   }
 }

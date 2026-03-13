@@ -1,12 +1,12 @@
-import { Buffer } from './buffer/Buffer'
 import { BufferCompositor } from './buffer/BufferCompositor'
-import { Hero } from './Hero'
-import { Monster } from './Monster'
+import { Hero } from './entities/Hero'
+import { Monster } from './entities/Monster'
 import { Terminal } from './terminal/Terminal'
 import { Debug } from './Debug'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Game } from './Game'
 import { Position } from './types'
+import { Buffer } from './buffer/Buffer'
 
 /*
 TODO:
@@ -14,6 +14,7 @@ TODO:
 - Add a status class that manages the status bar buffer
 - move entities as property in game class?
 - Fix bug in BufferCompositor.
+- PRNG see https://gemini.google.com/share/49c3dda200ae
 */
 
 const game = new Game({
@@ -57,10 +58,9 @@ function main() {
 
   // initial render
   dungeonBuffer.clear()
-  dungeonBuffer.setCell(game.hero.x, game.hero.y, game.hero.char)
+  dungeonBuffer.set(game.hero.x, game.hero.y, game.hero.char)
   statusBuffer.clear()
 
-  let prevHeroPosition: Position = { x: game.hero.x, y: game.hero.y }
   let gameEnabled = false
 
   terminal.on('invalid', () => {
@@ -102,26 +102,12 @@ function main() {
         break
     }
 
-    if (
-      game.hero.x !== prevHeroPosition.x ||
-      game.hero.y !== prevHeroPosition.y
-    ) {
-      // check for collision with any monster
-      for (let i = 0; i < game.entities.monsters.length; i++) {
-        const m = game.entities.monsters[i]
-        if (game.hero.x === m.x && game.hero.y === m.y) {
-          // remove monster
-          game.entities.removeMonster(m)
-          break
-        }
-      }
-    }
-
     // update status bar buffer
-    const statusText = `Turns: ${game.hero.turns} Ticks: ${game.tick}`.padEnd(
-      game.dungeon.width,
-    )
-    statusBuffer.setText(0, 0, statusText)
+    const statusText =
+      `Turns: ${game.hero.turns} Ticks: ${game.tick} Monsters: ${game.hero.kills}`.padEnd(
+        game.dungeon.width,
+      )
+    statusBuffer.text(0, 0, statusText)
     flushBuffer(terminal, compositor)
   }
 
@@ -135,19 +121,17 @@ function main() {
 
   const spawnMonster = () => {
     // choose position not occupied by hero or other monsters
-    const position: Position = { x: 0, y: 0 }
+    const pos: Position = { x: 0, y: 0 }
     do {
-      position.x = Math.floor(Math.random() * game.dungeon.width)
-      position.y = Math.floor(Math.random() * game.dungeon.height)
+      pos.x = Math.floor(Math.random() * game.dungeon.width)
+      pos.y = Math.floor(Math.random() * game.dungeon.height)
     } while (
-      (position.x === game.hero.x && position.y === game.hero.y) ||
-      game.entities.monsters.some(
-        (m) => m.x === position.x && m.y === position.y,
-      )
+      (pos.x === game.hero.x && pos.y === game.hero.y) ||
+      game.entities.monsters.some((m) => m.x === pos.x && m.y === pos.y)
     )
-    const monster = new Monster(position)
+    const monster = new Monster(pos)
     game.entities.addMonster(monster)
-    dungeonBuffer.setCell(monster.x, monster.y, monster.char)
+    dungeonBuffer.set(monster.x, monster.y, monster.char)
   }
 
   /**
@@ -163,12 +147,12 @@ function main() {
         // entity is ready to act
 
         if (entity instanceof Monster) {
-          // simple random movement for monsters
-          // const dx = Math.floor(Math.random() * 3) - 1
-          // const dy = Math.floor(Math.random() * 3) - 1
-          // const nx = Math.max(0, Math.min(cols - 1, entity.x + dx))
-          // const ny = Math.max(0, Math.min(gameRows - 1, entity.y + dy))
-          // entity.act()
+          // const action = entity.move()
+          // // update monster position in buffer
+          // if (action.type === 'move') {
+          //   dungeonBuffer.clearCell(action.from.x, action.from.y)
+          //   dungeonBuffer.setCell(action.to.x, action.to.y, entity.char)
+          // }
         }
 
         if (entity instanceof Hero) {
@@ -179,15 +163,28 @@ function main() {
   }
 
   function handleMovement(dx: number, dy: number) {
-    const from: Position = { x: game.hero.x, y: game.hero.y }
-    if (game.hero.move(dx, dy, game.dungeon.width, game.dungeon.height)) {
-      // mark cells for potential collision check
-      dungeonBuffer.clearCell(from.x, from.y)
-      dungeonBuffer.setCell(game.hero.x, game.hero.y, game.hero.char)
-      prevHeroPosition = { x: from.x, y: from.y }
+    const action = game.hero.move(
+      dx,
+      dy,
+      game.dungeon.width,
+      game.dungeon.height,
+    )
+    if (action.type === 'move') {
+      dungeonBuffer.clear(action.from.x, action.from.y)
+      dungeonBuffer.set(action.to.x, action.to.y, game.hero.char)
 
+      // check for collision with any monster
+      for (let i = 0; i < game.entities.monsters.length; i++) {
+        const m = game.entities.monsters[i]
+        if (game.hero.x === m.x && game.hero.y === m.y) {
+          // remove monster
+          game.entities.removeMonster(m)
+          game.hero.kills++
+          break
+        }
+      }
       // Debug.write(
-      //   `Hero from (${from.x}, ${from.y}) to (${game.hero.x}, ${game.hero.y})`.padEnd(
+      //   `Hero from (${action.from.x}, ${action.from.y}) to (${action.to.x}, ${action.to.y})`.padEnd(
       //     game.size.width,
       //   ),
       // )

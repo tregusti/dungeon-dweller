@@ -6,13 +6,19 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts",
-    "prettier": "prettier --write \"src/**/*.ts\""
+    "prettier": "prettier --write \"src/**/*.ts\"",
+    "# https://github.com/nodejs/node/issues/60704#issuecomment-3529614006": "",
+    "test": "NODE_OPTIONS='--no-experimental-webstorage' jest",
+    "test:watch": "NODE_OPTIONS='--no-experimental-webstorage' jest --watch"
   },
   "devDependencies": {
-    "@types/node": "^20.6.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.4.0",
+    "jest": "^30.3.0",
     "prettier": "^3.8.1",
     "prettier-plugin-jsdoc": "^1.8.0",
     "ts-essentials": "^10.1.1",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

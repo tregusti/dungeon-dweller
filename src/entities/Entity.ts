@@ -1,4 +1,35 @@
-import { Position } from './types'
+import { Position } from '../types'
+
+export type ActionType = 'move' | 'noop'
+export type ActionResult = Readonly<{
+  from: Position
+  to: Position
+  type: ActionType
+}>
+
+/**
+ * Annan ide:
+ *
+ * # Energy System i TS
+ *
+ * Eftersom du frågade om speed tidigare: I TypeScript kan du implementera ett
+ * Action Point (AP) eller Energy system med en enkel loop:
+ *
+ * ```typescript
+ * TypeScript
+ * // Enkel princip för din spelmotor
+ * while (player.energy < 12) {
+ *   allEntities.forEach((ent) => {
+ *     ent.energy += ent.speed
+ *     if (ent.energy >= 12 && ent.isMonster) {
+ *       ent.takeTurn() // Monstret agerar
+ *       ent.energy -= 12
+ *     }
+ *   })
+ *   player.energy += player.speed
+ * }
+ * ```
+ */
 
 export class Entity {
   x: number
