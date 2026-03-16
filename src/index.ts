@@ -1,12 +1,12 @@
-import { BufferCompositor } from './buffer/BufferCompositor'
-import { Hero } from './entities/Hero'
-import { Monster } from './entities/Monster'
-import { Terminal } from './terminal/Terminal'
-import { Debug } from './Debug'
-import { flushBuffer } from './terminal/BufferWriter'
-import { Game } from './Game'
-import { Position } from './types'
 import { Buffer } from './buffer/Buffer'
+import { BufferCompositor } from './buffer/BufferCompositor'
+import { Debug } from './Debug'
+import { Monster } from './entities/Monster'
+import { Game } from './Game'
+import { Status } from './Status'
+import { flushBuffer } from './terminal/BufferWriter'
+import { Terminal } from './terminal/Terminal'
+import { Position } from './types'
 
 /*
 TODO:
@@ -17,9 +17,11 @@ TODO:
 - PRNG see https://gemini.google.com/share/49c3dda200ae
 */
 
+const status = new Status({ width: 30, height: 3 })
+
 const game = new Game({
   dungeon: { width: 30, height: 10 },
-  status: { width: 30, height: 3 },
+  status,
 })
 
 function main() {
@@ -30,7 +32,6 @@ function main() {
     width: game.width,
     height: game.height,
   })
-
   const dungeonBuffer = compositor.add({
     buffer: new Buffer({
       width: game.dungeon.width,
@@ -40,8 +41,8 @@ function main() {
     y: 0,
     z: 0,
   })
-  const statusBuffer = compositor.add({
-    buffer: new Buffer(game.status),
+  compositor.add({
+    buffer: status.buffer,
     x: 0,
     y: game.dungeon.height + 1,
     z: 1,
@@ -61,7 +62,7 @@ function main() {
   // initial render
   dungeonBuffer.clear()
   dungeonBuffer.set(game.hero.x, game.hero.y, game.hero.char)
-  statusBuffer.clear()
+  status.update(game)
 
   let gameEnabled = false
 
@@ -109,8 +110,7 @@ function main() {
         break
     }
 
-    statusBuffer.line(0, `Turns: ${game.turns} Monsters: ${game.hero.kills}`)
-    statusBuffer.line(1, `Energy: ${game.hero.energy}`)
+    status.update(game)
     flushBuffer(terminal, compositor)
   }
 

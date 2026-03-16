@@ -37,6 +37,7 @@ export class BufferCompositor {
     y: number
     z: number
   }) {
+    // TODO: Verify that the buffer is not place so its boundaries are outside the game view.
     this.#buffers.push({ buffer, x, y, z })
     // Sort by z (lowest first)
     this.#buffers.sort((a, b) => a.z - b.z)

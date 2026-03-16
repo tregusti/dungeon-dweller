@@ -2,11 +2,12 @@ import { Debug } from './Debug'
 import { MonsterCollection } from './entities/EntityCollection'
 import { Hero } from './entities/Hero'
 import { Monster } from './entities/Monster'
+import { Status } from './Status'
 import { DeepReadonly, Size } from './types'
 
 type GameOptions = {
   dungeon: Size
-  status: Size
+  status: Status
 }
 
 export class Game implements Readonly<Size> {
