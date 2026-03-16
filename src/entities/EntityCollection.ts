@@ -1,33 +1,17 @@
-import { Entity } from './Entity'
-import { Hero } from './Hero'
+import { Monster } from './Monster'
 
-export class EntityCollection {
-  #monsters: Set<Entity> = new Set()
-  #hero: Hero
-
-  //  TODO: Monster needs to be sorted by ticksUntilAct and a unique ID for efficient scheduling. Maybe use a sorted array instead of a Set
-
-  constructor(hero: Hero) {
-    this.#hero = hero
-  }
+export class MonsterCollection {
+  #monsters: Set<Monster> = new Set()
 
   get all() {
-    return [this.#hero, ...this.#monsters]
+    return Array.from(this.#monsters).sort((a, b) => b.energy - a.energy) // sort by energy descending
   }
 
-  get hero() {
-    return this.#hero
-  }
-
-  get monsters() {
-    return Array.from(this.#monsters)
-  }
-
-  addMonster(monster: Entity) {
+  add(monster: Monster) {
     this.#monsters.add(monster)
   }
 
-  removeMonster(monster: Entity) {
+  remove(monster: Monster) {
     this.#monsters.delete(monster)
   }
 }

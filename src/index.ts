@@ -41,10 +41,7 @@ function main() {
     z: 0,
   })
   const statusBuffer = compositor.add({
-    buffer: new Buffer({
-      width: game.dungeon.width,
-      height: 3,
-    }),
+    buffer: new Buffer(game.status),
     x: 0,
     y: game.dungeon.height + 1,
     z: 1,
@@ -77,6 +74,11 @@ function main() {
     gameEnabled = true
   })
 
+  terminal.on('input', onInput)
+
+  forceRedraw()
+  gameEnabled = true
+
   function onInput(chunk: string) {
     if (chunk === '\u0003' || chunk === 'q') {
       // ctrl-c
@@ -107,24 +109,12 @@ function main() {
         break
     }
 
-    // update status bar buffer
-    const statusText =
-      `Turns: ${game.hero.turns} Ticks: ${game.tick} Monsters: ${game.hero.kills}`.padEnd(
-        game.dungeon.width,
-      )
-    statusBuffer.text(0, 0, statusText)
+    statusBuffer.line(0, `Turns: ${game.turns} Monsters: ${game.hero.kills}`)
+    statusBuffer.line(1, `Energy: ${game.hero.energy}`)
     flushBuffer(terminal, compositor)
   }
 
-  terminal.on('input', onInput)
-
-  forceRedraw()
-  gameEnabled = true
-  while (!processTickUntilHeroActs()) {
-    game.advance()
-  }
-
-  const spawnMonster = () => {
+  function spawnMonster() {
     // choose position not occupied by hero or other monsters
     const pos: Position = { x: 0, y: 0 }
     do {
@@ -132,39 +122,11 @@ function main() {
       pos.y = Math.floor(Math.random() * game.dungeon.height)
     } while (
       (pos.x === game.hero.x && pos.y === game.hero.y) ||
-      game.entities.monsters.some((m) => m.x === pos.x && m.y === pos.y)
+      game.monsters.all.some((m) => m.x === pos.x && m.y === pos.y)
     )
     const monster = new Monster(pos)
-    game.entities.addMonster(monster)
+    game.monsters.add(monster)
     dungeonBuffer.set(monster.x, monster.y, monster.char)
-  }
-
-  /**
-   * Handle a game tick: advance time and update all entities. Entities have a
-   * speed that determines how many ticks must pass before they can act again.
-   * When an entity acts, its ticksUntilAct is reset based on its speed.
-   *
-   * @returns {boolean} Whether or not it is the heros turn to act.
-   */
-  function processTickUntilHeroActs() {
-    for (const entity of game.entities.all) {
-      if (entity.tick()) {
-        // entity is ready to act
-
-        if (entity instanceof Monster) {
-          // const action = entity.move()
-          // // update monster position in buffer
-          // if (action.type === 'move') {
-          //   dungeonBuffer.clearCell(action.from.x, action.from.y)
-          //   dungeonBuffer.setCell(action.to.x, action.to.y, entity.char)
-          // }
-        }
-
-        if (entity instanceof Hero) {
-          return true
-        }
-      }
-    }
   }
 
   function handleMovement(dx: number, dy: number) {
@@ -178,25 +140,26 @@ function main() {
       dungeonBuffer.clear(action.from.x, action.from.y)
       dungeonBuffer.set(action.to.x, action.to.y, game.hero.char)
 
+      game.advanceTurn()
+
       // check for collision with any monster
-      for (let i = 0; i < game.entities.monsters.length; i++) {
-        const m = game.entities.monsters[i]
+      for (let i = 0; i < game.monsters.all.length; i++) {
+        const m = game.monsters.all[i]
         if (game.hero.x === m.x && game.hero.y === m.y) {
           // remove monster
-          game.entities.removeMonster(m)
+          Debug.write(`Hero kills ${m.char} at turn ${game.turns}`)
+          game.monsters.remove(m)
           game.hero.kills++
           break
         }
       }
-      // Debug.write(
-      //   `Hero from (${action.from.x}, ${action.from.y}) to (${action.to.x}, ${action.to.y})`.padEnd(
-      //     game.size.width,
-      //   ),
-      // )
-      while (!processTickUntilHeroActs()) {
-        // advance time until it's the heros turn again
-        game.advance()
-      }
+    }
+
+    if (action.type !== 'noop') {
+      do {
+        game.processMonsterTurn()
+        game.hero.giveEnergy()
+      } while (game.hero.energy < game.hero.speed)
     }
   }
 }
