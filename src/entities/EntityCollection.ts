@@ -7,11 +7,11 @@ export class MonsterCollection {
     return Array.from(this.#monsters).sort((a, b) => b.energy - a.energy) // sort by energy descending
   }
 
-  add(monster: Monster) {
+  add(monster: Monster): void {
     this.#monsters.add(monster)
   }
 
-  remove(monster: Monster) {
+  remove(monster: Monster): void {
     this.#monsters.delete(monster)
   }
 }

@@ -3,6 +3,12 @@ import { BufferCompositor } from './buffer/BufferCompositor'
 import { Debug } from './Debug'
 import { Monster } from './entities/Monster'
 import { Game } from './Game'
+import {
+  MoveHeroCollisionService,
+  MoveHeroCommandHandler,
+} from './messaging/commands/MoveHero'
+import { Bus } from './messaging/core'
+import { EventName } from './messaging/core/Events'
 import { Status } from './Status'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Terminal } from './terminal/Terminal'
@@ -64,6 +70,32 @@ function main() {
   dungeonBuffer.set(game.hero.x, game.hero.y, game.hero.char)
   status.update(game)
 
+  const moveHeroCollisionService = new MoveHeroCollisionService(
+    game.dungeon,
+    game.monsters,
+  )
+  const moveHeroCommandHandler = new MoveHeroCommandHandler(
+    game.hero,
+    moveHeroCollisionService,
+    Bus.event,
+  )
+  Bus.command.register('MoveHero', (payload) =>
+    moveHeroCommandHandler.handle(payload),
+  )
+
+  Bus.event.subscribe(EventName.HeroMoved, ({ from, to }) => {
+    dungeonBuffer.clear(from.x, from.y)
+    dungeonBuffer.set(to.x, to.y, game.hero.char)
+    game.advanceTurn()
+  })
+
+  // Messaging.event.subscribe(
+  //   EventName.HeroAttackedMonster,
+  //   ({ monsterChar }) => {
+  //     Debug.write(`Hero kills ${monsterChar} at turn ${game.turns}`)
+  //   },
+  // )
+
   let gameEnabled = false
 
   terminal.on('invalid', () => {
@@ -80,7 +112,7 @@ function main() {
   forceRedraw()
   gameEnabled = true
 
-  function onInput(chunk: string) {
+  async function onInput(chunk: string) {
     if (chunk === '\u0003' || chunk === 'q') {
       // ctrl-c
       terminal.exit()
@@ -93,16 +125,16 @@ function main() {
     switch (chunk) {
       // movement keys
       case 'h':
-        handleMovement(-1, 0)
+        await handleMovement(-1, 0)
         break
       case 'l':
-        handleMovement(1, 0)
+        await handleMovement(1, 0)
         break
       case 'k':
-        handleMovement(0, -1)
+        await handleMovement(0, -1)
         break
       case 'j':
-        handleMovement(0, 1)
+        await handleMovement(0, 1)
         break
       // actions
       case 'm':
@@ -129,37 +161,25 @@ function main() {
     dungeonBuffer.set(monster.x, monster.y, monster.char)
   }
 
-  function handleMovement(dx: number, dy: number) {
-    const action = game.hero.move(
+  async function handleMovement(dx: number, dy: number) {
+    const result = await Bus.command.execute('MoveHero', {
       dx,
       dy,
-      game.dungeon.width,
-      game.dungeon.height,
-    )
-    if (action.type === 'move') {
-      dungeonBuffer.clear(action.from.x, action.from.y)
-      dungeonBuffer.set(action.to.x, action.to.y, game.hero.char)
+    })
 
-      game.advanceTurn()
-
-      // check for collision with any monster
-      for (let i = 0; i < game.monsters.all.length; i++) {
-        const m = game.monsters.all[i]
-        if (game.hero.x === m.x && game.hero.y === m.y) {
-          // remove monster
-          Debug.write(`Hero kills ${m.char} at turn ${game.turns}`)
-          game.monsters.remove(m)
-          game.hero.kills++
-          break
-        }
-      }
-    }
-
-    if (action.type !== 'noop') {
+    if (result.success) {
       do {
         game.processMonsterTurn()
         game.hero.giveEnergy()
       } while (game.hero.energy < game.hero.speed)
+    } else {
+      if (result.reason === 'wall') {
+        Debug.write(`Hero bumps into a wall at turn ${game.turns}`)
+      } else if (result.reason === 'monster') {
+        Debug.write(
+          `Hero bumps into a ${result.monster.char} at turn ${game.turns}`,
+        )
+      }
     }
   }
 }

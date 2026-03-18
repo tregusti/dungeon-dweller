@@ -1,0 +1,153 @@
+import { MonsterCollection } from '../../../entities/EntityCollection'
+import { Hero } from '../../../entities/Hero'
+import { Monster } from '../../../entities/Monster'
+import { EventBus } from '../../core/EventBus'
+import { EventName, Events } from '../../core/Events'
+import { MoveHeroCollisionService } from './MoveHeroCollisionService'
+import { MoveHeroCommandHandler, Movement } from './MoveHeroCommandHandler'
+
+describe('MoveHeroCommandHandler', () => {
+  const createSUT = ({
+    heroPosition = { x: 5, y: 5 },
+  }: { heroPosition?: { x: number; y: number } } = {}) => {
+    const dungeon = { width: 10, height: 10 }
+    const hero = new Hero(heroPosition)
+    const monsters = new MonsterCollection()
+    const events = new EventBus<Events>()
+    const collision = new MoveHeroCollisionService(dungeon, monsters)
+    const subject = new MoveHeroCommandHandler(hero, collision, events)
+
+    return {
+      hero,
+      monsters,
+      events,
+      subject,
+    }
+  }
+
+  describe('when move is successful', () => {
+    it('should move the hero', () => {
+      const { hero, subject } = createSUT({ heroPosition: { x: 5, y: 5 } })
+
+      subject.handle({ dx: 1, dy: 0 })
+
+      expect(hero.x).toBe(6)
+      expect(hero.y).toBe(5)
+    })
+    it('should emit the HeroMoved event', async () => {
+      const { events, subject } = createSUT({ heroPosition: { x: 5, y: 5 } })
+      const movedEvents: Events['HeroMoved'][] = []
+      events.subscribe('HeroMoved', (payload) => {
+        movedEvents.push(payload)
+      })
+
+      await subject.handle({ dx: 1, dy: 0 })
+
+      expect(movedEvents).toHaveLength(1)
+      expect(movedEvents.at(0)).toEqual({
+        from: { x: 5, y: 5 },
+        to: { x: 6, y: 5 },
+      })
+    })
+    it('should return success in the result', async () => {
+      const { subject } = createSUT({ heroPosition: { x: 5, y: 5 } })
+
+      const result = await subject.handle({ dx: 1, dy: 0 })
+
+      expect(result).toEqual({
+        success: true,
+        from: { x: 5, y: 5 },
+        to: { x: 6, y: 5 },
+      })
+    })
+  })
+  describe('when monster is in the way', () => {
+    it('should not move the hero', async () => {
+      const { hero, monsters, subject } = createSUT({
+        heroPosition: { x: 5, y: 5 },
+      })
+      const monster = new Monster({ x: 6, y: 5 })
+      monsters.add(monster)
+
+      await subject.handle(Movement.Right)
+
+      expect(hero.x).toBe(5)
+      expect(hero.y).toBe(5)
+    })
+    it('should not emit the HeroMoved event', async () => {
+      // Arrange
+      const { monsters, events, subject } = createSUT({
+        heroPosition: { x: 5, y: 5 },
+      })
+      const monster = new Monster({ x: 6, y: 5 })
+      monsters.add(monster)
+
+      const movedEvents: any[] = []
+      events.subscribe('HeroMoved', (payload) => {
+        movedEvents.push(payload)
+      })
+
+      // Act
+      await subject.handle(Movement.Right)
+
+      // Assert
+      expect(movedEvents).toHaveLength(0)
+    })
+    it('should return the reason in the result', async () => {
+      const { monsters, subject } = createSUT({
+        heroPosition: { x: 5, y: 5 },
+      })
+      const monster = new Monster({ x: 6, y: 5 })
+      monsters.add(monster)
+
+      const result = await subject.handle(Movement.Right)
+
+      expect(result).toEqual({
+        success: false,
+        reason: 'monster',
+        monster,
+      })
+    })
+  })
+  describe('when wall is in the way', () => {
+    it('should not move the hero', async () => {
+      const { hero, subject } = createSUT({
+        heroPosition: { x: 0, y: 0 },
+      })
+
+      await subject.handle(Movement.Left)
+
+      expect(hero.x).toBe(0)
+      expect(hero.y).toBe(0)
+    })
+    it('should not emit the HeroMoved event', async () => {
+      // Arrange
+      const { events, subject } = createSUT({
+        heroPosition: { x: 0, y: 0 },
+      })
+
+      const movedEvents: any[] = []
+      events.subscribe('HeroMoved', (payload) => {
+        movedEvents.push(payload)
+      })
+
+      // Act
+      await subject.handle(Movement.Left)
+
+      // Assert
+      expect(movedEvents).toHaveLength(0)
+    })
+    it('should return the reason in the result', async () => {
+      const { subject } = createSUT({
+        heroPosition: { x: 0, y: 0 },
+      })
+
+      const result = await subject.handle(Movement.Left)
+
+      expect(result).toEqual({
+        success: false,
+        reason: 'wall',
+      })
+    })
+  })
+})

@@ -1,3 +1,5 @@
+export type MaybePromise<T> = T | Promise<T>
+
 export * from 'ts-essentials'
 
 export type Size = {
