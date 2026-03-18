@@ -1,9 +1,8 @@
 import { Monster } from '../../../entities/Monster'
 import { Position } from '../../../types'
-import { CommandDef } from '../../core'
 
-export type MoveHeroPayload = { dx: number; dy: number }
-export type MoveHeroResult =
+export type MoveHeroCommandPayload = { dx: number; dy: number }
+export type MoveHeroCommandResult =
   | {
       success: false
       reason: 'wall'
@@ -18,9 +17,3 @@ export type MoveHeroResult =
       from: Position
       to: Position
     }
-
-export type MoveHeroCommand = CommandDef<
-  'MoveHero',
-  MoveHeroPayload,
-  MoveHeroResult
->

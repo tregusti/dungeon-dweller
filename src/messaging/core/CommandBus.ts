@@ -1,7 +1,17 @@
 import { MaybePromise } from '../../types'
-import { CommandDef } from './Commands'
 
-type CommandMap = Record<string, CommandDef<string, any, any>>
+type CommandShape<TPayload = unknown, TResult = unknown> = {
+  payload: TPayload
+  result: TResult
+}
+
+type CommandMap = Record<symbol, CommandShape>
+
+type CommandPayload<TCommands extends CommandMap, K extends keyof TCommands> =
+  TCommands[K] extends CommandShape<infer TPayload, unknown> ? TPayload : never
+
+type CommandResult<TCommands extends CommandMap, K extends keyof TCommands> =
+  TCommands[K] extends CommandShape<unknown, infer TResult> ? TResult : never
 
 type CommandHandler<TPayload, TResult> = (
   payload: TPayload,
@@ -12,7 +22,10 @@ export class CommandBus<TCommands extends CommandMap> {
 
   register<K extends keyof TCommands>(
     type: K,
-    handler: CommandHandler<TCommands[K]['payload'], TCommands[K]['result']>,
+    handler: CommandHandler<
+      CommandPayload<TCommands, K>,
+      CommandResult<TCommands, K>
+    >,
   ): void {
     if (this.handlers.has(type)) {
       throw new Error(
@@ -24,8 +37,8 @@ export class CommandBus<TCommands extends CommandMap> {
 
   async execute<K extends keyof TCommands>(
     type: K,
-    payload: TCommands[K]['payload'],
-  ): Promise<TCommands[K]['result']> {
+    payload: CommandPayload<TCommands, K>,
+  ): Promise<CommandResult<TCommands, K>> {
     const handler = this.handlers.get(type)
     if (!handler) {
       throw new Error(`No command handler registered for "${String(type)}"`)

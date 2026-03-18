@@ -1,8 +1,11 @@
 import { Hero } from '../../../entities/Hero'
 import { EventBus } from '../../core/EventBus'
-import { Events } from '../../core/Events'
+import { Events, EventType } from '../../core/Events'
 import { MoveHeroCollisionService } from './MoveHeroCollisionService'
-import type { MoveHeroPayload, MoveHeroResult } from './MoveHeroCommand'
+import type {
+  MoveHeroCommandPayload,
+  MoveHeroCommandResult,
+} from './MoveHeroCommand'
 
 export const Movement = {
   Up: { dx: 0, dy: -1 },
@@ -18,7 +21,10 @@ export class MoveHeroCommandHandler {
     private readonly events: EventBus<Events>,
   ) {}
 
-  async handle({ dx, dy }: MoveHeroPayload): Promise<MoveHeroResult> {
+  async handle({
+    dx,
+    dy,
+  }: MoveHeroCommandPayload): Promise<MoveHeroCommandResult> {
     const evaluation = this.collision.evaluate({
       from: { x: this.hero.x, y: this.hero.y },
       dx,
@@ -27,7 +33,7 @@ export class MoveHeroCommandHandler {
 
     if (evaluation.success) {
       const { from, to } = this.hero.move(dx, dy)
-      await this.events.publish('HeroMoved', {
+      await this.events.publish(EventType.HeroMoved, {
         from: from,
         to: to,
       })

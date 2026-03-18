@@ -1,6 +1,6 @@
 type EventHandler<TPayload> = (payload: TPayload) => void | Promise<void>
 
-type EventMap = Record<string, any>
+type EventMap = Record<symbol, unknown>
 
 export class EventBus<TEvents extends EventMap> {
   private listeners = new Map<keyof TEvents, EventHandler<any>[]>()

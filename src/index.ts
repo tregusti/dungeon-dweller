@@ -8,7 +8,8 @@ import {
   MoveHeroCommandHandler,
 } from './messaging/commands/MoveHero'
 import { Bus } from './messaging/core'
-import { EventName } from './messaging/core/Events'
+import { CommandType } from './messaging/core/Commands'
+import { EventType } from './messaging/core/Events'
 import { Status } from './Status'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Terminal } from './terminal/Terminal'
@@ -79,11 +80,11 @@ function main() {
     moveHeroCollisionService,
     Bus.event,
   )
-  Bus.command.register('MoveHero', (payload) =>
+  Bus.command.register(CommandType.MoveHero, (payload) =>
     moveHeroCommandHandler.handle(payload),
   )
 
-  Bus.event.subscribe(EventName.HeroMoved, ({ from, to }) => {
+  Bus.event.subscribe(EventType.HeroMoved, ({ from, to }) => {
     dungeonBuffer.clear(from.x, from.y)
     dungeonBuffer.set(to.x, to.y, game.hero.char)
     game.advanceTurn()
@@ -162,7 +163,7 @@ function main() {
   }
 
   async function handleMovement(dx: number, dy: number) {
-    const result = await Bus.command.execute('MoveHero', {
+    const result = await Bus.command.execute(CommandType.MoveHero, {
       dx,
       dy,
     })
