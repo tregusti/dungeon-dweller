@@ -1,11 +1,9 @@
-import {
-  MoveHeroCommandPayload,
-  MoveHeroCommandResult,
-  MoveHeroCommandType,
-} from '../commands/MoveHero'
+import * as CreateMonster from '../commands/CreateMonster'
+import * as MoveHero from '../commands/MoveHero'
 
 export const CommandType = {
-  MoveHero: MoveHeroCommandType,
+  MoveHero: MoveHero.MoveHeroCommandType,
+  CreateMonster: CreateMonster.CreateMonsterCommandType,
 } as const
 
 type CommandDef<TPayload, TResult> = {
@@ -14,8 +12,12 @@ type CommandDef<TPayload, TResult> = {
 }
 
 export type Commands = {
+  [CommandType.CreateMonster]: CommandDef<
+    CreateMonster.CreateMonsterCommandPayload,
+    CreateMonster.CreateMonsterCommandResult
+  >
   [CommandType.MoveHero]: CommandDef<
-    MoveHeroCommandPayload,
-    MoveHeroCommandResult
+    MoveHero.MoveHeroCommandPayload,
+    MoveHero.MoveHeroCommandResult
   >
 }

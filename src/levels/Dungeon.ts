@@ -41,4 +41,21 @@ export class Dungeon {
 
     return []
   }
+  isOccupied(x: number, y: number): boolean {
+    return this.at(x, y).length > 0
+  }
+  isFree(x: number, y: number): boolean {
+    return !this.isOccupied(x, y)
+  }
+  getFreePositions(): Position[] {
+    const freePositions: Position[] = []
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        if (this.isFree(x, y)) {
+          freePositions.push({ x, y })
+        }
+      }
+    }
+    return freePositions
+  }
 }

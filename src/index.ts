@@ -3,9 +3,9 @@ import { BufferCompositor } from './buffer/BufferCompositor'
 import { Debug } from './Debug'
 import { MonsterCollection } from './entities/EntityCollection'
 import { Hero } from './entities/Hero'
-import { Monster } from './entities/Monster'
 import { Game } from './Game'
 import { Dungeon } from './levels/Dungeon'
+import { CreateMonsterCommandHandler } from './messaging/commands/CreateMonster'
 import {
   MoveHeroCollisionService,
   MoveHeroCommandHandler,
@@ -13,18 +13,14 @@ import {
 import { Bus } from './messaging/core'
 import { CommandType } from './messaging/core/Commands'
 import { EventType } from './messaging/core/Events'
+import { Random } from './Random'
 import { Status } from './Status'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Terminal } from './terminal/Terminal'
-import { Position } from './types'
 
 /*
 TODO:
-- Extract game logic into separate Game class
-- Add a status class that manages the status bar buffer
-- move entities as property in game class?
 - Fix bug in BufferCompositor.
-- PRNG see https://gemini.google.com/share/49c3dda200ae
 */
 
 const dungeonSize = { width: 30, height: 20 }
@@ -91,6 +87,15 @@ function main() {
     moveHeroCommandHandler.handle(payload),
   )
 
+  const createMonsterCommandHandler = new CreateMonsterCommandHandler(
+    game.dungeon,
+    game.monsters,
+    Random,
+  )
+  Bus.command.register(CommandType.CreateMonster, () =>
+    createMonsterCommandHandler.handle(),
+  )
+
   Bus.event.subscribe(EventType.HeroMoved, ({ from, to }) => {
     dungeonBuffer.clear(from.x, from.y)
     dungeonBuffer.set(to.x, to.y, game.hero.char)
@@ -146,7 +151,7 @@ function main() {
         break
       // actions
       case 'm':
-        spawnMonster()
+        await handleCreateMonster()
         break
     }
 
@@ -154,15 +159,15 @@ function main() {
     flushBuffer(terminal, compositor)
   }
 
-  function spawnMonster() {
-    // choose position not occupied by hero or other monsters
-    const pos: Position = { x: 0, y: 0 }
-    do {
-      pos.x = Math.floor(Math.random() * game.dungeon.width)
-      pos.y = Math.floor(Math.random() * game.dungeon.height)
-    } while (dungeon.at(pos.x, pos.y).length > 0)
-    const monster = new Monster(pos)
-    game.monsters.add(monster)
+  async function handleCreateMonster() {
+    const result = await Bus.command.execute(CommandType.CreateMonster)
+
+    if (!result.success) {
+      Debug.write(`No free dungeon tile to spawn monster at turn ${game.turns}`)
+      return
+    }
+
+    const { monster } = result
     dungeonBuffer.set(monster.x, monster.y, monster.char)
   }
 

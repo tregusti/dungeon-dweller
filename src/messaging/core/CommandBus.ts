@@ -13,12 +13,18 @@ type CommandPayload<TCommands extends CommandMap, K extends keyof TCommands> =
 type CommandResult<TCommands extends CommandMap, K extends keyof TCommands> =
   TCommands[K] extends CommandShape<unknown, infer TResult> ? TResult : never
 
-type CommandHandler<TPayload, TResult> = (
-  payload: TPayload,
-) => MaybePromise<TResult>
+type CommandExecuteArgs<TPayload> = [TPayload] extends [void]
+  ? []
+  : [payload: TPayload]
+
+type CommandHandler<TPayload, TResult> = [TPayload] extends [void]
+  ? () => MaybePromise<TResult>
+  : (payload: TPayload) => MaybePromise<TResult>
+
+type AnyCommandHandler = (...args: any[]) => MaybePromise<any>
 
 export class CommandBus<TCommands extends CommandMap> {
-  private handlers = new Map<keyof TCommands, CommandHandler<any, any>>()
+  private handlers = new Map<keyof TCommands, AnyCommandHandler>()
 
   register<K extends keyof TCommands>(
     type: K,
@@ -37,12 +43,12 @@ export class CommandBus<TCommands extends CommandMap> {
 
   async execute<K extends keyof TCommands>(
     type: K,
-    payload: CommandPayload<TCommands, K>,
+    ...args: CommandExecuteArgs<CommandPayload<TCommands, K>>
   ): Promise<CommandResult<TCommands, K>> {
     const handler = this.handlers.get(type)
     if (!handler) {
       throw new Error(`No command handler registered for "${String(type)}"`)
     }
-    return await handler(payload)
+    return await handler(...(args as any[]))
   }
 }

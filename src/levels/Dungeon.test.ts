@@ -50,4 +50,55 @@ describe('Dungeon', () => {
       expect(cell.monster).toBe(monster)
     })
   })
+  describe('.isOccupied() and .isFree()', () => {
+    it('should return false for an empty spot', () => {
+      const { dungeon } = createSUT()
+      expect(dungeon.isOccupied(1, 1)).toBe(false)
+      expect(dungeon.isFree(1, 1)).toBe(true)
+    })
+    it('should return false if hero is on the spot', () => {
+      const { dungeon } = createSUT({ heroPosition: { x: 1, y: 1 } })
+      expect(dungeon.isOccupied(1, 1)).toBe(true)
+      expect(dungeon.isFree(1, 1)).toBe(false)
+    })
+    it('should return false if monster is on the spot', () => {
+      const { dungeon, monsters } = createSUT()
+      const monster = new Monster({ x: 2, y: 2 })
+      monsters.add(monster)
+
+      expect(dungeon.isOccupied(2, 2)).toBe(true)
+      expect(dungeon.isFree(2, 2)).toBe(false)
+    })
+  })
+  describe('.getFreePositions()', () => {
+    const AA = { x: 0, y: 0 }
+    const BB = { x: 1, y: 0 }
+    const CC = { x: 0, y: 1 }
+    const DD = { x: 1, y: 1 }
+
+    it('should not include hero position', () => {
+      const { dungeon } = createSUT({
+        heroPosition: DD,
+        size: { width: 2, height: 2 },
+      })
+      const result = dungeon.getFreePositions()
+      expect(result).toHaveLength(3)
+      expect(result).toContainEqual(AA)
+      expect(result).toContainEqual(BB)
+      expect(result).toContainEqual(CC)
+    })
+
+    it('should not return creature positions', () => {
+      const { dungeon, monsters } = createSUT({
+        heroPosition: AA,
+        size: { width: 2, height: 2 },
+      })
+      monsters.add(new Monster(CC))
+      monsters.add(new Monster(DD))
+
+      const result = dungeon.getFreePositions()
+      expect(result).toHaveLength(1)
+      expect(result).toContainEqual(BB)
+    })
+  })
 })
