@@ -1,8 +1,11 @@
 import { Buffer } from './buffer/Buffer'
 import { BufferCompositor } from './buffer/BufferCompositor'
 import { Debug } from './Debug'
+import { MonsterCollection } from './entities/EntityCollection'
+import { Hero } from './entities/Hero'
 import { Monster } from './entities/Monster'
 import { Game } from './Game'
+import { Dungeon } from './levels/Dungeon'
 import {
   MoveHeroCollisionService,
   MoveHeroCommandHandler,
@@ -24,12 +27,16 @@ TODO:
 - PRNG see https://gemini.google.com/share/49c3dda200ae
 */
 
-const status = new Status({ width: 30, height: 3 })
+const dungeonSize = { width: 30, height: 20 }
 
-const game = new Game({
-  dungeon: { width: 30, height: 10 },
-  status,
+const status = new Status({ width: dungeonSize.width, height: 3 })
+const hero = new Hero({
+  x: Math.floor(dungeonSize.width / 2),
+  y: Math.floor(dungeonSize.height / 2),
 })
+const monsters = new MonsterCollection()
+const dungeon = new Dungeon(dungeonSize, hero, monsters)
+const game = new Game(dungeon, status, hero, monsters)
 
 function main() {
   const terminal = new Terminal(game.width, game.height)
@@ -153,10 +160,7 @@ function main() {
     do {
       pos.x = Math.floor(Math.random() * game.dungeon.width)
       pos.y = Math.floor(Math.random() * game.dungeon.height)
-    } while (
-      (pos.x === game.hero.x && pos.y === game.hero.y) ||
-      game.monsters.all.some((m) => m.x === pos.x && m.y === pos.y)
-    )
+    } while (dungeon.at(pos.x, pos.y).length > 0)
     const monster = new Monster(pos)
     game.monsters.add(monster)
     dungeonBuffer.set(monster.x, monster.y, monster.char)

@@ -2,16 +2,12 @@ import { Debug } from './Debug'
 import { MonsterCollection } from './entities/EntityCollection'
 import { Hero } from './entities/Hero'
 import { Monster } from './entities/Monster'
+import { Dungeon } from './levels/Dungeon'
 import { Status } from './Status'
-import { DeepReadonly, Size } from './types'
-
-type GameOptions = {
-  dungeon: Size
-  status: Status
-}
+import { Size } from './types'
 
 export class Game implements Readonly<Size> {
-  readonly dungeon: Readonly<Size>
+  readonly dungeon: Dungeon
   readonly status: Readonly<Size>
   readonly width: number
   readonly height: number
@@ -19,16 +15,18 @@ export class Game implements Readonly<Size> {
   readonly monsters: MonsterCollection
   private _turns: number = 0
 
-  constructor({ dungeon, status }: DeepReadonly<GameOptions>) {
+  constructor(
+    dungeon: Dungeon,
+    status: Status,
+    hero: Hero,
+    monsters: MonsterCollection,
+  ) {
     this.width = Math.max(dungeon.width, status.width)
     this.height = dungeon.height + status.height
     this.dungeon = dungeon
     this.status = status
-    this.hero = new Hero({
-      x: Math.floor(dungeon.width / 2),
-      y: Math.floor(dungeon.height / 2),
-    })
-    this.monsters = new MonsterCollection()
+    this.hero = hero
+    this.monsters = monsters
   }
 
   get turns() {

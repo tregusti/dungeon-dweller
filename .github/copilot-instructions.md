@@ -8,6 +8,12 @@ No default exports. All exports are named.
 Currently we are using commands and events as the main way to structure the
 code.
 
+# Terminology
+
+`spot` is a specific location in the dungeon, defined by its x and y
+coordinates. And in the future will probably also include a reference to the
+level it is on.
+
 # Commands and events
 
 Commands are organized in folders under `src/messaging/commands` and events are
