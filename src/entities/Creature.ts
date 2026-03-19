@@ -12,7 +12,7 @@ export type ActionResult = Readonly<
   )
 >
 
-export abstract class Entity {
+export abstract class Creature {
   x: number
   y: number
   char: string

@@ -1,7 +1,7 @@
 import { Position } from '../types'
-import { Entity } from './Entity'
+import { Creature } from './Creature'
 
-export class Hero extends Entity {
+export class Hero extends Creature {
   kills: number = 0
 
   constructor({ x, y }: Position) {
@@ -12,13 +12,7 @@ export class Hero extends Entity {
     this._energy += this.speed
   }
 
-  move(
-    dx: number,
-    dy: number,
-  ): {
-    from: Position
-    to: Position
-  } {
+  move(dx: number, dy: number): { from: Position; to: Position } {
     const from = { x: this.x, y: this.y }
     this.x += dx
     this.y += dy

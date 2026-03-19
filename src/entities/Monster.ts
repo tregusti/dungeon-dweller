@@ -1,7 +1,7 @@
-import { ActionResult, Entity } from './Entity'
 import { Position } from '../types'
+import { ActionResult, Creature } from './Creature'
 
-export class Monster extends Entity {
+export class Monster extends Creature {
   constructor({ x, y }: Position) {
     // pick random character
     const choices = ['x', 'm', 'M', '&', '£']
