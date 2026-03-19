@@ -1,10 +1,11 @@
 import {
   MoveHeroCommandPayload,
   MoveHeroCommandResult,
+  MoveHeroCommandType,
 } from '../commands/MoveHero'
 
 export const CommandType = {
-  MoveHero: Symbol('MoveHero'),
+  MoveHero: MoveHeroCommandType,
 } as const
 
 type CommandDef<TPayload, TResult> = {
