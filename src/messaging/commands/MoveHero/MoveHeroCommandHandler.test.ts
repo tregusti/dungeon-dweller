@@ -2,7 +2,7 @@ import { MonsterCollection } from '../../../entities/EntityCollection'
 import { Hero } from '../../../entities/Hero'
 import { Monster } from '../../../entities/Monster'
 import { EventBus } from '../../core/EventBus'
-import { Events, EventType } from '../../core/Events'
+import { EventPayload, Events, EventType } from '../../core/Events'
 import { MoveHeroCollisionService } from './MoveHeroCollisionService'
 import { MoveHeroCommandHandler, Movement } from './MoveHeroCommandHandler'
 
@@ -36,7 +36,7 @@ describe('MoveHeroCommandHandler', () => {
     })
     it('should emit the HeroMoved event', async () => {
       const { events, subject } = createSUT({ heroPosition: { x: 5, y: 5 } })
-      const movedEvents: Events[typeof EventType.HeroMoved][] = []
+      const movedEvents: EventPayload<typeof EventType.HeroMoved>[] = []
       events.subscribe(EventType.HeroMoved, (payload) => {
         movedEvents.push(payload)
       })

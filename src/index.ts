@@ -23,7 +23,7 @@ TODO:
 - Fix bug in BufferCompositor.
 */
 
-const dungeonSize = { width: 30, height: 20 }
+const dungeonSize = { width: 20, height: 10 }
 
 const status = new Status({ width: dungeonSize.width, height: 3 })
 const hero = new Hero({
@@ -101,13 +101,6 @@ function main() {
     dungeonBuffer.set(to.x, to.y, game.hero.char)
     game.advanceTurn()
   })
-
-  // Messaging.event.subscribe(
-  //   EventName.HeroAttackedMonster,
-  //   ({ monsterChar }) => {
-  //     Debug.write(`Hero kills ${monsterChar} at turn ${game.turns}`)
-  //   },
-  // )
 
   let gameEnabled = false
 

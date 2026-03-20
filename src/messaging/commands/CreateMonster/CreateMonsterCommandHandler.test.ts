@@ -4,6 +4,8 @@ import { Dungeon } from '../../../levels/Dungeon'
 import { Random } from '../../../Random'
 import { expectToBe, expectToHaveProperty } from '../../../test/expect'
 import { Position, Size } from '../../../types'
+import { Bus } from '../../core'
+import { EventType } from '../../core/Events'
 import { CreateMonsterCommandHandler } from './CreateMonsterCommandHandler'
 
 describe('CreateMonsterCommandHandler', () => {
@@ -51,6 +53,24 @@ describe('CreateMonsterCommandHandler', () => {
       expectToBe(result.success, true)
       expect(result.monster.x).toEqual(1)
       expect(result.monster.y).toEqual(1)
+    })
+    it('should emit the MonsterCreated event', async () => {
+      const { subject } = createSUT({
+        dungeonSize: { width: 2, height: 1 },
+        heroPosition: { x: 0, y: 0 },
+      })
+      const promise = new Promise<void>((resolve) => {
+        Bus.event.subscribe(EventType.MonsterCreated, (payload) => {
+          expectToHaveProperty(payload, 'monster')
+          expectToHaveProperty(payload, 'at')
+          expect(payload.at).toEqual({ x: 1, y: 0 })
+          resolve()
+        })
+      })
+
+      subject.handle()
+
+      await promise
     })
   })
 
