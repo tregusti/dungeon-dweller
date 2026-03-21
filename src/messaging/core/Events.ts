@@ -1,8 +1,9 @@
+import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { Position } from '../../types'
 
-export const HeroMovedEventType = Symbol('HeroMoved')
-export const MonsterCreatedEventType = Symbol('MonsterCreated')
+const HeroMovedEventType = Symbol('HeroMoved')
+const MonsterCreatedEventType = Symbol('MonsterCreated')
 
 export const EventType = {
   HeroMoved: HeroMovedEventType,
@@ -14,7 +15,11 @@ export type EventDef<TPayload> = {
 }
 
 export type Events = {
-  [EventType.HeroMoved]: EventDef<{ from: Position; to: Position }>
+  [EventType.HeroMoved]: EventDef<{
+    from: Position
+    to: Position
+    hero: Hero
+  }>
   [EventType.MonsterCreated]: EventDef<{
     monster: Monster
     at: Position

@@ -1,3 +1,4 @@
+import { Random } from '../Random'
 import { Position } from '../types'
 import { ActionResult, Creature } from './Creature'
 
@@ -8,7 +9,7 @@ export class Monster extends Creature {
     const char = choices[Math.floor(Math.random() * choices.length)]
 
     // assign default speed for monsters
-    const speed = Math.floor(5 + 26 * Math.random()) // 5 to 30
+    const speed = Random.int(3, 15)
 
     super({ x, y, char, speed })
   }

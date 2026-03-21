@@ -2,6 +2,7 @@ import { BufferCompositor } from '../buffer/BufferCompositor'
 import { Terminal } from './Terminal'
 
 // let flushes = 0
+/** @deprecated Use Renderer class instead */
 export const flushBuffer = (terminal: Terminal, buffer: BufferCompositor) => {
   buffer.flush((entries) => {
     // Debug.write(

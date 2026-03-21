@@ -35,7 +35,9 @@ describe('MoveHeroCommandHandler', () => {
       expect(hero.y).toBe(5)
     })
     it('should emit the HeroMoved event', async () => {
-      const { events, subject } = createSUT({ heroPosition: { x: 5, y: 5 } })
+      const { events, subject, hero } = createSUT({
+        heroPosition: { x: 5, y: 5 },
+      })
       const movedEvents: EventPayload<typeof EventType.HeroMoved>[] = []
       events.subscribe(EventType.HeroMoved, (payload) => {
         movedEvents.push(payload)
@@ -44,10 +46,10 @@ describe('MoveHeroCommandHandler', () => {
       await subject.handle({ dx: 1, dy: 0 })
 
       expect(movedEvents).toHaveLength(1)
-      expect(movedEvents.at(0)).toEqual({
-        from: { x: 5, y: 5 },
-        to: { x: 6, y: 5 },
-      })
+      const movedEvent = movedEvents.at(0)
+      expect(movedEvent).toHaveProperty('from', { x: 5, y: 5 })
+      expect(movedEvent).toHaveProperty('to', { x: 6, y: 5 })
+      expect(movedEvent?.hero).toBe(hero)
     })
     it('should return success in the result', async () => {
       const { subject } = createSUT({ heroPosition: { x: 5, y: 5 } })

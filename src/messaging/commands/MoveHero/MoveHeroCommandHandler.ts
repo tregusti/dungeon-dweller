@@ -36,6 +36,7 @@ export class MoveHeroCommandHandler {
       await this.events.publish(EventType.HeroMoved, {
         from: from,
         to: to,
+        hero: this.hero,
       })
       return {
         success: true,

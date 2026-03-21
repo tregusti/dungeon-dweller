@@ -14,6 +14,7 @@ import { Bus } from './messaging/core'
 import { CommandType } from './messaging/core/Commands'
 import { EventType } from './messaging/core/Events'
 import { Random } from './Random'
+import { Renderer } from './Renderer'
 import { Status } from './Status'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Terminal } from './terminal/Terminal'
@@ -58,12 +59,16 @@ function main() {
     z: 1,
   })
 
+  const renderer = new Renderer(dungeonBuffer, compositor, terminal)
+  renderer.attach()
+
   // IDEA:
   // status manages its own buffer and implements the CompositorRegistrant interface
   // which is a method that compositor invokes and passes the buffer to it when it's registered.
   // const status = new Status({ game })
   // compositor.register(status)
 
+  /** @deprecated */
   function forceRedraw() {
     terminal.clear()
     flushBuffer(terminal, compositor)
@@ -96,9 +101,7 @@ function main() {
     createMonsterCommandHandler.handle(),
   )
 
-  Bus.event.subscribe(EventType.HeroMoved, ({ from, to }) => {
-    dungeonBuffer.clear(from.x, from.y)
-    dungeonBuffer.set(to.x, to.y, game.hero.char)
+  Bus.event.subscribe(EventType.HeroMoved, () => {
     game.advanceTurn()
   })
 
@@ -149,7 +152,6 @@ function main() {
     }
 
     status.update(game)
-    flushBuffer(terminal, compositor)
   }
 
   async function handleCreateMonster() {
@@ -159,9 +161,6 @@ function main() {
       Debug.write(`No free dungeon tile to spawn monster at turn ${game.turns}`)
       return
     }
-
-    const { monster } = result
-    dungeonBuffer.set(monster.x, monster.y, monster.char)
   }
 
   async function handleMovement(dx: number, dy: number) {
