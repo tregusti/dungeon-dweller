@@ -19,11 +19,6 @@ import { Status } from './Status'
 import { flushBuffer } from './terminal/BufferWriter'
 import { Terminal } from './terminal/Terminal'
 
-/*
-TODO:
-- Fix bug in BufferCompositor.
-*/
-
 const dungeonSize = { width: 20, height: 10 }
 
 const status = new Status({ width: dungeonSize.width, height: 3 })
