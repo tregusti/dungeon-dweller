@@ -40,7 +40,7 @@ describe('Dungeon', () => {
     })
     it('should return the monster', () => {
       const { dungeon, monsters } = createSUT()
-      const monster = new Monster({ x: 2, y: 2 })
+      const monster = new Monster({ x: 2, y: 2, speed: 10 })
       monsters.add(monster)
 
       const list = dungeon.at(2, 2)
@@ -63,7 +63,7 @@ describe('Dungeon', () => {
     })
     it('should return false if monster is on the spot', () => {
       const { dungeon, monsters } = createSUT()
-      const monster = new Monster({ x: 2, y: 2 })
+      const monster = new Monster({ x: 2, y: 2, speed: 10 })
       monsters.add(monster)
 
       expect(dungeon.isOccupied(2, 2)).toBe(true)
@@ -93,8 +93,8 @@ describe('Dungeon', () => {
         heroPosition: AA,
         size: { width: 2, height: 2 },
       })
-      monsters.add(new Monster(CC))
-      monsters.add(new Monster(DD))
+      monsters.add(new Monster({ ...CC, speed: 10 }))
+      monsters.add(new Monster({ ...DD, speed: 10 }))
 
       const result = dungeon.getFreePositions()
       expect(result).toHaveLength(1)

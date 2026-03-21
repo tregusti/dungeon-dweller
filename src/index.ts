@@ -6,13 +6,12 @@ import { Game } from './Game'
 import { Dungeon } from './levels/Dungeon'
 import { CreateHeroCommandHandler } from './messaging/commands/CreateHero'
 import { CreateMonsterCommandHandler } from './messaging/commands/CreateMonster'
-import {
-  MoveHeroCollisionService,
-  MoveHeroCommandHandler,
-} from './messaging/commands/MoveHero'
+import { MoveHeroCommandHandler } from './messaging/commands/MoveHero'
+import { MoveMonsterCommandHandler } from './messaging/commands/MoveMonster'
 import { Bus } from './messaging/core'
 import { CommandType } from './messaging/core/Commands'
 import { EventType } from './messaging/core/Events'
+import { MoveCreatureCollisionService } from './messaging/services/MoveCreatureCollisionService'
 import { Random } from './Random'
 import { flushBuffer } from './screen/BufferWriter'
 import { Renderer } from './screen/Renderer'
@@ -76,17 +75,27 @@ dungeonBuffer.clear()
 dungeonBuffer.set(game.hero.x, game.hero.y, game.hero.char)
 status.update(game)
 
-const moveHeroCollisionService = new MoveHeroCollisionService(
+const moveCreatureCollisionService = new MoveCreatureCollisionService(
   game.dungeon,
   game.monsters,
+  game.hero,
 )
 const moveHeroCommandHandler = new MoveHeroCommandHandler(
   game.hero,
-  moveHeroCollisionService,
+  moveCreatureCollisionService,
+  Bus.event,
+)
+const moveMonsterCommandHandler = new MoveMonsterCommandHandler(
+  hero,
+  moveCreatureCollisionService,
+  random.create('move-monster'),
   Bus.event,
 )
 Bus.command.register(CommandType.MoveHero, (payload) =>
   moveHeroCommandHandler.handle(payload),
+)
+Bus.command.register(CommandType.MoveMonster, (payload) =>
+  moveMonsterCommandHandler.handle(payload),
 )
 
 const createMonsterCommandHandler = new CreateMonsterCommandHandler(
@@ -167,8 +176,25 @@ async function handleMovement(dx: number, dy: number) {
   })
 
   if (result.success) {
+    Debug.write(
+      `Hero moves to (${result.to.x},${result.to.y}) at turn ${game.turns}.`,
+    )
     do {
-      game.processMonsterTurn()
+      await game.processMonsterTurn(async (monster) => {
+        const result = await Bus.command.execute(CommandType.MoveMonster, {
+          monster,
+        })
+
+        if (result.success) {
+          Debug.write(
+            `${monster.char} moves to (${result.to.x},${result.to.y}) at turn ${game.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
+          )
+        } else {
+          Debug.write(
+            `${monster.char} bumps into a ${result.reason} at turn ${game.turns}`,
+          )
+        }
+      })
       game.hero.giveEnergy()
     } while (game.hero.energy < game.hero.speed)
   } else {

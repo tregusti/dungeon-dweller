@@ -1,7 +1,7 @@
 import { Hero } from '../../../entities/Hero'
 import { EventBus } from '../../core/EventBus'
 import { Events, EventType } from '../../core/Events'
-import { MoveHeroCollisionService } from './MoveHeroCollisionService'
+import { MoveCreatureCollisionService } from '../../services/MoveCreatureCollisionService'
 import type {
   MoveHeroCommandPayload,
   MoveHeroCommandResult,
@@ -17,7 +17,7 @@ export const Movement = {
 export class MoveHeroCommandHandler {
   constructor(
     private readonly hero: Hero,
-    private readonly collision: MoveHeroCollisionService,
+    private readonly collision: MoveCreatureCollisionService,
     private readonly events: EventBus<Events>,
   ) {}
 

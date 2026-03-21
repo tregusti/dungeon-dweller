@@ -1,17 +1,5 @@
 import { Position } from '../types'
 
-export type ActionType = 'move' | 'noop'
-export type ActionResult = Readonly<
-  { type: ActionType } & (
-    | { type: 'noop' }
-    | {
-        type: 'move'
-        from: Position
-        to: Position
-      }
-  )
->
-
 export abstract class Creature {
   x: number
   y: number

@@ -3,7 +3,7 @@ import { Hero } from '../../../entities/Hero'
 import { Monster } from '../../../entities/Monster'
 import { EventBus } from '../../core/EventBus'
 import { EventPayload, Events, EventType } from '../../core/Events'
-import { MoveHeroCollisionService } from './MoveHeroCollisionService'
+import { MoveCreatureCollisionService } from '../../services/MoveCreatureCollisionService'
 import { MoveHeroCommandHandler, Movement } from './MoveHeroCommandHandler'
 
 describe('MoveHeroCommandHandler', () => {
@@ -14,7 +14,7 @@ describe('MoveHeroCommandHandler', () => {
     const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()
     const events = new EventBus<Events>()
-    const collision = new MoveHeroCollisionService(dungeon, monsters)
+    const collision = new MoveCreatureCollisionService(dungeon, monsters, hero)
     const subject = new MoveHeroCommandHandler(hero, collision, events)
 
     return {
@@ -68,7 +68,7 @@ describe('MoveHeroCommandHandler', () => {
       const { hero, monsters, subject } = createSUT({
         heroPosition: { x: 5, y: 5 },
       })
-      const monster = new Monster({ x: 6, y: 5 })
+      const monster = new Monster({ x: 6, y: 5, speed: 10 })
       monsters.add(monster)
 
       await subject.handle(Movement.Right)
@@ -81,7 +81,7 @@ describe('MoveHeroCommandHandler', () => {
       const { monsters, events, subject } = createSUT({
         heroPosition: { x: 5, y: 5 },
       })
-      const monster = new Monster({ x: 6, y: 5 })
+      const monster = new Monster({ x: 6, y: 5, speed: 10 })
       monsters.add(monster)
 
       const movedEvents: unknown[] = []
@@ -99,7 +99,7 @@ describe('MoveHeroCommandHandler', () => {
       const { monsters, subject } = createSUT({
         heroPosition: { x: 5, y: 5 },
       })
-      const monster = new Monster({ x: 6, y: 5 })
+      const monster = new Monster({ x: 6, y: 5, speed: 10 })
       monsters.add(monster)
 
       const result = await subject.handle(Movement.Right)

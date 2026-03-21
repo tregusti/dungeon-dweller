@@ -21,6 +21,11 @@ export class Renderer {
       this.dungeonBuffer.set(at.x, at.y, monster.char)
       this.redraw()
     })
+    Bus.event.subscribe(EventType.MonsterMoved, ({ monster, from, to }) => {
+      this.dungeonBuffer.clear(from.x, from.y)
+      this.dungeonBuffer.set(to.x, to.y, monster.char)
+      this.redraw()
+    })
   }
 
   private redraw() {

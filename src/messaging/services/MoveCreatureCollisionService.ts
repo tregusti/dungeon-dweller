@@ -1,6 +1,7 @@
-import { MonsterCollection } from '../../../entities/EntityCollection'
-import { Monster } from '../../../entities/Monster'
-import { Position, Size } from '../../../types'
+import { MonsterCollection } from '../../entities/EntityCollection'
+import { Hero } from '../../entities/Hero'
+import { Monster } from '../../entities/Monster'
+import { Position, Size } from '../../types'
 
 type MoveEvaluation =
   | { success: true }
@@ -13,11 +14,17 @@ type MoveEvaluation =
       success: false
       reason: 'wall'
     }
+  | {
+      success: false
+      reason: 'hero'
+      hero: Hero
+    }
 
-export class MoveHeroCollisionService {
+export class MoveCreatureCollisionService {
   constructor(
     private readonly dungeon: Readonly<Size>,
     private readonly monsters: MonsterCollection,
+    private readonly hero: Hero,
   ) {}
 
   evaluate({
@@ -29,7 +36,6 @@ export class MoveHeroCollisionService {
     dx: number
     dy: number
   }): MoveEvaluation {
-    // check for outer boundary collision
     const attemptedTo = { x: from.x + dx, y: from.y + dy }
     const outside =
       attemptedTo.x < 0 ||
@@ -43,7 +49,14 @@ export class MoveHeroCollisionService {
       }
     }
 
-    // check for monster at attempted position
+    if (this.hero.x === attemptedTo.x && this.hero.y === attemptedTo.y) {
+      return {
+        success: false,
+        reason: 'hero',
+        hero: this.hero,
+      }
+    }
+
     const monster = this.monsters.all.find(
       (m) => m.x === attemptedTo.x && m.y === attemptedTo.y,
     )
@@ -55,7 +68,6 @@ export class MoveHeroCollisionService {
       }
     }
 
-    // otherwise, it's a successful move
     return {
       success: true,
     }

@@ -4,7 +4,7 @@ import { Hero } from './entities/Hero'
 import { Monster } from './entities/Monster'
 import { Dungeon } from './levels/Dungeon'
 import { Status } from './Status'
-import { Size } from './types'
+import { MaybePromise, Size } from './types'
 
 export class Game implements Readonly<Size> {
   readonly dungeon: Dungeon
@@ -36,17 +36,16 @@ export class Game implements Readonly<Size> {
     this._turns++
   }
 
-  processMonsterTurn() {
+  async processMonsterTurn(
+    onMonsterAct: (monster: Monster) => MaybePromise<void>,
+  ) {
     const monsters = this.monsters.all.slice()
     monsters.forEach((mon) => mon.giveEnergy())
 
     let mon: Monster | undefined
     while ((mon = monsters.shift())) {
       if (mon.energy >= this.hero.speed) {
-        Debug.write(
-          `${mon.char} acts at turn ${this._turns}! (energy: ${mon.energy} speed: ${mon.speed})`,
-        )
-        mon.move()
+        await onMonsterAct(mon)
         if (mon.energy >= this.hero.speed) {
           monsters.push(mon) // still has energy to act again
         }
