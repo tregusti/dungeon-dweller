@@ -2,9 +2,9 @@ import { Buffer } from './buffer/Buffer'
 import { BufferCompositor } from './buffer/BufferCompositor'
 import { Debug } from './Debug'
 import { MonsterCollection } from './entities/EntityCollection'
-import { Hero } from './entities/Hero'
 import { Game } from './Game'
 import { Dungeon } from './levels/Dungeon'
+import { CreateHeroCommandHandler } from './messaging/commands/CreateHero'
 import { CreateMonsterCommandHandler } from './messaging/commands/CreateMonster'
 import {
   MoveHeroCollisionService,
@@ -19,13 +19,16 @@ import { Renderer } from './screen/Renderer'
 import { Terminal } from './screen/Terminal'
 import { Status } from './Status'
 
+const random = new Random('lenn-seed')
+
 const dungeonSize = { width: 20, height: 10 }
 
 const status = new Status({ width: dungeonSize.width, height: 3 })
-const hero = new Hero({
-  x: Math.floor(dungeonSize.width / 2),
-  y: Math.floor(dungeonSize.height / 2),
-})
+const createHeroCommandHandler = new CreateHeroCommandHandler(
+  dungeonSize,
+  random.create('create-hero'),
+)
+const hero = createHeroCommandHandler.handle().hero
 const monsters = new MonsterCollection()
 const dungeon = new Dungeon(dungeonSize, hero, monsters)
 const game = new Game(dungeon, status, hero, monsters)
@@ -89,7 +92,7 @@ Bus.command.register(CommandType.MoveHero, (payload) =>
 const createMonsterCommandHandler = new CreateMonsterCommandHandler(
   game.dungeon,
   game.monsters,
-  Random,
+  random.create('create-monster'),
 )
 Bus.command.register(CommandType.CreateMonster, () =>
   createMonsterCommandHandler.handle(),

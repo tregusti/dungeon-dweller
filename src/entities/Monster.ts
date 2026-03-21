@@ -3,13 +3,10 @@ import { Position } from '../types'
 import { ActionResult, Creature } from './Creature'
 
 export class Monster extends Creature {
-  constructor({ x, y }: Position) {
+  constructor({ x, y, speed }: Position & { speed: number }) {
     // pick random character
     const choices = ['x', 'm', 'M', '&', '£']
     const char = choices[Math.floor(Math.random() * choices.length)]
-
-    // assign default speed for monsters
-    const speed = Random.int(3, 15)
 
     super({ x, y, char, speed })
   }

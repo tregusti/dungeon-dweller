@@ -1,8 +1,7 @@
 import { MonsterCollection } from '../../../entities/EntityCollection'
-import { Hero } from '../../../entities/Hero'
 import { Monster } from '../../../entities/Monster'
 import { Dungeon } from '../../../levels/Dungeon'
-import { Random } from '../../../Random'
+import { RandomGenerator } from '../../../Random'
 import { Bus } from '../../core'
 import { EventType } from '../../core/Events'
 import type { CreateMonsterCommandResult } from './CreateMonsterCommand'
@@ -11,7 +10,7 @@ export class CreateMonsterCommandHandler {
   constructor(
     private readonly dungeon: Dungeon,
     private readonly monsters: MonsterCollection,
-    private readonly random: Random,
+    private readonly random: RandomGenerator,
   ) {}
 
   handle(): CreateMonsterCommandResult {
@@ -25,7 +24,10 @@ export class CreateMonsterCommandHandler {
 
     const idx = this.random.int(freePositions.length - 1)
     const spawnAt = freePositions[idx]
-    const monster = new Monster(spawnAt)
+    const monster = new Monster({
+      ...spawnAt,
+      speed: this.random.int(3, 15),
+    })
     this.monsters.add(monster)
 
     Bus.event.publish(EventType.MonsterCreated, {

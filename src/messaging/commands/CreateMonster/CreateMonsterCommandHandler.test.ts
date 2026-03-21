@@ -1,7 +1,7 @@
 import { MonsterCollection } from '../../../entities/EntityCollection'
 import { Hero } from '../../../entities/Hero'
 import { Dungeon } from '../../../levels/Dungeon'
-import { Random } from '../../../Random'
+import { Random, RandomGenerator } from '../../../Random'
 import { expectToBe, expectToHaveProperty } from '../../../test/expect'
 import { Position, Size } from '../../../types'
 import { Bus } from '../../core'
@@ -12,11 +12,11 @@ describe('CreateMonsterCommandHandler', () => {
   const createSUT = ({
     dungeonSize = { width: 5, height: 5 },
     heroPosition = { x: 1, y: 1 },
-    random = Random,
+    random = new Random('test-seed'),
   }: {
     dungeonSize?: Size
     heroPosition?: Position
-    random?: Random
+    random?: RandomGenerator
   } = {}) => {
     const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()
