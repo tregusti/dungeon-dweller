@@ -1,6 +1,8 @@
 import type { Game } from './Game'
 import type { Terminal } from './terminal/Terminal'
 
+const DEBUG = true
+
 let terminal: Terminal | null = null
 let game: Game | null = null
 
@@ -8,6 +10,8 @@ const log = [] as string[]
 const lineLength = process.stdout.columns
 
 export const Debug = {
+  enabled: DEBUG,
+
   initialize({ terminal: t, game: g }: { terminal: Terminal; game: Game }) {
     terminal = t
     game = g
@@ -15,6 +19,10 @@ export const Debug = {
 
   // This might be called in tests without #initialize having been called.
   write(text: string) {
+    if (!DEBUG) {
+      return
+    }
+
     const offset = game ? game.height + 1 : 0
     const count = process.stdout.rows - offset
     log.unshift(text.replace(/\n/g, '/'))

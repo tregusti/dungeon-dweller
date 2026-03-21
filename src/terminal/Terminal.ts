@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
-import { ANSI } from '../ANSI'
 
-const DEBUG = true
+import { ANSI } from '../ANSI'
+import { Debug } from '../Debug'
 
 const ExitCodes = {
   OK: 0,
@@ -101,7 +101,7 @@ export class Terminal extends EventEmitter<TerminalEvents> {
 
     // Catch signals and exit gracefully
     const exit = (code: number, error?: Error | unknown) => {
-      if (DEBUG) {
+      if (Debug.enabled) {
         console.error(`Exiting with code ${code}`)
         if (error) {
           console.error(error)
