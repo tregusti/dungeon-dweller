@@ -1,3 +1,4 @@
+import { Debug } from '../../Debug'
 import type { EventDef } from './Events'
 
 type EventHandler<TPayload> = (payload: TPayload) => void | Promise<void>
@@ -34,8 +35,23 @@ export class EventBus<TEvents extends EventMap> {
     const handlers = this.listeners.get(type)
     if (!handlers || handlers.length === 0) return
 
+    debugEmittedEvent(type, payload)
+
     for (const handler of [...handlers]) {
       await handler(payload)
     }
   }
+}
+
+const debugEmittedEvent = (type: PropertyKey, payload: unknown) => {
+  let debug = payload as any
+  if (payload instanceof Object) {
+    debug = { ...payload }
+    if (debug.hero) debug.hero = '…'
+    if (debug.monster) debug.monster = '…'
+  }
+
+  Debug.write(
+    `Publishing event ${String(type)} with payload:` + JSON.stringify(debug),
+  )
 }

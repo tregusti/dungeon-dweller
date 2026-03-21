@@ -12,14 +12,20 @@ export const Debug = {
     terminal = t
     game = g
   },
+
+  // This might be called in tests without #initialize having been called.
   write(text: string) {
-    const offset = game!.height + 1
+    const offset = game ? game.height + 1 : 0
     const count = process.stdout.rows - offset
     log.unshift(text.replace(/\n/g, '/'))
     if (terminal) {
       for (let i = 0; i < Math.min(count, log.length); i++) {
         const line = `${log.length - i}: ${log[i]}`.padEnd(lineLength)
-        terminal.writeAt(0, offset + i, line)
+        const trimmed =
+          line.length > lineLength
+            ? line.substring(0, lineLength - 1) + '…'
+            : line
+        terminal.writeAt(0, offset + i, trimmed)
       }
     }
   },
