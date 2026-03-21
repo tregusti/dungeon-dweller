@@ -14,10 +14,10 @@ import { Bus } from './messaging/core'
 import { CommandType } from './messaging/core/Commands'
 import { EventType } from './messaging/core/Events'
 import { Random } from './Random'
-import { Renderer } from './Renderer'
+import { flushBuffer } from './screen/BufferWriter'
+import { Renderer } from './screen/Renderer'
+import { Terminal } from './screen/Terminal'
 import { Status } from './Status'
-import { flushBuffer } from './terminal/BufferWriter'
-import { Terminal } from './terminal/Terminal'
 
 const dungeonSize = { width: 20, height: 10 }
 

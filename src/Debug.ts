@@ -1,5 +1,5 @@
 import type { Game } from './Game'
-import type { Terminal } from './terminal/Terminal'
+import type { Terminal } from './screen/Terminal'
 
 const DEBUG = true
 

@@ -1,8 +1,8 @@
-import { Buffer } from './buffer/Buffer'
-import { BufferCompositor } from './buffer/BufferCompositor'
-import { Bus } from './messaging/core'
-import { EventType } from './messaging/core/Events'
-import { Terminal } from './terminal/Terminal'
+import { Buffer } from '../buffer/Buffer'
+import { BufferCompositor } from '../buffer/BufferCompositor'
+import { Bus } from '../messaging/core'
+import { EventType } from '../messaging/core/Events'
+import { Terminal } from '../screen/Terminal'
 
 export class Renderer {
   constructor(
