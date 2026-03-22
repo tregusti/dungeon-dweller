@@ -2,6 +2,8 @@ import * as CreateHero from '../commands/CreateHero'
 import * as CreateMonster from '../commands/CreateMonster'
 import * as MoveHero from '../commands/MoveHero'
 import * as MoveMonster from '../commands/MoveMonster'
+import * as ProcessMonsterRound from '../commands/ProcessMonsterRound'
+import * as ProcessUntilHeroReady from '../commands/ProcessUntilHeroReady'
 
 export const CommandType = {
   // Hero
@@ -11,6 +13,10 @@ export const CommandType = {
   // Monsters
   CreateMonster: CreateMonster.CreateMonsterCommandType,
   MoveMonster: MoveMonster.MoveMonsterCommandType,
+  ProcessMonsterRound: ProcessMonsterRound.ProcessMonsterRoundCommandType,
+
+  // Turn orchestration
+  ProcessUntilHeroReady: ProcessUntilHeroReady.ProcessUntilHeroReadyCommandType,
 } as const
 
 export type CommandDef<TPayload, TResult> = {
@@ -34,5 +40,13 @@ export type Commands = {
   [CommandType.MoveMonster]: CommandDef<
     MoveMonster.MoveMonsterCommandPayload,
     MoveMonster.MoveMonsterCommandResult
+  >
+  [CommandType.ProcessMonsterRound]: CommandDef<
+    ProcessMonsterRound.ProcessMonsterRoundCommandPayload,
+    ProcessMonsterRound.ProcessMonsterRoundCommandResult
+  >
+  [CommandType.ProcessUntilHeroReady]: CommandDef<
+    ProcessUntilHeroReady.ProcessUntilHeroReadyCommandPayload,
+    ProcessUntilHeroReady.ProcessUntilHeroReadyCommandResult
   >
 }

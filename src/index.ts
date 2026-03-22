@@ -8,6 +8,8 @@ import { CreateHeroCommandHandler } from './messaging/commands/CreateHero'
 import { CreateMonsterCommandHandler } from './messaging/commands/CreateMonster'
 import { MoveHeroCommandHandler } from './messaging/commands/MoveHero'
 import { MoveMonsterCommandHandler } from './messaging/commands/MoveMonster'
+import { ProcessMonsterRoundCommandHandler } from './messaging/commands/ProcessMonsterRound'
+import { ProcessUntilHeroReadyCommandHandler } from './messaging/commands/ProcessUntilHeroReady'
 import {
   CommandBus,
   Commands,
@@ -35,7 +37,7 @@ const createHeroCommandHandler = new CreateHeroCommandHandler(
 const hero = createHeroCommandHandler.handle().hero
 const monsters = new MonsterCollection()
 const dungeon = new Dungeon(dungeonSize, hero, monsters)
-const game = new Game(dungeon, status, hero, monsters)
+const game = new Game(dungeon, status)
 const commandBus = new CommandBus<Commands>()
 const eventBus = new EventBus<Events>()
 
@@ -48,8 +50,8 @@ const compositor = new BufferCompositor({
 })
 const dungeonBuffer = compositor.add({
   buffer: new Buffer({
-    width: game.dungeon.width,
-    height: game.dungeon.height,
+    width: dungeon.width,
+    height: dungeon.height,
   }),
   x: 0,
   y: 0,
@@ -58,7 +60,7 @@ const dungeonBuffer = compositor.add({
 compositor.add({
   buffer: status.buffer,
   x: 0,
-  y: game.dungeon.height + 1,
+  y: dungeon.height + 1,
   z: 1,
 })
 
@@ -79,16 +81,16 @@ function forceRedraw() {
 
 // initial render
 dungeonBuffer.clear()
-dungeonBuffer.set(game.hero.x, game.hero.y, game.hero.char)
+dungeonBuffer.set(hero.x, hero.y, hero.char)
 status.update(game)
 
 const moveCreatureCollisionService = new MoveCreatureCollisionService(
-  game.dungeon,
-  game.monsters,
-  game.hero,
+  dungeon,
+  monsters,
+  hero,
 )
 const moveHeroCommandHandler = new MoveHeroCommandHandler(
-  game.hero,
+  hero,
   moveCreatureCollisionService,
   eventBus,
 )
@@ -98,16 +100,29 @@ const moveMonsterCommandHandler = new MoveMonsterCommandHandler(
   random.create('move-monster'),
   eventBus,
 )
+const processMonsterRoundCommandHandler = new ProcessMonsterRoundCommandHandler(
+  monsters,
+  hero,
+  commandBus,
+)
+const processUntilHeroReadyCommandHandler =
+  new ProcessUntilHeroReadyCommandHandler(hero, commandBus)
 commandBus.register(CommandType.MoveHero, (payload) =>
   moveHeroCommandHandler.handle(payload),
 )
 commandBus.register(CommandType.MoveMonster, (payload) =>
   moveMonsterCommandHandler.handle(payload),
 )
+commandBus.register(CommandType.ProcessMonsterRound, () =>
+  processMonsterRoundCommandHandler.handle(),
+)
+commandBus.register(CommandType.ProcessUntilHeroReady, () =>
+  processUntilHeroReadyCommandHandler.handle(),
+)
 
 const createMonsterCommandHandler = new CreateMonsterCommandHandler(
-  game.dungeon,
-  game.monsters,
+  dungeon,
+  monsters,
   random.create('create-monster'),
   eventBus,
 )
@@ -187,24 +202,26 @@ async function handleMovement(dx: number, dy: number) {
     Debug.write(
       `Hero moves to (${result.to.x},${result.to.y}) at turn ${game.turns}.`,
     )
-    do {
-      await game.processMonsterTurn(async (monster) => {
-        const result = await commandBus.execute(CommandType.MoveMonster, {
-          monster,
-        })
+    const turnResult = await commandBus.execute(
+      CommandType.ProcessUntilHeroReady,
+    )
 
-        if (result.success) {
+    for (const round of turnResult.rounds) {
+      for (const action of round.actions) {
+        const monster = action.monster
+        const monsterResult = action.result
+
+        if (monsterResult.success) {
           Debug.write(
-            `${monster.char} moves to (${result.to.x},${result.to.y}) at turn ${game.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
+            `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${game.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
           )
         } else {
           Debug.write(
-            `${monster.char} bumps into a ${result.reason} at turn ${game.turns}`,
+            `${monster.char} bumps into a ${monsterResult.reason} at turn ${game.turns}`,
           )
         }
-      })
-      game.hero.giveEnergy()
-    } while (game.hero.energy < game.hero.speed)
+      }
+    }
   } else {
     if (result.reason === 'wall') {
       Debug.write(`Hero bumps into a wall at turn ${game.turns}`)

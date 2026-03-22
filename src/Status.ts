@@ -13,8 +13,9 @@ export class Status {
     this.buffer = new Buffer(size)
   }
 
+  /** @deprecated */
   update(game: Game) {
-    this.buffer.line(0, `Turns: ${game.turns} Monsters: ${game.hero.kills}`)
-    this.buffer.line(1, `Energy: ${game.hero.energy}`)
+    // this.buffer.line(0, `Turns: ${game.turns} Monsters: ${game.hero.kills}`)
+    // this.buffer.line(1, `Energy: ${game.hero.energy}`)
   }
 }
