@@ -16,8 +16,6 @@ const ExitCodes = {
 
 type TerminalEvents = {
   input: [chunk: string]
-  invalid: []
-  valid: []
 }
 
 export class Terminal extends EventEmitter<TerminalEvents> {
@@ -39,25 +37,12 @@ export class Terminal extends EventEmitter<TerminalEvents> {
     }
 
     this.attachExitHandlers()
-    this.attachResizeHandler()
     process.stdin.on('data', (chunk) => this.emit('input', chunk.toString()))
 
     process.stdin.setEncoding('utf8')
     process.stdin.setRawMode(true)
     process.stdin.resume()
     this.hideCursor()
-  }
-
-  private attachResizeHandler() {
-    const cols = process.stdout.columns || 0
-    const rows = process.stdout.rows || 0
-
-    if (cols < this.minWidth || rows < this.minHeight) {
-      this.emit('invalid')
-      this.writeSizeWarning()
-    } else {
-      this.emit('valid')
-    }
   }
 
   exit(code: number = ExitCodes.OK) {

@@ -5,24 +5,18 @@ import { CommandBus, Commands, CommandType } from '../messaging/core'
 type CreateInputHandlerArgs = {
   commandBus: CommandBus<Commands>
   hero: Hero
-  isGameEnabled: () => boolean
   exitGame: () => void
 }
 
 export function createInputHandler({
   commandBus,
   hero,
-  isGameEnabled,
   exitGame,
 }: CreateInputHandlerArgs) {
   return async function onInput(chunk: string) {
     if (chunk === '\u0003' || chunk === 'q') {
       // ctrl-c
       exitGame()
-    }
-
-    if (!isGameEnabled()) {
-      return
     }
 
     switch (chunk) {

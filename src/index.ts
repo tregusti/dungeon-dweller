@@ -18,7 +18,7 @@ const {
 
 Debug.initialize({ terminal, game })
 
-const { forceRedrawForInvalidTerminal } = attachRenderers({
+attachRenderers({
   game,
   terminal,
   eventBus,
@@ -33,22 +33,10 @@ registerCommandHandlers({
   random,
 })
 
-let gameEnabled = false
-
 const onInput = createInputHandler({
   commandBus,
   hero,
-  isGameEnabled: () => gameEnabled,
   exitGame: () => terminal.exit(),
-})
-
-terminal.on('invalid', () => {
-  gameEnabled = false
-})
-
-terminal.on('valid', () => {
-  forceRedrawForInvalidTerminal()
-  gameEnabled = true
 })
 
 terminal.on('input', onInput)
@@ -59,5 +47,4 @@ async function startGame() {
   await eventBus.publish(EventType.GameInitialized, {
     hero,
   })
-  gameEnabled = true
 }
