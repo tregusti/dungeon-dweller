@@ -1,0 +1,79 @@
+import { MonsterCollection } from '../entities/EntityCollection'
+import { Hero } from '../entities/Hero'
+import { Dungeon } from '../levels/Dungeon'
+import { CreateMonsterCommandHandler } from '../messaging/commands/CreateMonster'
+import { MoveHeroCommandHandler } from '../messaging/commands/MoveHero'
+import { MoveMonsterCommandHandler } from '../messaging/commands/MoveMonster'
+import { ProcessMonsterRoundCommandHandler } from '../messaging/commands/ProcessMonsterRound'
+import { ProcessUntilHeroReadyCommandHandler } from '../messaging/commands/ProcessUntilHeroReady'
+import {
+  CommandBus,
+  Commands,
+  CommandType,
+  EventBus,
+  Events,
+} from '../messaging/core'
+import { MoveCreatureCollisionService } from '../messaging/services/MoveCreatureCollisionService'
+import { Random } from '../Random'
+
+type RegisterCommandHandlersArgs = {
+  commandBus: CommandBus<Commands>
+  eventBus: EventBus<Events>
+  dungeon: Dungeon
+  monsters: MonsterCollection
+  hero: Hero
+  random: Random
+}
+
+export function registerCommandHandlers({
+  commandBus,
+  eventBus,
+  dungeon,
+  monsters,
+  hero,
+  random,
+}: RegisterCommandHandlersArgs) {
+  const moveCreatureCollisionService = new MoveCreatureCollisionService(
+    dungeon,
+    monsters,
+    hero,
+  )
+
+  const moveHeroCommandHandler = new MoveHeroCommandHandler(
+    hero,
+    moveCreatureCollisionService,
+    eventBus,
+  )
+  const moveMonsterCommandHandler = new MoveMonsterCommandHandler(
+    hero,
+    moveCreatureCollisionService,
+    random.create('move-monster'),
+    eventBus,
+  )
+  const processMonsterRoundCommandHandler =
+    new ProcessMonsterRoundCommandHandler(monsters, hero, commandBus)
+  const processUntilHeroReadyCommandHandler =
+    new ProcessUntilHeroReadyCommandHandler(hero, commandBus)
+  const createMonsterCommandHandler = new CreateMonsterCommandHandler(
+    dungeon,
+    monsters,
+    random.create('create-monster'),
+    eventBus,
+  )
+
+  commandBus.register(CommandType.MoveHero, (payload) =>
+    moveHeroCommandHandler.handle(payload),
+  )
+  commandBus.register(CommandType.MoveMonster, (payload) =>
+    moveMonsterCommandHandler.handle(payload),
+  )
+  commandBus.register(CommandType.ProcessMonsterRound, () =>
+    processMonsterRoundCommandHandler.handle(),
+  )
+  commandBus.register(CommandType.ProcessUntilHeroReady, () =>
+    processUntilHeroReadyCommandHandler.handle(),
+  )
+  commandBus.register(CommandType.CreateMonster, () =>
+    createMonsterCommandHandler.handle(),
+  )
+}
