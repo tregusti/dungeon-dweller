@@ -1,4 +1,5 @@
 import { MonsterCollection } from '../entities/EntityCollection'
+import type { Hero } from '../entities/Hero'
 import { Game } from '../Game'
 import { Layout } from '../Layout'
 import { Dungeon } from '../levels/Dungeon'
@@ -9,7 +10,7 @@ import { Terminal } from '../screen/Terminal'
 
 export type GameContext = {
   random: Random
-  hero: ReturnType<CreateHeroCommandHandler['handle']>['hero']
+  hero: Hero
   monsters: MonsterCollection
   dungeon: Dungeon
   game: Game

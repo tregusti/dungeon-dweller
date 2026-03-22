@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 
-import { ANSI } from '../ANSI'
 import { Debug } from '../Debug'
+import { ANSI } from './ANSI'
 
 const ExitCodes = {
   OK: 0,
