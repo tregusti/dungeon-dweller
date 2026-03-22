@@ -8,9 +8,14 @@ import { CreateHeroCommandHandler } from './messaging/commands/CreateHero'
 import { CreateMonsterCommandHandler } from './messaging/commands/CreateMonster'
 import { MoveHeroCommandHandler } from './messaging/commands/MoveHero'
 import { MoveMonsterCommandHandler } from './messaging/commands/MoveMonster'
-import { Bus } from './messaging/core'
-import { CommandType } from './messaging/core/Commands'
-import { EventType } from './messaging/core/Events'
+import {
+  CommandBus,
+  Commands,
+  CommandType,
+  EventBus,
+  Events,
+  EventType,
+} from './messaging/core'
 import { MoveCreatureCollisionService } from './messaging/services/MoveCreatureCollisionService'
 import { Random } from './Random'
 import { flushBuffer } from './screen/BufferWriter'
@@ -31,6 +36,8 @@ const hero = createHeroCommandHandler.handle().hero
 const monsters = new MonsterCollection()
 const dungeon = new Dungeon(dungeonSize, hero, monsters)
 const game = new Game(dungeon, status, hero, monsters)
+const commandBus = new CommandBus<Commands>()
+const eventBus = new EventBus<Events>()
 
 const terminal = new Terminal(game.width, game.height)
 Debug.initialize({ terminal, game })
@@ -55,7 +62,7 @@ compositor.add({
   z: 1,
 })
 
-const renderer = new Renderer(dungeonBuffer, compositor, terminal)
+const renderer = new Renderer(dungeonBuffer, compositor, terminal, eventBus)
 renderer.attach()
 
 // IDEA:
@@ -83,18 +90,18 @@ const moveCreatureCollisionService = new MoveCreatureCollisionService(
 const moveHeroCommandHandler = new MoveHeroCommandHandler(
   game.hero,
   moveCreatureCollisionService,
-  Bus.event,
+  eventBus,
 )
 const moveMonsterCommandHandler = new MoveMonsterCommandHandler(
   hero,
   moveCreatureCollisionService,
   random.create('move-monster'),
-  Bus.event,
+  eventBus,
 )
-Bus.command.register(CommandType.MoveHero, (payload) =>
+commandBus.register(CommandType.MoveHero, (payload) =>
   moveHeroCommandHandler.handle(payload),
 )
-Bus.command.register(CommandType.MoveMonster, (payload) =>
+commandBus.register(CommandType.MoveMonster, (payload) =>
   moveMonsterCommandHandler.handle(payload),
 )
 
@@ -102,12 +109,13 @@ const createMonsterCommandHandler = new CreateMonsterCommandHandler(
   game.dungeon,
   game.monsters,
   random.create('create-monster'),
+  eventBus,
 )
-Bus.command.register(CommandType.CreateMonster, () =>
+commandBus.register(CommandType.CreateMonster, () =>
   createMonsterCommandHandler.handle(),
 )
 
-Bus.event.subscribe(EventType.HeroMoved, () => {
+eventBus.subscribe(EventType.HeroMoved, () => {
   game.advanceTurn()
 })
 
@@ -161,7 +169,7 @@ async function onInput(chunk: string) {
 }
 
 async function handleCreateMonster() {
-  const result = await Bus.command.execute(CommandType.CreateMonster)
+  const result = await commandBus.execute(CommandType.CreateMonster)
 
   if (!result.success) {
     Debug.write(`No free dungeon tile to spawn monster at turn ${game.turns}`)
@@ -170,7 +178,7 @@ async function handleCreateMonster() {
 }
 
 async function handleMovement(dx: number, dy: number) {
-  const result = await Bus.command.execute(CommandType.MoveHero, {
+  const result = await commandBus.execute(CommandType.MoveHero, {
     dx,
     dy,
   })
@@ -181,7 +189,7 @@ async function handleMovement(dx: number, dy: number) {
     )
     do {
       await game.processMonsterTurn(async (monster) => {
-        const result = await Bus.command.execute(CommandType.MoveMonster, {
+        const result = await commandBus.execute(CommandType.MoveMonster, {
           monster,
         })
 

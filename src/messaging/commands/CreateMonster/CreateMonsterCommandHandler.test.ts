@@ -4,8 +4,7 @@ import { Dungeon } from '../../../levels/Dungeon'
 import { Random, RandomGenerator } from '../../../Random'
 import { expectToBe, expectToHaveProperty } from '../../../test/expect'
 import { Position, Size } from '../../../types'
-import { Bus } from '../../core'
-import { EventType } from '../../core/Events'
+import { EventBus, Events, EventType } from '../../core'
 import { CreateMonsterCommandHandler } from './CreateMonsterCommandHandler'
 
 describe('CreateMonsterCommandHandler', () => {
@@ -21,10 +20,17 @@ describe('CreateMonsterCommandHandler', () => {
     const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()
     const dungeon = new Dungeon(dungeonSize, hero, monsters)
-    const subject = new CreateMonsterCommandHandler(dungeon, monsters, random)
+    const events = new EventBus<Events>()
+    const subject = new CreateMonsterCommandHandler(
+      dungeon,
+      monsters,
+      random,
+      events,
+    )
 
     return {
       dungeon,
+      events,
       hero,
       monsters,
       subject,
@@ -55,12 +61,12 @@ describe('CreateMonsterCommandHandler', () => {
       expect(result.monster.y).toEqual(1)
     })
     it('should emit the MonsterCreated event', async () => {
-      const { subject } = createSUT({
+      const { subject, events } = createSUT({
         dungeonSize: { width: 2, height: 1 },
         heroPosition: { x: 0, y: 0 },
       })
       const promise = new Promise<void>((resolve) => {
-        Bus.event.subscribe(EventType.MonsterCreated, (payload) => {
+        events.subscribe(EventType.MonsterCreated, (payload) => {
           expectToHaveProperty(payload, 'monster')
           expectToHaveProperty(payload, 'at')
           expect(payload.at).toEqual({ x: 1, y: 0 })

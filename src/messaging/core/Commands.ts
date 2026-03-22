@@ -13,7 +13,7 @@ export const CommandType = {
   MoveMonster: MoveMonster.MoveMonsterCommandType,
 } as const
 
-type CommandDef<TPayload, TResult> = {
+export type CommandDef<TPayload, TResult> = {
   payload: TPayload
   result: TResult
 }

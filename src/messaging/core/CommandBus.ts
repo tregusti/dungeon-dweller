@@ -1,17 +1,13 @@
 import { MaybePromise } from '../../types'
+import { CommandDef } from './Commands'
 
-type CommandShape<TPayload = unknown, TResult = unknown> = {
-  payload: TPayload
-  result: TResult
-}
-
-type CommandMap = Record<symbol, CommandShape>
+type CommandMap = Record<symbol, CommandDef<unknown, unknown>>
 
 type CommandPayload<TCommands extends CommandMap, K extends keyof TCommands> =
-  TCommands[K] extends CommandShape<infer TPayload, unknown> ? TPayload : never
+  TCommands[K] extends CommandDef<infer TPayload, unknown> ? TPayload : never
 
 type CommandResult<TCommands extends CommandMap, K extends keyof TCommands> =
-  TCommands[K] extends CommandShape<unknown, infer TResult> ? TResult : never
+  TCommands[K] extends CommandDef<unknown, infer TResult> ? TResult : never
 
 type CommandExecuteArgs<TPayload> = [TPayload] extends [void]
   ? []
