@@ -3,6 +3,11 @@ import { Creature } from './Creature'
 
 export class Hero extends Creature {
   kills: number = 0
+  _turns: number = 0
+
+  get turns() {
+    return this._turns
+  }
 
   constructor({ x, y }: Position) {
     super({ x, y, char: '@', speed: 10 })
@@ -18,6 +23,8 @@ export class Hero extends Creature {
     this.y += dy
 
     this._energy -= this.speed
+    this._turns++
+
     return {
       from,
       to: { x: this.x, y: this.y },

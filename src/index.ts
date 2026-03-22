@@ -1,3 +1,5 @@
+import { buffer } from 'node:stream/consumers'
+
 import { Buffer } from './buffer/Buffer'
 import { BufferCompositor } from './buffer/BufferCompositor'
 import { Debug } from './Debug'
@@ -21,15 +23,14 @@ import {
 import { MoveCreatureCollisionService } from './messaging/services/MoveCreatureCollisionService'
 import { Random } from './Random'
 import { flushBuffer } from './screen/BufferWriter'
-import { Renderer } from './screen/Renderer'
+import { DungeonRenderer } from './screen/DungeonRenderer'
+import { StatusRenderer } from './screen/StatusRenderer'
 import { Terminal } from './screen/Terminal'
-import { Status } from './Status'
 
 const random = new Random('lenn-seed')
 
 const dungeonSize = { width: 20, height: 10 }
 
-const status = new Status({ width: dungeonSize.width, height: 3 })
 const createHeroCommandHandler = new CreateHeroCommandHandler(
   dungeonSize,
   random.create('create-hero'),
@@ -37,18 +38,28 @@ const createHeroCommandHandler = new CreateHeroCommandHandler(
 const hero = createHeroCommandHandler.handle().hero
 const monsters = new MonsterCollection()
 const dungeon = new Dungeon(dungeonSize, hero, monsters)
-const game = new Game(dungeon, status)
+const game = new Game(dungeon)
 const commandBus = new CommandBus<Commands>()
 const eventBus = new EventBus<Events>()
 
 const terminal = new Terminal(game.width, game.height)
 Debug.initialize({ terminal, game })
 
-const compositor = new BufferCompositor({
+const bufferCompositor = new BufferCompositor({
   width: game.width,
   height: game.height,
 })
-const dungeonBuffer = compositor.add({
+const statusRenderer = new StatusRenderer({
+  bufferCompositor,
+  terminal,
+  eventBus,
+  size: {
+    width: game.width,
+    height: 3,
+  },
+})
+statusRenderer.attach()
+const dungeonBuffer = bufferCompositor.add({
   buffer: new Buffer({
     width: dungeon.width,
     height: dungeon.height,
@@ -57,32 +68,23 @@ const dungeonBuffer = compositor.add({
   y: 0,
   z: 0,
 })
-compositor.add({
-  buffer: status.buffer,
-  x: 0,
-  y: dungeon.height + 1,
-  z: 1,
+const dungeonRenderer = new DungeonRenderer({
+  bufferCompositor: bufferCompositor,
+  terminal,
+  eventBus,
+  dungeonBuffer,
 })
-
-const renderer = new Renderer(dungeonBuffer, compositor, terminal, eventBus)
-renderer.attach()
-
-// IDEA:
-// status manages its own buffer and implements the CompositorRegistrant interface
-// which is a method that compositor invokes and passes the buffer to it when it's registered.
-// const status = new Status({ game })
-// compositor.register(status)
+dungeonRenderer.attach()
 
 /** @deprecated */
 function forceRedraw() {
   terminal.clear()
-  flushBuffer(terminal, compositor)
+  flushBuffer(terminal, bufferCompositor)
 }
 
 // initial render
 dungeonBuffer.clear()
 dungeonBuffer.set(hero.x, hero.y, hero.char)
-status.update(game)
 
 const moveCreatureCollisionService = new MoveCreatureCollisionService(
   dungeon,
@@ -130,10 +132,6 @@ commandBus.register(CommandType.CreateMonster, () =>
   createMonsterCommandHandler.handle(),
 )
 
-eventBus.subscribe(EventType.HeroMoved, () => {
-  game.advanceTurn()
-})
-
 let gameEnabled = false
 
 terminal.on('invalid', () => {
@@ -179,15 +177,13 @@ async function onInput(chunk: string) {
       await handleCreateMonster()
       break
   }
-
-  status.update(game)
 }
 
 async function handleCreateMonster() {
   const result = await commandBus.execute(CommandType.CreateMonster)
 
   if (!result.success) {
-    Debug.write(`No free dungeon tile to spawn monster at turn ${game.turns}`)
+    Debug.write(`No free dungeon tile to spawn monster at turn ${hero.turns}`)
     return
   }
 }
@@ -200,7 +196,7 @@ async function handleMovement(dx: number, dy: number) {
 
   if (result.success) {
     Debug.write(
-      `Hero moves to (${result.to.x},${result.to.y}) at turn ${game.turns}.`,
+      `Hero moves to (${result.to.x},${result.to.y}) at turn ${hero.turns}.`,
     )
     const turnResult = await commandBus.execute(
       CommandType.ProcessUntilHeroReady,
@@ -213,21 +209,21 @@ async function handleMovement(dx: number, dy: number) {
 
         if (monsterResult.success) {
           Debug.write(
-            `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${game.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
+            `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
           )
         } else {
           Debug.write(
-            `${monster.char} bumps into a ${monsterResult.reason} at turn ${game.turns}`,
+            `${monster.char} bumps into a ${monsterResult.reason} at turn ${hero.turns}`,
           )
         }
       }
     }
   } else {
     if (result.reason === 'wall') {
-      Debug.write(`Hero bumps into a wall at turn ${game.turns}`)
+      Debug.write(`Hero bumps into a wall at turn ${hero.turns}`)
     } else if (result.reason === 'monster') {
       Debug.write(
-        `Hero bumps into a ${result.monster.char} at turn ${game.turns}`,
+        `Hero bumps into a ${result.monster.char} at turn ${hero.turns}`,
       )
     }
   }

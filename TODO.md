@@ -1,5 +1,12 @@
 # TODO
 
+## Generic
+
+- Add CompleteHeroTurn command and HeroTurnCompleted event to track energy gain
+  end turn counter. And subscribe to it in StatusRenderer.
+- Add GameInitialized event with hero etc, to render a full initial status.
+- Remove hard coded ctor values in Game.
+
 ## BufferCompositor
 
 - Fix bug in BufferCompositor. Now it's not buffered, it renders everything the
