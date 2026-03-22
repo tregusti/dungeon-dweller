@@ -1,10 +1,8 @@
-import { buffer } from 'node:stream/consumers'
-
-import { Buffer } from './buffer/Buffer'
 import { BufferCompositor } from './buffer/BufferCompositor'
 import { Debug } from './Debug'
 import { MonsterCollection } from './entities/EntityCollection'
 import { Game } from './Game'
+import { Layout } from './Layout'
 import { Dungeon } from './levels/Dungeon'
 import { CreateHeroCommandHandler } from './messaging/commands/CreateHero'
 import { CreateMonsterCommandHandler } from './messaging/commands/CreateMonster'
@@ -29,15 +27,13 @@ import { Terminal } from './screen/Terminal'
 
 const random = new Random('lenn-seed')
 
-const dungeonSize = { width: 20, height: 10 }
-
 const createHeroCommandHandler = new CreateHeroCommandHandler(
-  dungeonSize,
+  Layout.dungeon.size,
   random.create('create-hero'),
 )
 const hero = createHeroCommandHandler.handle().hero
 const monsters = new MonsterCollection()
-const dungeon = new Dungeon(dungeonSize, hero, monsters)
+const dungeon = new Dungeon(Layout.dungeon.size, hero, monsters)
 const game = new Game(dungeon)
 const commandBus = new CommandBus<Commands>()
 const eventBus = new EventBus<Events>()
@@ -53,38 +49,24 @@ const statusRenderer = new StatusRenderer({
   bufferCompositor,
   terminal,
   eventBus,
-  size: {
-    width: game.width,
-    height: 3,
-  },
+  size: Layout.status.size,
+  position: Layout.status.position,
 })
 statusRenderer.attach()
-const dungeonBuffer = bufferCompositor.add({
-  buffer: new Buffer({
-    width: dungeon.width,
-    height: dungeon.height,
-  }),
-  x: 0,
-  y: 0,
-  z: 0,
-})
 const dungeonRenderer = new DungeonRenderer({
   bufferCompositor: bufferCompositor,
   terminal,
   eventBus,
-  dungeonBuffer,
+  size: Layout.dungeon.size,
+  position: Layout.dungeon.position,
 })
 dungeonRenderer.attach()
 
 /** @deprecated */
-function forceRedraw() {
+function forceRedrawForInvalidTerminal() {
   terminal.clear()
   flushBuffer(terminal, bufferCompositor)
 }
-
-// initial render
-dungeonBuffer.clear()
-dungeonBuffer.set(hero.x, hero.y, hero.char)
 
 const moveCreatureCollisionService = new MoveCreatureCollisionService(
   dungeon,
@@ -139,14 +121,20 @@ terminal.on('invalid', () => {
 })
 
 terminal.on('valid', () => {
-  forceRedraw()
+  forceRedrawForInvalidTerminal()
   gameEnabled = true
 })
 
 terminal.on('input', onInput)
 
-forceRedraw()
-gameEnabled = true
+void startGame()
+
+async function startGame() {
+  await eventBus.publish(EventType.GameInitialized, {
+    hero,
+  })
+  gameEnabled = true
+}
 
 async function onInput(chunk: string) {
   if (chunk === '\u0003' || chunk === 'q') {

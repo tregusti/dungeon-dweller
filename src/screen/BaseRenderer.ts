@@ -16,6 +16,7 @@ export abstract class BaseRenderer {
   }) {
     this.bufferCompositor = bufferCompositor
     this.terminal = terminal
+    this.terminal.clear()
   }
 
   protected redraw() {
