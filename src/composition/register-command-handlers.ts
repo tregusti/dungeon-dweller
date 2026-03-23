@@ -1,5 +1,5 @@
-import { MonsterCollection } from '../entities/EntityCollection'
 import { Hero } from '../entities/Hero'
+import { MonsterCollection } from '../entities/MonsterCollection'
 import { Dungeon } from '../levels/Dungeon'
 import { CreateMonsterCommandHandler } from '../messaging/commands/CreateMonster'
 import { MoveHeroCommandHandler } from '../messaging/commands/MoveHero'

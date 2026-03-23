@@ -1,8 +1,8 @@
 import assert from 'assert'
 
-import { MonsterCollection } from '../entities/EntityCollection'
 import { Hero } from '../entities/Hero'
 import { Monster } from '../entities/Monster'
+import { MonsterCollection } from '../entities/MonsterCollection'
 import { Dungeon, SpotContent } from './Dungeon'
 
 const createSUT = ({

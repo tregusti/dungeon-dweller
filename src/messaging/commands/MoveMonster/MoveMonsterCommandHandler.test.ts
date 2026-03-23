@@ -1,8 +1,8 @@
 import { assert } from 'ts-essentials'
 
-import { MonsterCollection } from '../../../entities/EntityCollection'
 import { Hero } from '../../../entities/Hero'
 import { Monster } from '../../../entities/Monster'
+import { MonsterCollection } from '../../../entities/MonsterCollection'
 import { EventBus } from '../../core/EventBus'
 import { EventPayload, Events, EventType } from '../../core/Events'
 import { MoveCreatureCollisionService } from '../../services/MoveCreatureCollisionService'

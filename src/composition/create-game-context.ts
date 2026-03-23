@@ -1,4 +1,3 @@
-import { MonsterCollection } from '../entities/EntityCollection'
 import type { Hero } from '../entities/Hero'
 import { Game } from '../Game'
 import { Layout } from '../Layout'

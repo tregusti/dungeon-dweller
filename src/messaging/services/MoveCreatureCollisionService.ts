@@ -1,6 +1,6 @@
-import { MonsterCollection } from '../../entities/EntityCollection'
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
+import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Position, Size } from '../../types'
 
 type MoveEvaluation =

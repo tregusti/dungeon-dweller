@@ -1,5 +1,5 @@
-import { MonsterCollection } from '../../../entities/EntityCollection'
 import { Monster } from '../../../entities/Monster'
+import { MonsterCollection } from '../../../entities/MonsterCollection'
 import { Dungeon } from '../../../levels/Dungeon'
 import { RandomGenerator } from '../../../Random'
 import { EventBus, Events, EventType } from '../../core'

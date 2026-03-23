@@ -1,5 +1,5 @@
-import { MonsterCollection } from '../../../entities/EntityCollection'
 import { Hero } from '../../../entities/Hero'
+import { MonsterCollection } from '../../../entities/MonsterCollection'
 import { CommandBus } from '../../core/CommandBus'
 import { Commands, CommandType } from '../../core/Commands'
 import { ProcessMonsterRoundCommandResult } from './ProcessMonsterRoundCommand'
