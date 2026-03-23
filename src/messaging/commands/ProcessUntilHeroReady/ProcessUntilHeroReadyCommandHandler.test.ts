@@ -44,6 +44,6 @@ describe('ProcessUntilHeroReadyCommandHandler', () => {
     await subject.handle()
 
     expect(hero.energy).toBe(hero.speed)
-    expect(processMonsterRound).toHaveBeenCalledTimes(3)
+    expect(processMonsterRound).toHaveBeenCalledTimes(2)
   })
 })

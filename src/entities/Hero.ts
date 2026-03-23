@@ -11,6 +11,8 @@ export class Hero extends Creature {
 
   constructor({ x, y }: Position) {
     super({ x, y, char: '@', speed: 10 })
+    // For hero, energy starts at full so they can act immediately
+    this._energy = this.speed
   }
 
   giveEnergy() {
