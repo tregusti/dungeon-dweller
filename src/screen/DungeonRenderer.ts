@@ -1,7 +1,6 @@
 import { Buffer } from '../buffer/Buffer'
 import { BufferCompositor } from '../buffer/BufferCompositor'
-import { EventBus, EventType } from '../messaging/core'
-import type { Events } from '../messaging/core'
+import { EventBus, Events, EventType } from '../messaging/core'
 import { Position, Size } from '../types'
 import { BaseRenderer } from './BaseRenderer'
 import { Terminal } from './Terminal'

@@ -33,18 +33,15 @@ registerCommandHandlers({
   random,
 })
 
-const onInput = createInputHandler({
-  commandBus,
-  hero,
-  exitGame: () => terminal.exit(),
-})
-
-terminal.on('input', onInput)
-
-void startGame()
-
-async function startGame() {
-  await eventBus.publish(EventType.GameInitialized, {
+terminal.on(
+  'input',
+  createInputHandler({
+    commandBus,
     hero,
-  })
-}
+    exitGame: () => terminal.exit(),
+  }),
+)
+
+eventBus.publish(EventType.GameInitialized, {
+  hero,
+})
