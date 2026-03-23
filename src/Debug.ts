@@ -1,10 +1,9 @@
-import type { Game } from './Game'
+import { Layout } from './Layout'
 import type { Terminal } from './screen/Terminal'
 
 const DEBUG = true
 
 let terminal: Terminal | null = null
-let game: Game | null = null
 
 const log = [] as string[]
 const lineLength = process.stdout.columns
@@ -12,9 +11,8 @@ const lineLength = process.stdout.columns
 export const Debug = {
   enabled: DEBUG,
 
-  initialize({ terminal: t, game: g }: { terminal: Terminal; game: Game }) {
+  initialize({ terminal: t }: { terminal: Terminal }) {
     terminal = t
-    game = g
   },
 
   // This might be called in tests without #initialize having been called.
@@ -23,7 +21,7 @@ export const Debug = {
       return
     }
 
-    const offset = game ? game.height + 1 : 0
+    const offset = Layout.game.size.height + 1
     const count = process.stdout.rows - offset
     log.unshift(text.replace(/\n/g, '/'))
     if (terminal) {

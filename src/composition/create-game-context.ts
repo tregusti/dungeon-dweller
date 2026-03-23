@@ -1,5 +1,5 @@
 import type { Hero } from '../entities/Hero'
-import { Game } from '../Game'
+import { MonsterCollection } from '../entities/MonsterCollection'
 import { Layout } from '../Layout'
 import { Dungeon } from '../levels/Dungeon'
 import { CreateHeroCommandHandler } from '../messaging/commands/CreateHero'
@@ -12,7 +12,6 @@ export type GameContext = {
   hero: Hero
   monsters: MonsterCollection
   dungeon: Dungeon
-  game: Game
   commandBus: CommandBus<Commands>
   eventBus: EventBus<Events>
   terminal: Terminal
@@ -28,17 +27,15 @@ export function createGameContext(): GameContext {
   const hero = createHeroCommandHandler.handle().hero
   const monsters = new MonsterCollection()
   const dungeon = new Dungeon(Layout.dungeon.size, hero, monsters)
-  const game = new Game(dungeon)
   const commandBus = new CommandBus<Commands>()
   const eventBus = new EventBus<Events>()
-  const terminal = new Terminal(game.width, game.height)
+  const terminal = new Terminal(Layout.game.size.width, Layout.game.size.height)
 
   return {
     random,
     hero,
     monsters,
     dungeon,
-    game,
     commandBus,
     eventBus,
     terminal,

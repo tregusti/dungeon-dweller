@@ -5,21 +5,12 @@ import { registerCommandHandlers } from './composition/register-command-handlers
 import { Debug } from './Debug'
 import { EventType } from './messaging/core'
 
-const {
-  random,
-  hero,
-  monsters,
-  dungeon,
-  game,
-  commandBus,
-  eventBus,
-  terminal,
-} = createGameContext()
+const { random, hero, monsters, dungeon, commandBus, eventBus, terminal } =
+  createGameContext()
 
-Debug.initialize({ terminal, game })
+Debug.initialize({ terminal })
 
 attachRenderers({
-  game,
   terminal,
   eventBus,
 })
