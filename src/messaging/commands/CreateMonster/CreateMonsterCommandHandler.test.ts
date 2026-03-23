@@ -46,8 +46,8 @@ describe('CreateMonsterCommandHandler', () => {
       expect(result.success).toBe(true)
       expectToHaveProperty(result, 'monster')
 
-      expect(monsters.all).toHaveLength(1)
-      expect(monsters.all.at(0)).toBe(result.monster)
+      expect(monsters.all()).toHaveLength(1)
+      expect(monsters.all().at(0)).toBe(result.monster)
     })
 
     it('should only spawn on free positions', () => {
@@ -93,7 +93,7 @@ describe('CreateMonsterCommandHandler', () => {
         success: false,
         reason: 'dungeon-full',
       })
-      expect(monsters.all).toHaveLength(0)
+      expect(monsters.all()).toHaveLength(0)
     })
   })
 })
