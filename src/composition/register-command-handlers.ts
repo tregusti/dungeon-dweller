@@ -1,11 +1,11 @@
 import { Hero } from '../entities/Hero'
 import { MonsterCollection } from '../entities/MonsterCollection'
 import { Dungeon } from '../levels/Dungeon'
-import { CreateMonsterCommandHandler } from '../messaging/commands/CreateMonster'
-import { MoveHeroCommandHandler } from '../messaging/commands/MoveHero'
-import { MoveMonsterCommandHandler } from '../messaging/commands/MoveMonster'
-import { ProcessMonsterRoundCommandHandler } from '../messaging/commands/ProcessMonsterRound'
-import { ProcessUntilHeroReadyCommandHandler } from '../messaging/commands/ProcessUntilHeroReady'
+import { CreateMonsterCommandHandler } from '../messaging/commands/CreateMonsterCommand'
+import { MoveHeroCommandHandler } from '../messaging/commands/MoveHeroCommand'
+import { MoveMonsterCommandHandler } from '../messaging/commands/MoveMonsterCommand'
+import { ProcessMonsterRoundCommandHandler } from '../messaging/commands/ProcessMonsterRoundCommand'
+import { ProcessUntilHeroReadyCommandHandler } from '../messaging/commands/ProcessUntilHeroReadyCommand'
 import {
   CommandBus,
   Commands,

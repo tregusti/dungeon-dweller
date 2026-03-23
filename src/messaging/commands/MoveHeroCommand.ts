@@ -1,11 +1,28 @@
-import { Hero } from '../../../entities/Hero'
-import { EventBus } from '../../core/EventBus'
-import { Events, EventType } from '../../core/Events'
-import { MoveCreatureCollisionService } from '../../services/MoveCreatureCollisionService'
-import type {
-  MoveHeroCommandPayload,
-  MoveHeroCommandResult,
-} from './MoveHeroCommand'
+import { Hero } from '../../entities/Hero'
+import { Monster } from '../../entities/Monster'
+import { Position } from '../../types'
+import { EventBus } from '../core/EventBus'
+import { Events, EventType } from '../core/Events'
+import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
+
+export const MoveHeroCommandType = Symbol('MoveHero')
+
+export type MoveHeroCommandPayload = { dx: number; dy: number }
+export type MoveHeroCommandResult =
+  | {
+      success: false
+      reason: 'wall'
+    }
+  | {
+      success: false
+      reason: 'monster'
+      monster: Monster
+    }
+  | {
+      success: true
+      from: Position
+      to: Position
+    }
 
 export const Movement = {
   Up: { dx: 0, dy: -1 },

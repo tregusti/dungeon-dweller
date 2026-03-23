@@ -1,8 +1,22 @@
-import { Hero } from '../../../entities/Hero'
-import { MonsterCollection } from '../../../entities/MonsterCollection'
-import { CommandBus } from '../../core/CommandBus'
-import { Commands, CommandType } from '../../core/Commands'
-import { ProcessMonsterRoundCommandResult } from './ProcessMonsterRoundCommand'
+import { Hero } from '../../entities/Hero'
+import { Monster } from '../../entities/Monster'
+import { MonsterCollection } from '../../entities/MonsterCollection'
+import { CommandBus } from '../core/CommandBus'
+import { Commands, CommandType } from '../core/Commands'
+import { MoveMonsterCommandResult } from './MoveMonsterCommand'
+
+export const ProcessMonsterRoundCommandType = Symbol('ProcessMonsterRound')
+
+export type ProcessMonsterRoundCommandPayload = void
+
+export type ProcessMonsterRoundAction = {
+  monster: Monster
+  result: MoveMonsterCommandResult
+}
+
+export type ProcessMonsterRoundCommandResult = {
+  actions: ProcessMonsterRoundAction[]
+}
 
 export class ProcessMonsterRoundCommandHandler {
   constructor(

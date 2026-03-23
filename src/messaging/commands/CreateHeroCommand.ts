@@ -1,7 +1,15 @@
-import { Hero } from '../../../entities/Hero'
-import { RandomGenerator } from '../../../Random'
-import { Size } from '../../../types'
-import type { CreateHeroCommandResult } from './CreateHeroCommand'
+import { Hero } from '../../entities/Hero'
+import { RandomGenerator } from '../../Random'
+import { Size } from '../../types'
+
+export const CreateHeroCommandType = Symbol('CreateHero')
+
+export type CreateHeroCommandPayload = void
+
+export type CreateHeroCommandResult = {
+  success: true
+  hero: Hero
+}
 
 export class CreateHeroCommandHandler {
   constructor(

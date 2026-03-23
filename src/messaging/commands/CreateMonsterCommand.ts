@@ -1,9 +1,22 @@
-import { Monster } from '../../../entities/Monster'
-import { MonsterCollection } from '../../../entities/MonsterCollection'
-import { Dungeon } from '../../../levels/Dungeon'
-import { RandomGenerator } from '../../../Random'
-import { EventBus, Events, EventType } from '../../core'
-import type { CreateMonsterCommandResult } from './CreateMonsterCommand'
+import { Monster } from '../../entities/Monster'
+import { MonsterCollection } from '../../entities/MonsterCollection'
+import { Dungeon } from '../../levels/Dungeon'
+import { RandomGenerator } from '../../Random'
+import { EventBus, Events, EventType } from '../core'
+
+export const CreateMonsterCommandType = Symbol('CreateMonster')
+
+export type CreateMonsterCommandPayload = void
+
+export type CreateMonsterCommandResult =
+  | {
+      success: false
+      reason: 'dungeon-full'
+    }
+  | {
+      success: true
+      monster: Monster
+    }
 
 export class CreateMonsterCommandHandler {
   constructor(

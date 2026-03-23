@@ -1,5 +1,5 @@
-import { expectToBe } from '../../../test/expect'
-import { CreateHeroCommandHandler } from './CreateHeroCommandHandler'
+import { expectToBe } from '../../test/expect'
+import { CreateHeroCommandHandler } from './CreateHeroCommand'
 
 describe('CreateHeroCommandHandler', () => {
   it('should create hero in dungeon bounds using prng values', () => {

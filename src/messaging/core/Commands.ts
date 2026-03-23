@@ -1,9 +1,9 @@
-import * as CreateHero from '../commands/CreateHero'
-import * as CreateMonster from '../commands/CreateMonster'
-import * as MoveHero from '../commands/MoveHero'
-import * as MoveMonster from '../commands/MoveMonster'
-import * as ProcessMonsterRound from '../commands/ProcessMonsterRound'
-import * as ProcessUntilHeroReady from '../commands/ProcessUntilHeroReady'
+import * as CreateHero from '../commands/CreateHeroCommand'
+import * as CreateMonster from '../commands/CreateMonsterCommand'
+import * as MoveHero from '../commands/MoveHeroCommand'
+import * as MoveMonster from '../commands/MoveMonsterCommand'
+import * as ProcessMonsterRound from '../commands/ProcessMonsterRoundCommand'
+import * as ProcessUntilHeroReady from '../commands/ProcessUntilHeroReadyCommand'
 
 export const CommandType = {
   // Hero

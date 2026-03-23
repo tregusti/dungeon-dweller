@@ -1,7 +1,15 @@
-import { Hero } from '../../../entities/Hero'
-import { CommandBus } from '../../core/CommandBus'
-import { Commands, CommandType } from '../../core/Commands'
-import { ProcessUntilHeroReadyCommandResult } from './ProcessUntilHeroReadyCommand'
+import { Hero } from '../../entities/Hero'
+import { CommandBus } from '../core/CommandBus'
+import { Commands, CommandType } from '../core/Commands'
+import { ProcessMonsterRoundCommandResult } from './ProcessMonsterRoundCommand'
+
+export const ProcessUntilHeroReadyCommandType = Symbol('ProcessUntilHeroReady')
+
+export type ProcessUntilHeroReadyCommandPayload = void
+
+export type ProcessUntilHeroReadyCommandResult = {
+  rounds: ProcessMonsterRoundCommandResult[]
+}
 
 export class ProcessUntilHeroReadyCommandHandler {
   constructor(
