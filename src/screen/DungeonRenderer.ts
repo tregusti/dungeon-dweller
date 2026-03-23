@@ -47,6 +47,10 @@ export class DungeonRenderer extends BaseRenderer {
       this.buffer.set(at.x, at.y, monster.char)
       this.redraw()
     })
+    this.eventBus.subscribe(EventType.MonsterKilled, ({ at }) => {
+      this.buffer.clear(at.x, at.y)
+      this.redraw()
+    })
     this.eventBus.subscribe(EventType.MonsterMoved, ({ monster, from, to }) => {
       this.buffer.clear(from.x, from.y)
       this.buffer.set(to.x, to.y, monster.char)

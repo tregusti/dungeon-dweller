@@ -59,32 +59,43 @@ export function createInputHandler({
       Debug.write(
         `Hero moves to (${result.to.x},${result.to.y}) at turn ${hero.turns}.`,
       )
-      const turnResult = await commandBus.execute(
-        CommandType.ProcessUntilHeroReady,
-      )
-
-      for (const round of turnResult.rounds) {
-        for (const action of round.actions) {
-          const monster = action.monster
-          const monsterResult = action.result
-
-          if (monsterResult.success) {
-            Debug.write(
-              `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
-            )
-          } else {
-            Debug.write(
-              `${monster.char} bumps into a ${monsterResult.reason} at turn ${hero.turns}`,
-            )
-          }
-        }
-      }
+      await handleMonsterRounds()
     } else if (result.reason === 'wall') {
       Debug.write(`Hero bumps into a wall at turn ${hero.turns}`)
     } else if (result.reason === 'monster') {
-      Debug.write(
-        `Hero bumps into a ${result.monster.char} at turn ${hero.turns}`,
-      )
+      await commandBus.execute(CommandType.MeleeAttackCreature, {
+        attacker: hero,
+        target: result.monster,
+      })
+      Debug.write(`Hero attacks ${result.monster.char} at turn ${hero.turns}`)
+    }
+  }
+
+  async function handleMonsterRounds() {
+    const turnResult = await commandBus.execute(
+      CommandType.ProcessUntilHeroReady,
+    )
+
+    for (const round of turnResult.rounds) {
+      for (const action of round.actions) {
+        const monster = action.monster
+        const monsterResult = action.result
+
+        if (monsterResult.success) {
+          Debug.write(
+            `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
+          )
+        } else if (monsterResult.reason === 'hero') {
+          await commandBus.execute(CommandType.MeleeAttackCreature, {
+            attacker: monster,
+            target: hero,
+          })
+        } else {
+          Debug.write(
+            `${monster.char} bumps into a ${monsterResult.reason} at turn ${hero.turns}`,
+          )
+        }
+      }
     }
   }
 }

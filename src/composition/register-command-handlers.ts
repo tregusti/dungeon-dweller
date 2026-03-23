@@ -2,6 +2,7 @@ import { Hero } from '../entities/Hero'
 import { MonsterCollection } from '../entities/MonsterCollection'
 import { Dungeon } from '../levels/Dungeon'
 import { CreateMonsterCommandHandler } from '../messaging/commands/CreateMonsterCommand'
+import { MeleeAttackCreatureCommandHandler } from '../messaging/commands/MeleeAttackCreatureCommand'
 import { MoveHeroCommandHandler } from '../messaging/commands/MoveHeroCommand'
 import { MoveMonsterCommandHandler } from '../messaging/commands/MoveMonsterCommand'
 import { ProcessMonsterRoundCommandHandler } from '../messaging/commands/ProcessMonsterRoundCommand'
@@ -52,6 +53,8 @@ export function registerCommandHandlers({
   )
   const processMonsterRoundCommandHandler =
     new ProcessMonsterRoundCommandHandler(monsters, hero, commandBus)
+  const meleeAttackCreatureCommandHandler =
+    new MeleeAttackCreatureCommandHandler(monsters, eventBus)
   const processUntilHeroReadyCommandHandler =
     new ProcessUntilHeroReadyCommandHandler(hero, commandBus)
   const createMonsterCommandHandler = new CreateMonsterCommandHandler(
@@ -66,6 +69,9 @@ export function registerCommandHandlers({
   )
   commandBus.register(CommandType.MoveMonster, (payload) =>
     moveMonsterCommandHandler.handle(payload),
+  )
+  commandBus.register(CommandType.MeleeAttackCreature, (payload) =>
+    meleeAttackCreatureCommandHandler.handle(payload),
   )
   commandBus.register(CommandType.ProcessMonsterRound, () =>
     processMonsterRoundCommandHandler.handle(),
