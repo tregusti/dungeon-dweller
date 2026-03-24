@@ -1,12 +1,13 @@
-const dungeonWidth = 20
-const dungeonHeight = 10
+const gameWidth = 60
+const dungeonWidth = gameWidth
+const dungeonHeight = 20
 const statusHeight = 3
 const statusOffset = 1
 
 export const Layout = {
   game: {
     size: {
-      width: dungeonWidth,
+      width: gameWidth,
       height: dungeonHeight + statusHeight + statusOffset,
     },
   },
@@ -26,7 +27,7 @@ export const Layout = {
       y: dungeonHeight + statusOffset,
     },
     size: {
-      width: dungeonWidth,
+      width: gameWidth,
       height: statusHeight,
     },
   },
