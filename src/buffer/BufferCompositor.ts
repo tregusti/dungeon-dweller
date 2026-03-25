@@ -46,8 +46,10 @@ export class BufferCompositor {
     for (let i = 0; i < this.#buffers.length; i++) {
       const ce = this.#buffers[i]
       ce.buffer.entries.forEach(({ x, y, char }) => {
-        // Add to composed buffer with offset
-        composed.set(x + ce.x, y + ce.y, char)
+        const hasPrevValue = composed.get(x + ce.x, y + ce.y) !== null
+        if (!(char === null && hasPrevValue)) {
+          composed.set(x + ce.x, y + ce.y, char)
+        }
       })
     }
 
