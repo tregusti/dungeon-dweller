@@ -11,3 +11,7 @@ export type Position = {
   x: number
   y: number
 }
+export type Spot = Position & {
+  // Options for now. Should later be required when we have multiple levels.
+  level?: string
+}

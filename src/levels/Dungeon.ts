@@ -1,7 +1,8 @@
 import { Hero } from '../entities/Hero'
 import { Monster } from '../entities/Monster'
 import { MonsterCollection } from '../entities/MonsterCollection'
-import { Position, Size } from '../types'
+import { DeepReadonly, Position, Size } from '../types'
+import { Level } from './Level'
 
 export type SpotContent = Readonly<
   Position &
@@ -16,17 +17,21 @@ export type SpotContent = Readonly<
         }
     )
 >
+
 export class Dungeon {
   readonly width: number
   readonly height: number
+  readonly levels: DeepReadonly<Level>[] = []
 
   constructor(
     size: Size,
     private hero: Hero,
     private monsters: MonsterCollection,
+    levels: DeepReadonly<Level>[] = [],
   ) {
     this.width = size.width
     this.height = size.height
+    this.levels = levels
   }
 
   at(x: number, y: number): SpotContent[] {
@@ -41,12 +46,15 @@ export class Dungeon {
 
     return []
   }
+
   isOccupied(x: number, y: number): boolean {
     return this.at(x, y).length > 0
   }
+
   isFree(x: number, y: number): boolean {
     return !this.isOccupied(x, y)
   }
+
   getFreePositions(): Position[] {
     const freePositions: Position[] = []
     for (let y = 0; y < this.height; y++) {

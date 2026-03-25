@@ -1,5 +1,6 @@
 import { BufferCompositor } from '../buffer/BufferCompositor'
 import { Layout } from '../Layout'
+import { Dungeon } from '../levels/Dungeon'
 import { EventBus, Events } from '../messaging/core'
 import { DungeonRenderer } from '../screen/DungeonRenderer'
 import { StatusRenderer } from '../screen/StatusRenderer'
@@ -8,11 +9,13 @@ import { Terminal } from '../screen/Terminal'
 type AttachRenderersArgs = {
   terminal: Terminal
   eventBus: EventBus<Events>
+  dungeon: Dungeon
 }
 
 export function attachRenderers({
   terminal,
   eventBus,
+  dungeon,
 }: AttachRenderersArgs): void {
   const bufferCompositor = new BufferCompositor({
     width: Layout.game.size.width,
@@ -32,6 +35,7 @@ export function attachRenderers({
     bufferCompositor,
     terminal,
     eventBus,
+    dungeon,
     size: Layout.dungeon.size,
     position: Layout.dungeon.position,
   })

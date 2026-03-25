@@ -1,13 +1,13 @@
-import { Position } from '../types'
+import { Position, Spot } from '../types'
 import { Creature } from './Creature'
 
 export class Monster extends Creature {
-  constructor({ x, y, speed }: Position & { speed: number }) {
+  constructor({ x, y, level, speed }: Spot & { speed: number }) {
     // pick random character
     const choices = ['x', 'm', 'M', '&', '£']
     const char = choices[Math.floor(Math.random() * choices.length)]
 
-    super({ x, y, char, speed })
+    super({ x, y, char, speed, level })
   }
   giveEnergy() {
     this._energy += this.speed
