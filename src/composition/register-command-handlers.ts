@@ -7,6 +7,7 @@ import { MoveHeroCommandHandler } from '../messaging/commands/MoveHeroCommand'
 import { MoveMonsterCommandHandler } from '../messaging/commands/MoveMonsterCommand'
 import { ProcessMonsterRoundCommandHandler } from '../messaging/commands/ProcessMonsterRoundCommand'
 import { ProcessUntilHeroReadyCommandHandler } from '../messaging/commands/ProcessUntilHeroReadyCommand'
+import { SwitchLevelCommandHandler } from '../messaging/commands/SwitchLevelCommand'
 import { CommandBus, Commands, EventBus, Events } from '../messaging/core'
 import { MoveCreatureCollisionService } from '../messaging/services/MoveCreatureCollisionService'
 import { Random } from '../Random'
@@ -57,6 +58,10 @@ export function registerCommandHandlers({
     random.create('create-monster'),
     eventBus,
   )
+  const switchLevelCommandHandler = new SwitchLevelCommandHandler(
+    hero,
+    eventBus,
+  )
 
   commandBus.register('MoveHero', (payload) =>
     moveHeroCommandHandler.handle(payload),
@@ -73,7 +78,10 @@ export function registerCommandHandlers({
   commandBus.register('ProcessUntilHeroReady', () =>
     processUntilHeroReadyCommandHandler.handle(),
   )
-  commandBus.register('CreateMonster', () =>
-    createMonsterCommandHandler.handle(),
+  commandBus.register('CreateMonster', (payload) =>
+    createMonsterCommandHandler.handle(payload),
+  )
+  commandBus.register('SwitchLevel', (payload) =>
+    switchLevelCommandHandler.handle(payload),
   )
 }

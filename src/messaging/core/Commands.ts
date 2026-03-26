@@ -6,6 +6,7 @@ import '../commands/MoveHeroCommand'
 import '../commands/MoveMonsterCommand'
 import '../commands/ProcessMonsterRoundCommand'
 import '../commands/ProcessUntilHeroReadyCommand'
+import '../commands/SwitchLevelCommand'
 
 export type CommandDef<TPayload, TResult> = {
   payload: TPayload

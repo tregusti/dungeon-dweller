@@ -12,6 +12,7 @@ Debug.initialize({ terminal })
 attachRenderers({
   terminal,
   eventBus,
+  dungeon,
 })
 
 registerCommandHandlers({

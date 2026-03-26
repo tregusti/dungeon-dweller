@@ -20,6 +20,7 @@ export class CreateHeroCommandHandler {
   constructor(
     private readonly dungeon: Readonly<Size>,
     private readonly random: RandomGenerator,
+    private readonly startingLevelId: string,
   ) {}
 
   handle(): CreateHeroCommandResult {
@@ -28,7 +29,7 @@ export class CreateHeroCommandHandler {
 
     return {
       success: true,
-      hero: new Hero({ x, y }),
+      hero: new Hero({ x, y, levelId: this.startingLevelId }),
     }
   }
 }

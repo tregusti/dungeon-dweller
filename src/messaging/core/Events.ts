@@ -1,6 +1,6 @@
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
-import { Position } from '../../types'
+import { Position, Spot } from '../../types'
 
 export type EventDef<TPayload> = {
   payload: TPayload
@@ -14,6 +14,11 @@ export type Events = {
   HeroMoved: EventDef<{
     from: Position
     to: Position
+    hero: Hero
+  }>
+  LevelSwitched: EventDef<{
+    from: Spot
+    to: Spot
     hero: Hero
   }>
   MonsterCreated: EventDef<{

@@ -1,5 +1,6 @@
 import { Debug } from '../Debug'
 import { Hero } from '../entities/Hero'
+import { Layout } from '../Layout'
 import { CommandBus, Commands } from '../messaging/core'
 
 type CreateInputHandlerArgs = {
@@ -33,6 +34,9 @@ export function createInputHandler({
       case 'j':
         await handleMovement(0, 1)
         break
+      case 's':
+        await handleLevelSwitch()
+        break
       // actions
       case 'm':
         await handleCreateMonster()
@@ -40,8 +44,23 @@ export function createInputHandler({
     }
   }
 
+  async function handleLevelSwitch() {
+    await commandBus.execute('SwitchLevel', {
+      // TODO: This should of course not be hard coded later on.
+      levelId: hero.levelId === '1' ? '2' : '1',
+      to: {
+        x: Math.floor(Layout.levels.defaultSize.width / 2),
+        y: Math.floor(Layout.levels.defaultSize.height / 2),
+      },
+    })
+    Debug.write(`Hero switches to level ${hero.levelId} at turn ${hero.turns}`)
+    await handleMonsterRounds()
+  }
+
   async function handleCreateMonster() {
-    const result = await commandBus.execute('CreateMonster')
+    const result = await commandBus.execute('CreateMonster', {
+      levelId: hero.levelId,
+    })
 
     if (!result.success) {
       Debug.write(`No free dungeon tile to spawn monster at turn ${hero.turns}`)

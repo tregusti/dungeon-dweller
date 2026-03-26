@@ -42,11 +42,15 @@ export class StatusRenderer extends BaseRenderer {
     this.eventBus.subscribe('HeroMoved', ({ hero }) => {
       this.renderStatus(hero)
     })
+    this.eventBus.subscribe('LevelSwitched', ({ hero }) => {
+      this.renderStatus(hero)
+    })
   }
 
   private renderStatus(hero: Hero) {
     this.buffer.line(0, `Turns: ${hero.turns} Monsters: ${hero.kills}`)
-    this.buffer.line(1, `Energy: ${hero.energy}`)
+    this.buffer.line(1, `x: ${hero.x} y: ${hero.y} Level: ${hero.levelId}`)
+    this.buffer.line(2, `Energy: ${hero.energy}`)
     this.redraw()
   }
 }

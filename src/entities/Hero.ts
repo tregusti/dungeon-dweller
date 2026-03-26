@@ -1,4 +1,4 @@
-import { Position } from '../types'
+import { Position, Spot } from '../types'
 import { Creature } from './Creature'
 
 export class Hero extends Creature {
@@ -9,8 +9,8 @@ export class Hero extends Creature {
     return this._turns
   }
 
-  constructor({ x, y }: Position) {
-    super({ x, y, char: '@', speed: 10 })
+  constructor({ x, y, levelId }: Spot) {
+    super({ x, y, char: '@', speed: 10, levelId })
     // For hero, energy starts at full so they can act immediately
     this._energy = this.speed
   }

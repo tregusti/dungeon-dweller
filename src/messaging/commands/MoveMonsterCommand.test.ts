@@ -3,6 +3,7 @@ import { assert } from 'ts-essentials'
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
+import { Spot } from '../../types'
 import { EventBus } from '../core/EventBus'
 import { EventPayload, Events } from '../core/Events'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
@@ -10,13 +11,20 @@ import { MoveMonsterCommandHandler } from './MoveMonsterCommand'
 
 describe('MoveMonsterCommandHandler', () => {
   const createSUT = ({
-    heroPosition = { x: 5, y: 5 },
+    heroPosition = { x: 5, y: 5, levelId: '1' },
     randomInts = [1, 0],
   }: {
-    heroPosition?: { x: number; y: number }
+    heroPosition?: Spot
     randomInts?: number[]
   } = {}) => {
-    const dungeon = { width: 10, height: 10 }
+    const level = {
+      width: 10,
+      height: 10,
+      isInside: (x: number, y: number) => x >= 0 && y >= 0 && x < 10 && y < 10,
+    }
+    const dungeon = {
+      getLevel: jest.fn(() => level),
+    } as any
     const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()
     const events = new EventBus<Events>()
@@ -48,10 +56,10 @@ describe('MoveMonsterCommandHandler', () => {
 
   it('moves toward hero when the toward branch is selected', async () => {
     const { monsters, subject } = createSUT({
-      heroPosition: { x: 7, y: 5 },
+      heroPosition: { x: 7, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10 })
+    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -65,10 +73,10 @@ describe('MoveMonsterCommandHandler', () => {
 
   it('moves in a non-toward direction when the other branch is selected', async () => {
     const { monsters, subject } = createSUT({
-      heroPosition: { x: 7, y: 5 },
+      heroPosition: { x: 7, y: 5, levelId: '1' },
       randomInts: [100, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10 })
+    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -82,10 +90,10 @@ describe('MoveMonsterCommandHandler', () => {
 
   it('retries when chosen direction collides with wall', async () => {
     const { monsters, subject } = createSUT({
-      heroPosition: { x: 2, y: 0 },
+      heroPosition: { x: 2, y: 0, levelId: '1' },
       randomInts: [100, 2, 1, 0],
     })
-    const monster = new Monster({ x: 0, y: 0, speed: 10 })
+    const monster = new Monster({ x: 0, y: 0, speed: 10, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -99,10 +107,10 @@ describe('MoveMonsterCommandHandler', () => {
 
   it('does not move into the hero', async () => {
     const { hero, monsters, subject } = createSUT({
-      heroPosition: { x: 6, y: 5 },
+      heroPosition: { x: 6, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10 })
+    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -116,10 +124,10 @@ describe('MoveMonsterCommandHandler', () => {
 
   it('emits MonsterMoved when the monster moves', async () => {
     const { events, monsters, subject } = createSUT({
-      heroPosition: { x: 7, y: 5 },
+      heroPosition: { x: 7, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10 })
+    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
     monsters.add(monster)
 
     const movedEvents: EventPayload<'MonsterMoved'>[] = []

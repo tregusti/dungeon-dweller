@@ -16,6 +16,12 @@ export class Random implements RandomGenerator {
   }
 
   /**
+   * Get a random float number between 0 and 1.
+   */
+  float(): number {
+    return this.prng()
+  }
+  /**
    * Generate a random number between 0 and max (inclusive).
    * @param max Maximum allowed value.
    */

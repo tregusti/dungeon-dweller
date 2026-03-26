@@ -1,7 +1,8 @@
 import { Hero } from '../entities/Hero'
 import { Monster } from '../entities/Monster'
 import { MonsterCollection } from '../entities/MonsterCollection'
-import { Position, Size } from '../types'
+import { DeepReadonly, Position, Size } from '../types'
+import { Level } from './Level'
 
 export type SpotContent = Readonly<
   Position &
@@ -16,44 +17,70 @@ export type SpotContent = Readonly<
         }
     )
 >
+
 export class Dungeon {
   readonly width: number
   readonly height: number
+  readonly levels: DeepReadonly<Level>[] = []
 
   constructor(
     size: Size,
     private hero: Hero,
     private monsters: MonsterCollection,
+    levels: DeepReadonly<Level>[] = [],
   ) {
     this.width = size.width
     this.height = size.height
+    this.levels = levels
   }
 
-  at(x: number, y: number): SpotContent[] {
-    if (this.hero.x === x && this.hero.y === y) {
+  at(x: number, y: number, levelId: string = this.hero.levelId): SpotContent[] {
+    if (
+      this.hero.levelId === levelId &&
+      this.hero.x === x &&
+      this.hero.y === y
+    ) {
       return [{ type: 'hero', hero: this.hero, x, y }]
     }
 
-    const monster = this.monsters.all().find((m) => m.x === x && m.y === y)
+    const monster = this.monsters
+      .list({ levelId })
+      .find((m) => m.x === x && m.y === y)
     if (monster) {
       return [{ type: 'monster', monster, x, y }]
     }
 
     return []
   }
-  isOccupied(x: number, y: number): boolean {
-    return this.at(x, y).length > 0
+
+  isOccupied(
+    x: number,
+    y: number,
+    levelId: string = this.hero.levelId,
+  ): boolean {
+    return this.at(x, y, levelId).length > 0
   }
-  isFree(x: number, y: number): boolean {
-    return !this.isOccupied(x, y)
+
+  isFree(x: number, y: number, levelId: string = this.hero.levelId): boolean {
+    return !this.isOccupied(x, y, levelId)
   }
-  getFreePositions(): Position[] {
+
+  getLevel(id: string): DeepReadonly<Level> {
+    const level = this.levels.find((l) => l.id === id)
+    if (!level) throw new Error(`Level '${id}' not found`)
+    return level
+  }
+
+  get currentLevel(): DeepReadonly<Level> {
+    return this.getLevel(this.hero.levelId)
+  }
+
+  getFreePositions(levelId: string = this.hero.levelId): Position[] {
+    const level = this.getLevel(levelId)
     const freePositions: Position[] = []
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        if (this.isFree(x, y)) {
-          freePositions.push({ x, y })
-        }
+    for (const position of level.positions()) {
+      if (this.isFree(position.x, position.y, levelId)) {
+        freePositions.push(position)
       }
     }
     return freePositions

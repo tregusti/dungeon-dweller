@@ -3,11 +3,15 @@ import { Monster } from './Monster'
 export class MonsterCollection {
   #monsters: Set<Monster> = new Set()
 
-  sortedByEnergy() {
-    return Array.from(this.#monsters).sort((a, b) => a.energy - b.energy)
-  }
-  all() {
-    return Array.from(this.#monsters)
+  list({ levelId, sortBy }: { levelId?: string; sortBy?: 'energy' } = {}) {
+    let monsters = Array.from(this.#monsters)
+    if (levelId) {
+      monsters = monsters.filter((m) => m.levelId === levelId)
+    }
+    if (sortBy === 'energy') {
+      monsters = monsters.sort((a, b) => a.energy - b.energy)
+    }
+    return monsters
   }
 
   add(monster: Monster): void {

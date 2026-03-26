@@ -13,6 +13,7 @@ describe('CreateHeroCommandHandler', () => {
     const subject = new CreateHeroCommandHandler(
       { width: 5, height: 4 },
       random,
+      '1',
     )
 
     const result = subject.handle()
