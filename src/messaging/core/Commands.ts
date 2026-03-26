@@ -26,6 +26,10 @@ export type CommandDef<TPayload, TResult> = {
   result: TResult
 }
 
+// TODO: This is a bit awkward to maintain. Maybe use declaration merging of
+// interface instead? But we would need to switch to use strings as command
+// types instead of symbols for that to work.
+// https://blog.logrocket.com/types-vs-interfaces-typescript/#declarationmerging
 export type Commands = {
   [CommandType.CreateHero]: CommandDef<
     CreateHero.CreateHeroCommandPayload,
