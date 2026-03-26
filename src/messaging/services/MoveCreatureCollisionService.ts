@@ -58,7 +58,7 @@ export class MoveCreatureCollisionService {
     }
 
     const monster = this.monsters
-      .all()
+      .list()
       .find((m) => m.x === attemptedTo.x && m.y === attemptedTo.y)
     if (monster) {
       return {

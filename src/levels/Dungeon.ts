@@ -39,7 +39,7 @@ export class Dungeon {
       return [{ type: 'hero', hero: this.hero, x, y }]
     }
 
-    const monster = this.monsters.all().find((m) => m.x === x && m.y === y)
+    const monster = this.monsters.list().find((m) => m.x === x && m.y === y)
     if (monster) {
       return [{ type: 'monster', monster, x, y }]
     }

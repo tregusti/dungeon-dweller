@@ -47,7 +47,7 @@ describe('MeleeAttackCreatureCommandHandler', () => {
         attacker: hero,
         target,
       })
-      expect(monsters.all()).toHaveLength(0)
+      expect(monsters.list()).toHaveLength(0)
       expect(hero.kills).toBe(1)
       expect(killedEvents).toEqual([
         {
@@ -78,7 +78,7 @@ describe('MeleeAttackCreatureCommandHandler', () => {
         attacker: monster,
         target: hero,
       })
-      expect(monsters.all()).toEqual([monster])
+      expect(monsters.list()).toEqual([monster])
       expect(debug).toHaveBeenCalledWith(expect.stringContaining('Hero'))
     })
   })
