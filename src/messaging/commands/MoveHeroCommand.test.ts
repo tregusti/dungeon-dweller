@@ -11,8 +11,13 @@ describe('MoveHeroCommandHandler', () => {
   const createSUT = ({
     heroPosition = { x: 5, y: 5, levelId: '1' },
   }: { heroPosition?: Spot } = {}) => {
+    const level = {
+      width: 10,
+      height: 10,
+      isInside: (x: number, y: number) => x >= 0 && y >= 0 && x < 10 && y < 10,
+    }
     const dungeon = {
-      getLevel: jest.fn(() => ({ width: 10, height: 10 })),
+      getLevel: jest.fn(() => level),
     } as any
     const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()

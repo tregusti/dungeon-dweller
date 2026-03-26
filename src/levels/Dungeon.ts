@@ -78,11 +78,9 @@ export class Dungeon {
   getFreePositions(levelId: string = this.hero.levelId): Position[] {
     const level = this.getLevel(levelId)
     const freePositions: Position[] = []
-    for (let y = 0; y < level.height; y++) {
-      for (let x = 0; x < level.width; x++) {
-        if (this.isFree(x, y, levelId)) {
-          freePositions.push({ x, y })
-        }
+    for (const position of level.positions()) {
+      if (this.isFree(position.x, position.y, levelId)) {
+        freePositions.push(position)
       }
     }
     return freePositions

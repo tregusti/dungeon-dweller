@@ -43,12 +43,7 @@ export class MoveCreatureCollisionService {
   }): MoveEvaluation {
     const attemptedTo = { x: from.x + dx, y: from.y + dy }
     const level = this.levelLookup.getLevel(levelId)
-    const outside =
-      attemptedTo.x < 0 ||
-      attemptedTo.y < 0 ||
-      attemptedTo.x >= level.width ||
-      attemptedTo.y >= level.height
-    if (outside) {
+    if (!level.isInside(attemptedTo.x, attemptedTo.y)) {
       return {
         success: false,
         reason: 'wall',
