@@ -12,6 +12,5 @@ export type Position = {
   y: number
 }
 export type Spot = Position & {
-  // Options for now. Should later be required when we have multiple levels.
-  levelId?: string
+  levelId: string
 }

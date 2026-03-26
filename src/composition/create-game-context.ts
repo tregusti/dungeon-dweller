@@ -24,6 +24,7 @@ export function createGameContext(): GameContext {
   const createHeroCommandHandler = new CreateHeroCommandHandler(
     Layout.dungeon.size,
     random.create('create-hero'),
+    '1',
   )
   const hero = createHeroCommandHandler.handle().hero
   const monsters = new MonsterCollection()

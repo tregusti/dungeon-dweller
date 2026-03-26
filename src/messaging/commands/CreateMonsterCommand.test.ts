@@ -3,22 +3,24 @@ import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Dungeon } from '../../levels/Dungeon'
 import { Random, RandomGenerator } from '../../Random'
 import { expectToBe, expectToHaveProperty } from '../../test/expect'
-import { Position, Size } from '../../types'
+import { Size, Spot } from '../../types'
 import { EventBus, Events } from '../core'
 import { CreateMonsterCommandHandler } from './CreateMonsterCommand'
 
 describe('CreateMonsterCommandHandler', () => {
   const createSUT = ({
     dungeonSize = { width: 5, height: 5 },
-    heroPosition = { x: 1, y: 1 },
+    heroPosition = { x: 1, y: 1, levelId: '1' },
+    levelId = '1',
     random = new Random('test-seed'),
   }: {
     dungeonSize?: Size
-    heroPosition?: Position
+    heroPosition?: Spot
+    levelId?: string
     random?: RandomGenerator
   } = {}) => {
-    const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()
+    const hero = new Hero(heroPosition)
     const dungeon = new Dungeon(dungeonSize, hero, monsters)
     const events = new EventBus<Events>()
     const subject = new CreateMonsterCommandHandler(
@@ -31,7 +33,7 @@ describe('CreateMonsterCommandHandler', () => {
     return {
       dungeon,
       events,
-      hero,
+      levelId,
       monsters,
       subject,
     }
@@ -39,9 +41,9 @@ describe('CreateMonsterCommandHandler', () => {
 
   describe('when there is at least one free position', () => {
     it('should create and add a monster', () => {
-      const { subject, monsters } = createSUT()
+      const { subject, monsters, levelId } = createSUT()
 
-      const result = subject.handle()
+      const result = subject.handle({ levelId })
 
       expect(result.success).toBe(true)
       expectToHaveProperty(result, 'monster')
@@ -51,19 +53,16 @@ describe('CreateMonsterCommandHandler', () => {
     })
 
     it('should only spawn on free positions', () => {
-      const { subject, dungeon } = createSUT({
-        heroPosition: { x: 0, y: 0 },
-      })
+      const { subject, dungeon, levelId } = createSUT()
       jest.spyOn(dungeon, 'getFreePositions').mockReturnValue([{ x: 1, y: 1 }])
-      const result = subject.handle()
+      const result = subject.handle({ levelId })
       expectToBe(result.success, true)
       expect(result.monster.x).toEqual(1)
       expect(result.monster.y).toEqual(1)
     })
     it('should emit the MonsterCreated event', async () => {
-      const { subject, events } = createSUT({
+      const { subject, events, levelId } = createSUT({
         dungeonSize: { width: 2, height: 1 },
-        heroPosition: { x: 0, y: 0 },
       })
       const promise = new Promise<void>((resolve) => {
         events.subscribe('MonsterCreated', (payload) => {
@@ -74,7 +73,7 @@ describe('CreateMonsterCommandHandler', () => {
         })
       })
 
-      subject.handle()
+      subject.handle({ levelId })
 
       await promise
     })
@@ -82,12 +81,12 @@ describe('CreateMonsterCommandHandler', () => {
 
   describe('when dungeon has no free position', () => {
     it('should return dungeon-full and not create a monster', () => {
-      const { subject, monsters } = createSUT({
+      const { subject, monsters, levelId } = createSUT({
         dungeonSize: { width: 1, height: 1 },
-        heroPosition: { x: 0, y: 0 },
+        heroPosition: { x: 0, y: 0, levelId: '1' },
       })
 
-      const result = subject.handle()
+      const result = subject.handle({ levelId })
 
       expect(result).toEqual({
         success: false,

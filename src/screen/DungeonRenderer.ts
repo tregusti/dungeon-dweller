@@ -52,7 +52,7 @@ export class DungeonRenderer extends BaseRenderer {
 
   attach() {
     this.eventBus.subscribe('GameInitialized', ({ hero }) => {
-      this.updateLevelBuffer()
+      this.updateLevelBuffer(hero.levelId)
       this.entityBuffer.set(hero.x, hero.y, hero.char)
       this.redraw()
     })
@@ -74,11 +74,16 @@ export class DungeonRenderer extends BaseRenderer {
       this.entityBuffer.set(to.x, to.y, monster.char)
       this.redraw()
     })
+    this.eventBus.subscribe('LevelSwitched', ({ hero, to }) => {
+      this.updateLevelBuffer(to.levelId)
+      this.entityBuffer.clear()
+      this.entityBuffer.set(to.x, to.y, hero.char)
+      this.redraw()
+    })
   }
 
-  private updateLevelBuffer() {
-    const level = this.dungeon.levels[0]
-    if (!level) return
+  private updateLevelBuffer(levelId: string) {
+    const level = this.dungeon.getLevel(levelId)
     for (let y = 0; y < this.levelBuffer.height; y++) {
       for (let x = 0; x < this.levelBuffer.width; x++) {
         this.levelBuffer.set(x, y, level.at(x, y))

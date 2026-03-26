@@ -33,7 +33,10 @@ export class ProcessMonsterRoundCommandHandler {
   ) {}
 
   async handle(): Promise<ProcessMonsterRoundCommandResult> {
-    const queue = this.monsters.list({ sortBy: 'energy' })
+    const queue = this.monsters.list({
+      levelId: this.hero.levelId,
+      sortBy: 'energy',
+    })
     queue.forEach((monster) => monster.giveEnergy())
 
     const actions: ProcessMonsterRoundCommandResult['actions'] = []

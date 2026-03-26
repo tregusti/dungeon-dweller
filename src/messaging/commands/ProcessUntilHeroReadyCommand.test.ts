@@ -5,7 +5,7 @@ import { ProcessUntilHeroReadyCommandHandler } from './ProcessUntilHeroReadyComm
 
 describe('ProcessUntilHeroReadyCommandHandler', () => {
   const createSUT = () => {
-    const hero = new Hero({ x: 3, y: 3 })
+    const hero = new Hero({ x: 3, y: 3, levelId: '1' })
     const commandBus = new CommandBus<Commands>()
 
     const processMonsterRound = jest.fn(

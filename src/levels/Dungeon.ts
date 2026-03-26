@@ -55,6 +55,12 @@ export class Dungeon {
     return !this.isOccupied(x, y)
   }
 
+  getLevel(id: string): DeepReadonly<Level> {
+    const level = this.levels.find((l) => l.id === id)
+    if (!level) throw new Error(`Level '${id}' not found`)
+    return level
+  }
+
   getFreePositions(): Position[] {
     const freePositions: Position[] = []
     for (let y = 0; y < this.height; y++) {

@@ -14,8 +14,9 @@ export class DungeonCreator {
 
   create(size: Size): Dungeon {
     const levelCreator = new LevelCreator(this.random.create('level-creator'))
-    const level = levelCreator.create('1', size)
+    const level1 = levelCreator.create('1', size)
+    const level2 = levelCreator.create('2', size)
 
-    return new Dungeon(size, this.hero, this.monsters, [level])
+    return new Dungeon(size, this.hero, this.monsters, [level1, level2])
   }
 }

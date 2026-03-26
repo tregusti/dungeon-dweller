@@ -6,7 +6,7 @@ import { MoveCreatureCollisionService } from './MoveCreatureCollisionService'
 describe('MoveCreatureCollisionService', () => {
   const createSUT = () => {
     const dungeon = { width: 10, height: 10 }
-    const hero = new Hero({ x: 8, y: 5 })
+    const hero = new Hero({ x: 8, y: 5, levelId: '1' })
     const monsters = new MonsterCollection()
     const subject = new MoveCreatureCollisionService(dungeon, monsters, hero)
 
@@ -27,7 +27,7 @@ describe('MoveCreatureCollisionService', () => {
 
   it('evaluate move into monster as unsuccessful and return monster', () => {
     const { subject, monsters } = createSUT()
-    const monster = new Monster({ x: 6, y: 5, speed: 10 })
+    const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
     monsters.add(monster)
     const result = subject.evaluate({ from: { x: 5, y: 5 }, dx: 1, dy: 0 })
     expect(result).toEqual({

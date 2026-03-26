@@ -1,6 +1,6 @@
 export class Level {
   constructor(
-    private readonly id: string,
+    public readonly id: string,
     private readonly layout: string[][],
   ) {}
 

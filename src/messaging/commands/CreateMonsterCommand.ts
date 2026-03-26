@@ -14,7 +14,9 @@ declare module '../core/Commands' {
   }
 }
 
-export type CreateMonsterCommandPayload = void
+export type CreateMonsterCommandPayload = {
+  levelId: string
+}
 
 export type CreateMonsterCommandResult =
   | {
@@ -34,7 +36,7 @@ export class CreateMonsterCommandHandler {
     private readonly events: EventBus<Events>,
   ) {}
 
-  handle(): CreateMonsterCommandResult {
+  handle({ levelId }: CreateMonsterCommandPayload): CreateMonsterCommandResult {
     const freePositions = this.dungeon.getFreePositions()
     if (freePositions.length === 0) {
       return {
@@ -47,6 +49,7 @@ export class CreateMonsterCommandHandler {
     const spawnAt = freePositions[idx]
     const monster = new Monster({
       ...spawnAt,
+      levelId,
       speed: this.random.int(3, 15),
     })
     this.monsters.add(monster)

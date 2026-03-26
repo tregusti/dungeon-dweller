@@ -8,7 +8,7 @@ import { ProcessMonsterRoundCommandHandler } from './ProcessMonsterRoundCommand'
 
 describe('ProcessMonsterRoundCommandHandler', () => {
   const createSUT = () => {
-    const hero = new Hero({ x: 0, y: 0 })
+    const hero = new Hero({ x: 0, y: 0, levelId: '1' })
     const monsters = new MonsterCollection()
     const commandBus = new CommandBus<Commands>()
 
@@ -47,8 +47,8 @@ describe('ProcessMonsterRoundCommandHandler', () => {
 
   it('processes monsters until they can no longer act', async () => {
     const { monsters, moveMonster, subject } = createSUT()
-    const fastMonster = new Monster({ x: 1, y: 1, speed: 25 })
-    const normalMonster = new Monster({ x: 2, y: 2, speed: 12 })
+    const fastMonster = new Monster({ x: 1, y: 1, speed: 25, levelId: '1' })
+    const normalMonster = new Monster({ x: 2, y: 2, speed: 12, levelId: '1' })
 
     monsters.add(normalMonster)
     monsters.add(fastMonster)
@@ -66,7 +66,7 @@ describe('ProcessMonsterRoundCommandHandler', () => {
 
   it('skips monsters that do not have enough energy to act', async () => {
     const { monsters, moveMonster, subject } = createSUT()
-    monsters.add(new Monster({ x: 1, y: 1, speed: 5 }))
+    monsters.add(new Monster({ x: 1, y: 1, speed: 5, levelId: '1' }))
 
     const result = await subject.handle()
 

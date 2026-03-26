@@ -24,7 +24,7 @@ function createLayout(random: Random, size: Size): string[][] {
     const row: string[] = []
     for (let x = 0; x < size.width; x++) {
       const value = noise2D(x * scale, y * scale)
-      row.push(value > 0 ? '#' : '.')
+      row.push(value > 0 ? '░' : '.')
     }
     layout.push(row)
   }
