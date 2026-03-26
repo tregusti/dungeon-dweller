@@ -4,7 +4,6 @@
 
 - Add CompleteHeroTurn command and HeroTurnCompleted event to track energy gain
   end turn counter. And subscribe to it in StatusRenderer.
-- Remove hard coded ctor values in Game.
 
 ## BufferCompositor
 
