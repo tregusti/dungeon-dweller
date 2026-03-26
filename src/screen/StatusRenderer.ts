@@ -30,7 +30,7 @@ export class StatusRenderer extends BaseRenderer {
       buffer: new Buffer(size),
       x: position.x,
       y: position.y,
-      z: 1,
+      layer: 1,
     })
     this.buffer.clear()
   }

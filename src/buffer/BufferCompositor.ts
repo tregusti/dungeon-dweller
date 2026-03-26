@@ -1,7 +1,7 @@
-import { Position3D, Size } from '../types'
+import { Position, Size } from '../types'
 import { Buffer, BufferEntry } from './Buffer'
 
-type CompositorEntry = Position3D & { buffer: Buffer }
+type CompositorEntry = Position & { buffer: Buffer; layer: number }
 
 export class BufferCompositor {
   #buffers: CompositorEntry[] = []
@@ -15,7 +15,7 @@ export class BufferCompositor {
 
   /**
    * Adds a buffer to the compositor. The buffer will be composited on top of
-   * the existing buffers based on its z-index.
+   * the existing buffers based on its layer index.
    *
    * @param buffer The buffer to add.
    * @returns The added buffer.
@@ -24,16 +24,16 @@ export class BufferCompositor {
     buffer,
     x,
     y,
-    z,
+    layer,
   }: {
     buffer: Buffer
     x: number
     y: number
-    z: number
+    layer: number
   }) {
-    this.#buffers.push({ buffer, x, y, z })
-    // Sort by z (lowest first)
-    this.#buffers.sort((a, b) => a.z - b.z)
+    this.#buffers.push({ buffer, x, y, layer })
+    // Sort by layer (lowest first)
+    this.#buffers.sort((a, b) => a.layer - b.layer)
     return buffer
   }
 

@@ -28,7 +28,7 @@ export class DungeonRenderer extends BaseRenderer {
       buffer: new Buffer(size),
       x: position.x,
       y: position.y,
-      z: 0,
+      layer: 0,
     })
     this.buffer.clear()
   }

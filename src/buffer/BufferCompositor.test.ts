@@ -1,4 +1,3 @@
-import { Size } from '../types'
 import { Buffer, BufferEntry } from './Buffer'
 import { BufferCompositor } from './BufferCompositor'
 
@@ -16,7 +15,7 @@ describe('BufferCompositor', () => {
       buffer: new Buffer(size5x5),
       x: 0,
       y: 0,
-      z: 0,
+      layer: 0,
     })
     buffer.set(2, 2, 'A')
 
@@ -32,13 +31,13 @@ describe('BufferCompositor', () => {
       buffer: new Buffer(size5x5),
       x: 0,
       y: 0,
-      z: 1,
+      layer: 1,
     })
     const buffer2 = compositor.add({
       buffer: new Buffer(size5x5),
       x: 0,
       y: 0,
-      z: 2,
+      layer: 2,
     })
     buffer1.set(2, 2, 'A')
     buffer2.set(2, 2, 'B')
@@ -53,8 +52,8 @@ describe('BufferCompositor', () => {
     const compositor = new BufferCompositor(size5x5)
     const buffer1 = new Buffer(size5x5)
     const buffer2 = new Buffer(size5x5)
-    compositor.add({ buffer: buffer1, x: 0, y: 0, z: 1 })
-    compositor.add({ buffer: buffer2, x: 0, y: 0, z: 2 })
+    compositor.add({ buffer: buffer1, x: 0, y: 0, layer: 1 })
+    compositor.add({ buffer: buffer2, x: 0, y: 0, layer: 2 })
     buffer1.set(2, 2, 'A')
     buffer2.set(2, 2, 'B')
     buffer2.clear(2, 2)
@@ -71,7 +70,7 @@ describe('BufferCompositor', () => {
       buffer: new Buffer(size5x5),
       x: 0,
       y: 0,
-      z: 0,
+      layer: 0,
     })
 
     buffer.set(2, 2, null)
