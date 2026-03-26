@@ -38,6 +38,7 @@ export function attachRenderers({
     dungeon,
     size: Layout.dungeon.size,
     position: Layout.dungeon.position,
+    scrollMargin: Layout.dungeon.scrollMargin,
   })
   dungeonRenderer.attach()
 }

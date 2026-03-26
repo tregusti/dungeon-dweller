@@ -34,12 +34,18 @@ export class Dungeon {
     this.levels = levels
   }
 
-  at(x: number, y: number): SpotContent[] {
-    if (this.hero.x === x && this.hero.y === y) {
+  at(x: number, y: number, levelId: string = this.hero.levelId): SpotContent[] {
+    if (
+      this.hero.levelId === levelId &&
+      this.hero.x === x &&
+      this.hero.y === y
+    ) {
       return [{ type: 'hero', hero: this.hero, x, y }]
     }
 
-    const monster = this.monsters.list().find((m) => m.x === x && m.y === y)
+    const monster = this.monsters
+      .list({ levelId })
+      .find((m) => m.x === x && m.y === y)
     if (monster) {
       return [{ type: 'monster', monster, x, y }]
     }
@@ -47,12 +53,16 @@ export class Dungeon {
     return []
   }
 
-  isOccupied(x: number, y: number): boolean {
-    return this.at(x, y).length > 0
+  isOccupied(
+    x: number,
+    y: number,
+    levelId: string = this.hero.levelId,
+  ): boolean {
+    return this.at(x, y, levelId).length > 0
   }
 
-  isFree(x: number, y: number): boolean {
-    return !this.isOccupied(x, y)
+  isFree(x: number, y: number, levelId: string = this.hero.levelId): boolean {
+    return !this.isOccupied(x, y, levelId)
   }
 
   getLevel(id: string): DeepReadonly<Level> {
@@ -61,11 +71,16 @@ export class Dungeon {
     return level
   }
 
-  getFreePositions(): Position[] {
+  get currentLevel(): DeepReadonly<Level> {
+    return this.getLevel(this.hero.levelId)
+  }
+
+  getFreePositions(levelId: string = this.hero.levelId): Position[] {
+    const level = this.getLevel(levelId)
     const freePositions: Position[] = []
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        if (this.isFree(x, y)) {
+    for (let y = 0; y < level.height; y++) {
+      for (let x = 0; x < level.width; x++) {
+        if (this.isFree(x, y, levelId)) {
           freePositions.push({ x, y })
         }
       }

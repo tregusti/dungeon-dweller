@@ -20,9 +20,10 @@ export type GameContext = {
 
 export function createGameContext(): GameContext {
   const random = new Random('lenn-seed')
+  const levelSize = Layout.levels.defaultSize
 
   const createHeroCommandHandler = new CreateHeroCommandHandler(
-    Layout.dungeon.size,
+    levelSize,
     random.create('create-hero'),
     '1',
   )
@@ -33,7 +34,7 @@ export function createGameContext(): GameContext {
     hero,
     monsters,
   )
-  const dungeon = dungeonCreator.create(Layout.dungeon.size)
+  const dungeon = dungeonCreator.create(levelSize)
 
   const commandBus = new CommandBus<Commands>()
   const eventBus = new EventBus<Events>()

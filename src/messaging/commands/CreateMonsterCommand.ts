@@ -37,7 +37,7 @@ export class CreateMonsterCommandHandler {
   ) {}
 
   handle({ levelId }: CreateMonsterCommandPayload): CreateMonsterCommandResult {
-    const freePositions = this.dungeon.getFreePositions()
+    const freePositions = this.dungeon.getFreePositions(levelId)
     if (freePositions.length === 0) {
       return {
         success: false,

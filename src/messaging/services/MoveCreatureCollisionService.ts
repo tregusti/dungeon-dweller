@@ -1,7 +1,10 @@
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Position, Size } from '../../types'
+import { Dungeon } from '../../levels/Dungeon'
+import { Position } from '../../types'
+
+type LevelLookup = Pick<Dungeon, 'getLevel'>
 
 type MoveEvaluation =
   | { success: true }
@@ -22,7 +25,7 @@ type MoveEvaluation =
 
 export class MoveCreatureCollisionService {
   constructor(
-    private readonly dungeon: Readonly<Size>,
+    private readonly levelLookup: LevelLookup,
     private readonly monsters: MonsterCollection,
     private readonly hero: Hero,
   ) {}
@@ -31,17 +34,20 @@ export class MoveCreatureCollisionService {
     from,
     dx,
     dy,
+    levelId,
   }: {
     from: Position
     dx: number
     dy: number
+    levelId: string
   }): MoveEvaluation {
     const attemptedTo = { x: from.x + dx, y: from.y + dy }
+    const level = this.levelLookup.getLevel(levelId)
     const outside =
       attemptedTo.x < 0 ||
       attemptedTo.y < 0 ||
-      attemptedTo.x >= this.dungeon.width ||
-      attemptedTo.y >= this.dungeon.height
+      attemptedTo.x >= level.width ||
+      attemptedTo.y >= level.height
     if (outside) {
       return {
         success: false,
@@ -49,7 +55,11 @@ export class MoveCreatureCollisionService {
       }
     }
 
-    if (this.hero.x === attemptedTo.x && this.hero.y === attemptedTo.y) {
+    if (
+      this.hero.levelId === levelId &&
+      this.hero.x === attemptedTo.x &&
+      this.hero.y === attemptedTo.y
+    ) {
       return {
         success: false,
         reason: 'hero',
@@ -58,7 +68,7 @@ export class MoveCreatureCollisionService {
     }
 
     const monster = this.monsters
-      .list()
+      .list({ levelId })
       .find((m) => m.x === attemptedTo.x && m.y === attemptedTo.y)
     if (monster) {
       return {

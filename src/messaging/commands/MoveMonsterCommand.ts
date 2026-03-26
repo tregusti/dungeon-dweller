@@ -64,6 +64,7 @@ export class MoveMonsterCommandHandler {
         from: { x: monster.x, y: monster.y },
         dx: direction.dx,
         dy: direction.dy,
+        levelId: monster.levelId,
       })
 
       if (evaluation.success) {

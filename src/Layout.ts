@@ -1,6 +1,8 @@
 const gameWidth = 60
-const dungeonWidth = gameWidth
-const dungeonHeight = 20
+const dungeonViewportWidth = gameWidth
+const dungeonViewportHeight = 20
+const levelDefaultWidth = 500
+const levelDefaultHeight = 500
 const statusHeight = 3
 const statusOffset = 1
 
@@ -8,7 +10,7 @@ export const Layout = {
   game: {
     size: {
       width: gameWidth,
-      height: dungeonHeight + statusHeight + statusOffset,
+      height: dungeonViewportHeight + statusHeight + statusOffset,
     },
   },
   dungeon: {
@@ -17,14 +19,24 @@ export const Layout = {
       y: 0,
     },
     size: {
-      width: dungeonWidth,
-      height: dungeonHeight,
+      width: dungeonViewportWidth,
+      height: dungeonViewportHeight,
+    },
+    scrollMargin: {
+      x: 10,
+      y: 5,
+    },
+  },
+  levels: {
+    defaultSize: {
+      width: levelDefaultWidth,
+      height: levelDefaultHeight,
     },
   },
   status: {
     position: {
       x: 0,
-      y: dungeonHeight + statusOffset,
+      y: dungeonViewportHeight + statusOffset,
     },
     size: {
       width: gameWidth,

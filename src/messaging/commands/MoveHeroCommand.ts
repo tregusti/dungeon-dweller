@@ -51,6 +51,7 @@ export class MoveHeroCommandHandler {
       from: { x: this.hero.x, y: this.hero.y },
       dx,
       dy,
+      levelId: this.hero.levelId,
     })
 
     if (evaluation.success) {

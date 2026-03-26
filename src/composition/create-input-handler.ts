@@ -49,8 +49,8 @@ export function createInputHandler({
       // TODO: This should of course not be hard coded later on.
       levelId: hero.levelId === '1' ? '2' : '1',
       to: {
-        x: Layout.dungeon.size.width / 2,
-        y: Layout.dungeon.size.height / 2,
+        x: Math.floor(Layout.levels.defaultSize.width / 2),
+        y: Math.floor(Layout.levels.defaultSize.height / 2),
       },
     })
     Debug.write(`Hero switches to level ${hero.levelId} at turn ${hero.turns}`)

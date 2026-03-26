@@ -1,6 +1,7 @@
 import { Hero } from '../../entities/Hero'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Dungeon } from '../../levels/Dungeon'
+import { Level } from '../../levels/Level'
 import { Random, RandomGenerator } from '../../Random'
 import { expectToBe, expectToHaveProperty } from '../../test/expect'
 import { Size, Spot } from '../../types'
@@ -21,7 +22,13 @@ describe('CreateMonsterCommandHandler', () => {
   } = {}) => {
     const monsters = new MonsterCollection()
     const hero = new Hero(heroPosition)
-    const dungeon = new Dungeon(dungeonSize, hero, monsters)
+    const level = new Level(
+      levelId,
+      Array.from({ length: dungeonSize.height }, () =>
+        Array(dungeonSize.width).fill('.'),
+      ),
+    )
+    const dungeon = new Dungeon(dungeonSize, hero, monsters, [level])
     const events = new EventBus<Events>()
     const subject = new CreateMonsterCommandHandler(
       dungeon,

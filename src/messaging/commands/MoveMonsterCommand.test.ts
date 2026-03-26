@@ -17,7 +17,9 @@ describe('MoveMonsterCommandHandler', () => {
     heroPosition?: Spot
     randomInts?: number[]
   } = {}) => {
-    const dungeon = { width: 10, height: 10 }
+    const dungeon = {
+      getLevel: jest.fn(() => ({ width: 10, height: 10 })),
+    } as any
     const hero = new Hero(heroPosition)
     const monsters = new MonsterCollection()
     const events = new EventBus<Events>()
