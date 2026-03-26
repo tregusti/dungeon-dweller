@@ -3,10 +3,10 @@ import { Monster } from './Monster'
 export class MonsterCollection {
   #monsters: Set<Monster> = new Set()
 
-  list({ level, sortBy }: { level?: string; sortBy?: 'energy' } = {}) {
+  list({ levelId, sortBy }: { levelId?: string; sortBy?: 'energy' } = {}) {
     let monsters = Array.from(this.#monsters)
-    if (level) {
-      monsters = monsters.filter((m) => m.level === level)
+    if (levelId) {
+      monsters = monsters.filter((m) => m.levelId === levelId)
     }
     if (sortBy === 'energy') {
       monsters = monsters.sort((a, b) => a.energy - b.energy)

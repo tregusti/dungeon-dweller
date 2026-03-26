@@ -9,8 +9,8 @@ export class Hero extends Creature {
     return this._turns
   }
 
-  constructor({ x, y, level }: Spot) {
-    super({ x, y, char: '@', speed: 10, level })
+  constructor({ x, y, levelId }: Spot) {
+    super({ x, y, char: '@', speed: 10, levelId })
     // For hero, energy starts at full so they can act immediately
     this._energy = this.speed
   }

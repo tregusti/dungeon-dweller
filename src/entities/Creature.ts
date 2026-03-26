@@ -3,7 +3,7 @@ import { Spot } from '../types'
 export abstract class Creature {
   x: number
   y: number
-  level: string
+  levelId: string
   char: string
   speed: number
   protected _energy: number = 0
@@ -15,7 +15,7 @@ export abstract class Creature {
   constructor({
     x,
     y,
-    level = '1',
+    levelId = '1',
     char,
     speed,
   }: {
@@ -24,7 +24,7 @@ export abstract class Creature {
   } & Spot) {
     this.x = x
     this.y = y
-    this.level = level
+    this.levelId = levelId
     this.char = char
     this.speed = speed
   }
