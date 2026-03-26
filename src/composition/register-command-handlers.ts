@@ -7,13 +7,7 @@ import { MoveHeroCommandHandler } from '../messaging/commands/MoveHeroCommand'
 import { MoveMonsterCommandHandler } from '../messaging/commands/MoveMonsterCommand'
 import { ProcessMonsterRoundCommandHandler } from '../messaging/commands/ProcessMonsterRoundCommand'
 import { ProcessUntilHeroReadyCommandHandler } from '../messaging/commands/ProcessUntilHeroReadyCommand'
-import {
-  CommandBus,
-  Commands,
-  CommandType,
-  EventBus,
-  Events,
-} from '../messaging/core'
+import { CommandBus, Commands, EventBus, Events } from '../messaging/core'
 import { MoveCreatureCollisionService } from '../messaging/services/MoveCreatureCollisionService'
 import { Random } from '../Random'
 
@@ -64,22 +58,22 @@ export function registerCommandHandlers({
     eventBus,
   )
 
-  commandBus.register(CommandType.MoveHero, (payload) =>
+  commandBus.register('MoveHero', (payload) =>
     moveHeroCommandHandler.handle(payload),
   )
-  commandBus.register(CommandType.MoveMonster, (payload) =>
+  commandBus.register('MoveMonster', (payload) =>
     moveMonsterCommandHandler.handle(payload),
   )
-  commandBus.register(CommandType.MeleeAttackCreature, (payload) =>
+  commandBus.register('MeleeAttackCreature', (payload) =>
     meleeAttackCreatureCommandHandler.handle(payload),
   )
-  commandBus.register(CommandType.ProcessMonsterRound, () =>
+  commandBus.register('ProcessMonsterRound', () =>
     processMonsterRoundCommandHandler.handle(),
   )
-  commandBus.register(CommandType.ProcessUntilHeroReady, () =>
+  commandBus.register('ProcessUntilHeroReady', () =>
     processUntilHeroReadyCommandHandler.handle(),
   )
-  commandBus.register(CommandType.CreateMonster, () =>
+  commandBus.register('CreateMonster', () =>
     createMonsterCommandHandler.handle(),
   )
 }

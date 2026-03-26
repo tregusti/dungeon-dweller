@@ -1,6 +1,6 @@
 import { Debug } from '../Debug'
 import { Hero } from '../entities/Hero'
-import { CommandBus, Commands, CommandType } from '../messaging/core'
+import { CommandBus, Commands } from '../messaging/core'
 
 type CreateInputHandlerArgs = {
   commandBus: CommandBus<Commands>
@@ -41,7 +41,7 @@ export function createInputHandler({
   }
 
   async function handleCreateMonster() {
-    const result = await commandBus.execute(CommandType.CreateMonster)
+    const result = await commandBus.execute('CreateMonster')
 
     if (!result.success) {
       Debug.write(`No free dungeon tile to spawn monster at turn ${hero.turns}`)
@@ -50,7 +50,7 @@ export function createInputHandler({
   }
 
   async function handleMovement(dx: number, dy: number) {
-    const result = await commandBus.execute(CommandType.MoveHero, {
+    const result = await commandBus.execute('MoveHero', {
       dx,
       dy,
     })
@@ -63,7 +63,7 @@ export function createInputHandler({
     } else if (result.reason === 'wall') {
       Debug.write(`Hero bumps into a wall at turn ${hero.turns}`)
     } else if (result.reason === 'monster') {
-      await commandBus.execute(CommandType.MeleeAttackCreature, {
+      await commandBus.execute('MeleeAttackCreature', {
         attacker: hero,
         target: result.monster,
       })
@@ -72,9 +72,7 @@ export function createInputHandler({
   }
 
   async function handleMonsterRounds() {
-    const turnResult = await commandBus.execute(
-      CommandType.ProcessUntilHeroReady,
-    )
+    const turnResult = await commandBus.execute('ProcessUntilHeroReady')
 
     for (const round of turnResult.rounds) {
       for (const action of round.actions) {
@@ -86,7 +84,7 @@ export function createInputHandler({
             `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
           )
         } else if (monsterResult.reason === 'hero') {
-          await commandBus.execute(CommandType.MeleeAttackCreature, {
+          await commandBus.execute('MeleeAttackCreature', {
             attacker: monster,
             target: hero,
           })

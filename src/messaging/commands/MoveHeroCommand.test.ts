@@ -2,7 +2,7 @@ import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { EventBus } from '../core/EventBus'
-import { EventPayload, Events, EventType } from '../core/Events'
+import { EventPayload, Events } from '../core/Events'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
 import { MoveHeroCommandHandler, Movement } from './MoveHeroCommand'
 
@@ -38,8 +38,8 @@ describe('MoveHeroCommandHandler', () => {
       const { events, subject, hero } = createSUT({
         heroPosition: { x: 5, y: 5 },
       })
-      const movedEvents: EventPayload<typeof EventType.HeroMoved>[] = []
-      events.subscribe(EventType.HeroMoved, (payload) => {
+      const movedEvents: EventPayload<'HeroMoved'>[] = []
+      events.subscribe('HeroMoved', (payload) => {
         movedEvents.push(payload)
       })
 
@@ -85,7 +85,7 @@ describe('MoveHeroCommandHandler', () => {
       monsters.add(monster)
 
       const movedEvents: unknown[] = []
-      events.subscribe(EventType.HeroMoved, (payload) => {
+      events.subscribe('HeroMoved', (payload) => {
         movedEvents.push(payload)
       })
 
@@ -129,7 +129,7 @@ describe('MoveHeroCommandHandler', () => {
       })
 
       const movedEvents: unknown[] = []
-      events.subscribe(EventType.HeroMoved, (payload) => {
+      events.subscribe('HeroMoved', (payload) => {
         movedEvents.push(payload)
       })
 

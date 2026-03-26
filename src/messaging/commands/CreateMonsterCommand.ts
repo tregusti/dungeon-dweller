@@ -2,9 +2,17 @@ import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Dungeon } from '../../levels/Dungeon'
 import { RandomGenerator } from '../../Random'
-import { EventBus, Events, EventType } from '../core'
+import { EventBus, Events } from '../core'
+import type { CommandDef } from '../core/Commands'
 
-export const CreateMonsterCommandType = Symbol('CreateMonster')
+declare module '../core/Commands' {
+  interface Commands {
+    CreateMonster: CommandDef<
+      CreateMonsterCommandPayload,
+      CreateMonsterCommandResult
+    >
+  }
+}
 
 export type CreateMonsterCommandPayload = void
 
@@ -43,7 +51,7 @@ export class CreateMonsterCommandHandler {
     })
     this.monsters.add(monster)
 
-    this.events.publish(EventType.MonsterCreated, {
+    this.events.publish('MonsterCreated', {
       monster,
       at: spawnAt,
     })

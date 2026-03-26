@@ -1,8 +1,13 @@
 import { Hero } from '../../entities/Hero'
 import { RandomGenerator } from '../../Random'
 import { Size } from '../../types'
+import type { CommandDef } from '../core/Commands'
 
-export const CreateHeroCommandType = Symbol('CreateHero')
+declare module '../core/Commands' {
+  interface Commands {
+    CreateHero: CommandDef<CreateHeroCommandPayload, CreateHeroCommandResult>
+  }
+}
 
 export type CreateHeroCommandPayload = void
 

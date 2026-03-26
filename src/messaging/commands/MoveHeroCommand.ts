@@ -1,11 +1,16 @@
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { Position } from '../../types'
+import type { CommandDef } from '../core/Commands'
 import { EventBus } from '../core/EventBus'
-import { Events, EventType } from '../core/Events'
+import { Events } from '../core/Events'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
 
-export const MoveHeroCommandType = Symbol('MoveHero')
+declare module '../core/Commands' {
+  interface Commands {
+    MoveHero: CommandDef<MoveHeroCommandPayload, MoveHeroCommandResult>
+  }
+}
 
 export type MoveHeroCommandPayload = { dx: number; dy: number }
 export type MoveHeroCommandResult =
@@ -50,7 +55,7 @@ export class MoveHeroCommandHandler {
 
     if (evaluation.success) {
       const { from, to } = this.hero.move(dx, dy)
-      await this.events.publish(EventType.HeroMoved, {
+      await this.events.publish('HeroMoved', {
         from: from,
         to: to,
         hero: this.hero,

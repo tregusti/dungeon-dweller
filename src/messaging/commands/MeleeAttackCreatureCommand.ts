@@ -3,10 +3,18 @@ import { Creature } from '../../entities/Creature'
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
+import type { CommandDef } from '../core/Commands'
 import { EventBus } from '../core/EventBus'
-import { Events, EventType } from '../core/Events'
+import { Events } from '../core/Events'
 
-export const MeleeAttackCreatureCommandType = Symbol('MeleeAttackCreature')
+declare module '../core/Commands' {
+  interface Commands {
+    MeleeAttackCreature: CommandDef<
+      MeleeAttackCreatureCommandPayload,
+      MeleeAttackCreatureCommandResult
+    >
+  }
+}
 
 export type MeleeAttackCreatureCommandPayload = {
   attacker: Creature
@@ -60,7 +68,7 @@ export class MeleeAttackCreatureCommandHandler {
     }
 
     this.monsters.remove(target)
-    this.events.publish(EventType.MonsterKilled, {
+    this.events.publish('MonsterKilled', {
       monster: target,
       at: { x: target.x, y: target.y },
     })

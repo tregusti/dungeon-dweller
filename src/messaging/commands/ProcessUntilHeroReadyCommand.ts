@@ -1,9 +1,16 @@
 import { Hero } from '../../entities/Hero'
 import { CommandBus } from '../core/CommandBus'
-import { Commands, CommandType } from '../core/Commands'
+import type { CommandDef, Commands } from '../core/Commands'
 import { ProcessMonsterRoundCommandResult } from './ProcessMonsterRoundCommand'
 
-export const ProcessUntilHeroReadyCommandType = Symbol('ProcessUntilHeroReady')
+declare module '../core/Commands' {
+  interface Commands {
+    ProcessUntilHeroReady: CommandDef<
+      ProcessUntilHeroReadyCommandPayload,
+      ProcessUntilHeroReadyCommandResult
+    >
+  }
+}
 
 export type ProcessUntilHeroReadyCommandPayload = void
 
@@ -21,9 +28,7 @@ export class ProcessUntilHeroReadyCommandHandler {
     const rounds: ProcessUntilHeroReadyCommandResult['rounds'] = []
 
     do {
-      const round = await this.commandBus.execute(
-        CommandType.ProcessMonsterRound,
-      )
+      const round = await this.commandBus.execute('ProcessMonsterRound')
       rounds.push(round)
       this.hero.giveEnergy()
     } while (this.hero.energy < this.hero.speed)

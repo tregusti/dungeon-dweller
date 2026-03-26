@@ -1,7 +1,7 @@
 import { Buffer } from '../buffer/Buffer'
 import { BufferCompositor } from '../buffer/BufferCompositor'
 import { Hero } from '../entities/Hero'
-import { EventBus, Events, EventType } from '../messaging/core'
+import { EventBus, Events } from '../messaging/core'
 import { Position, Size } from '../types'
 import { BaseRenderer } from './BaseRenderer'
 import { Terminal } from './Terminal'
@@ -36,10 +36,10 @@ export class StatusRenderer extends BaseRenderer {
   }
 
   attach() {
-    this.eventBus.subscribe(EventType.GameInitialized, ({ hero }) => {
+    this.eventBus.subscribe('GameInitialized', ({ hero }) => {
       this.renderStatus(hero)
     })
-    this.eventBus.subscribe(EventType.HeroMoved, ({ hero }) => {
+    this.eventBus.subscribe('HeroMoved', ({ hero }) => {
       this.renderStatus(hero)
     })
   }

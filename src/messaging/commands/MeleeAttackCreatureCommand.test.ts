@@ -3,7 +3,7 @@ import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { EventBus } from '../core/EventBus'
-import { EventPayload, Events, EventType } from '../core/Events'
+import { EventPayload, Events } from '../core/Events'
 import { MeleeAttackCreatureCommandHandler } from './MeleeAttackCreatureCommand'
 
 describe('MeleeAttackCreatureCommandHandler', () => {
@@ -31,8 +31,8 @@ describe('MeleeAttackCreatureCommandHandler', () => {
       monsters.add(target)
 
       jest.spyOn(Debug, 'write').mockImplementation(() => {})
-      const killedEvents: EventPayload<typeof EventType.MonsterKilled>[] = []
-      events.subscribe(EventType.MonsterKilled, (payload) => {
+      const killedEvents: EventPayload<'MonsterKilled'>[] = []
+      events.subscribe('MonsterKilled', (payload) => {
         killedEvents.push(payload)
       })
 

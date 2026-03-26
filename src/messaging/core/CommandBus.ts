@@ -1,12 +1,10 @@
 import { MaybePromise } from '../../types'
 import { CommandDef } from './Commands'
 
-type CommandMap = Record<symbol, CommandDef<unknown, unknown>>
-
-type CommandPayload<TCommands extends CommandMap, K extends keyof TCommands> =
+type CommandPayload<TCommands, K extends keyof TCommands> =
   TCommands[K] extends CommandDef<infer TPayload, unknown> ? TPayload : never
 
-type CommandResult<TCommands extends CommandMap, K extends keyof TCommands> =
+type CommandResult<TCommands, K extends keyof TCommands> =
   TCommands[K] extends CommandDef<unknown, infer TResult> ? TResult : never
 
 type CommandExecuteArgs<TPayload> = [TPayload] extends [void]
@@ -19,7 +17,9 @@ type CommandHandler<TPayload, TResult> = [TPayload] extends [void]
 
 type AnyCommandHandler = (...args: any[]) => MaybePromise<any>
 
-export class CommandBus<TCommands extends CommandMap> {
+export class CommandBus<
+  TCommands extends { [K in keyof TCommands]: CommandDef<unknown, unknown> },
+> {
   private handlers = new Map<keyof TCommands, AnyCommandHandler>()
 
   register<K extends keyof TCommands>(

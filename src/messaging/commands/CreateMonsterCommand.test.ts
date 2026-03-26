@@ -4,7 +4,7 @@ import { Dungeon } from '../../levels/Dungeon'
 import { Random, RandomGenerator } from '../../Random'
 import { expectToBe, expectToHaveProperty } from '../../test/expect'
 import { Position, Size } from '../../types'
-import { EventBus, Events, EventType } from '../core'
+import { EventBus, Events } from '../core'
 import { CreateMonsterCommandHandler } from './CreateMonsterCommand'
 
 describe('CreateMonsterCommandHandler', () => {
@@ -66,7 +66,7 @@ describe('CreateMonsterCommandHandler', () => {
         heroPosition: { x: 0, y: 0 },
       })
       const promise = new Promise<void>((resolve) => {
-        events.subscribe(EventType.MonsterCreated, (payload) => {
+        events.subscribe('MonsterCreated', (payload) => {
           expectToHaveProperty(payload, 'monster')
           expectToHaveProperty(payload, 'at')
           expect(payload.at).toEqual({ x: 1, y: 0 })

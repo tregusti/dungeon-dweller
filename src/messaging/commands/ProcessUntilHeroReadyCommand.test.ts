@@ -1,6 +1,6 @@
 import { Hero } from '../../entities/Hero'
 import { CommandBus } from '../core/CommandBus'
-import { Commands, CommandType } from '../core/Commands'
+import { Commands } from '../core/Commands'
 import { ProcessUntilHeroReadyCommandHandler } from './ProcessUntilHeroReadyCommand'
 
 describe('ProcessUntilHeroReadyCommandHandler', () => {
@@ -9,12 +9,12 @@ describe('ProcessUntilHeroReadyCommandHandler', () => {
     const commandBus = new CommandBus<Commands>()
 
     const processMonsterRound = jest.fn(
-      (): Commands[typeof CommandType.ProcessMonsterRound]['result'] => ({
+      (): Commands['ProcessMonsterRound']['result'] => ({
         actions: [],
       }),
     )
 
-    commandBus.register(CommandType.ProcessMonsterRound, processMonsterRound)
+    commandBus.register('ProcessMonsterRound', processMonsterRound)
 
     const subject = new ProcessUntilHeroReadyCommandHandler(hero, commandBus)
 

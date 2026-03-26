@@ -4,7 +4,7 @@ import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { EventBus } from '../core/EventBus'
-import { EventPayload, Events, EventType } from '../core/Events'
+import { EventPayload, Events } from '../core/Events'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
 import { MoveMonsterCommandHandler } from './MoveMonsterCommand'
 
@@ -122,8 +122,8 @@ describe('MoveMonsterCommandHandler', () => {
     const monster = new Monster({ x: 5, y: 5, speed: 10 })
     monsters.add(monster)
 
-    const movedEvents: EventPayload<typeof EventType.MonsterMoved>[] = []
-    events.subscribe(EventType.MonsterMoved, (payload) => {
+    const movedEvents: EventPayload<'MonsterMoved'>[] = []
+    events.subscribe('MonsterMoved', (payload) => {
       movedEvents.push(payload)
     })
 

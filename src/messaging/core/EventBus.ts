@@ -3,12 +3,12 @@ import type { EventDef } from './Events'
 
 type EventHandler<TPayload> = (payload: TPayload) => void | Promise<void>
 
-type EventMap = Record<symbol, EventDef<unknown>>
-
-type EventBusPayload<TEvents extends EventMap, K extends keyof TEvents> =
+type EventBusPayload<TEvents, K extends keyof TEvents> =
   TEvents[K] extends EventDef<infer TPayload> ? TPayload : never
 
-export class EventBus<TEvents extends EventMap> {
+export class EventBus<
+  TEvents extends { [K in keyof TEvents]: EventDef<unknown> },
+> {
   private listeners = new Map<keyof TEvents, EventHandler<any>[]>()
 
   subscribe<K extends keyof TEvents>(

@@ -2,11 +2,16 @@ import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { RandomGenerator } from '../../Random'
 import { Position } from '../../types'
+import type { CommandDef } from '../core/Commands'
 import { EventBus } from '../core/EventBus'
-import { Events, EventType } from '../core/Events'
+import { Events } from '../core/Events'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
 
-export const MoveMonsterCommandType = Symbol('MoveMonster')
+declare module '../core/Commands' {
+  interface Commands {
+    MoveMonster: CommandDef<MoveMonsterCommandPayload, MoveMonsterCommandResult>
+  }
+}
 
 export type MoveMonsterCommandPayload = {
   monster: Monster
@@ -63,7 +68,7 @@ export class MoveMonsterCommandHandler {
 
       if (evaluation.success) {
         const { from, to } = monster.move(direction.dx, direction.dy)
-        await this.events.publish(EventType.MonsterMoved, {
+        await this.events.publish('MonsterMoved', {
           from,
           to,
           monster,

@@ -3,7 +3,7 @@ import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Position } from '../../types'
 import { CommandBus } from '../core/CommandBus'
-import { Commands, CommandType } from '../core/Commands'
+import { Commands } from '../core/Commands'
 import { ProcessMonsterRoundCommandHandler } from './ProcessMonsterRoundCommand'
 
 describe('ProcessMonsterRoundCommandHandler', () => {
@@ -17,7 +17,7 @@ describe('ProcessMonsterRoundCommandHandler', () => {
         monster,
       }: {
         monster: Monster
-      }): Commands[typeof CommandType.MoveMonster]['result'] => {
+      }): Commands['MoveMonster']['result'] => {
         const from: Position = { x: monster.x, y: monster.y }
         const to = monster.move(0, 0).to
 
@@ -29,7 +29,7 @@ describe('ProcessMonsterRoundCommandHandler', () => {
       },
     )
 
-    commandBus.register(CommandType.MoveMonster, moveMonster)
+    commandBus.register('MoveMonster', moveMonster)
 
     const subject = new ProcessMonsterRoundCommandHandler(
       monsters,
