@@ -10,35 +10,30 @@ code.
 
 # Terminology
 
-`spot` is a specific location in the dungeon, defined by its x and y
-coordinates. And in the future will probably also include a reference to the
-level it is on.
+- `spot` is a specific location in the dungeon, defined by its x and y
+  coordinates, together with a level.
+- `coords` is a location without a level, just x and y coordinates. A spot is a
+  coords with a level.
+- `level` is a specific floor in the dungeon, defined by its id. The level id is
+  a string, which can be used to look up the level's layout and other
+  properties.
+- `dungeon` is the entire game world, which consists of multiple levels.
 
-# Commands and events
+# Commands and events
 
-Commands are organized in folders under `src/messaging/commands` and events are
-added more simple directly to the `src/messaging/core/Events.ts` file.
-CommandType and EventType are defined in `src/messaging/core/Commands.ts` and
-`src/messaging/core/Events.ts` respectively. They are indexed both by symbols.
-Each command has a handler and optionally some services, which are all exported
-from the command's index file. For example, the `MoveHero` command is
-implemented in `src/messaging/commands/MoveHero` and has the following files:
+Commands are organized as single files under `src/messaging/commands`, where
+each command file contains the command type string, payload/result types, and
+its handler class. For example, `MoveHero` is implemented in
+`src/messaging/commands/MoveHeroCommand.ts`.
 
-```
-src/messaging/commands/MoveHero/
-  index.ts
-  MoveHeroCommand.ts
-  MoveHeroCommandHandler.ts
-  MoveHeroCollisionService.ts
-```
+The interface `Commands` is defined in `src/messaging/core/Commands.ts` and is
+augmented by all command definitions and is indexed by the type string for the
+command. Refer to the add-command skill for instructions on how to add a new
+command.
 
-`MoveHeroCommand.ts` defines the command's payload and result types, and exports
-them. `MoveHeroCommandHandler.ts` defines the command handler, which implements
-the logic for executing the command. `MoveHeroCollisionService.ts` defines a
-service that is used by the command handler to check for collisions when moving
-the hero. `index.ts` exports all of these entities, so that they can be easily
-imported from other parts of the codebase. When generating new commands, we can
-use the `MoveHero` command as a template for the file structure and content.
+Events are defined directly in `src/messaging/core/Events.ts`. `Events` are
+string-indexed and should stay alphabetically sorted as indicated by local
+comments in that file.
 
 # Testing
 
@@ -47,5 +42,5 @@ Generate as small test cases as possible, split up large tests into smaller
 same test case. Each test case should ideally only test one thing.
 
 Generally a test file resides next to the file it tests, with the same name and
-an additional `.test` suffix. For example, `./MoveHeroCommandHandler.ts` is
-tested by `./MoveHeroCommandHandler.test.ts`.
+an additional `.test` suffix. For example, `./MoveHeroCommand.ts` is tested by
+`./MoveHeroCommand.test.ts`.
