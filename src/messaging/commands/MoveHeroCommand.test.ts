@@ -80,7 +80,7 @@ describe('MoveHeroCommandHandler', () => {
       const { hero, monsters, subject } = createSUT({
         heroCell: { x: 5, y: 5, levelId: '1' },
       })
-      const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
+      const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
       monsters.add(monster)
 
       await subject.handle(Movement.Right)
@@ -93,7 +93,7 @@ describe('MoveHeroCommandHandler', () => {
       const { monsters, events, subject } = createSUT({
         heroCell: { x: 5, y: 5, levelId: '1' },
       })
-      const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
+      const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
       monsters.add(monster)
 
       const movedEvents: unknown[] = []
@@ -111,7 +111,7 @@ describe('MoveHeroCommandHandler', () => {
       const { monsters, subject } = createSUT({
         heroCell: { x: 5, y: 5, levelId: '1' },
       })
-      const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
+      const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
       monsters.add(monster)
 
       const result = await subject.handle(Movement.Right)

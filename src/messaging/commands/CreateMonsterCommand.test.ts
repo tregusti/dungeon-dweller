@@ -71,18 +71,22 @@ describe('CreateMonsterCommandHandler', () => {
       const { subject, events, levelId } = createSUT({
         dungeonSize: { width: 2, height: 1 },
       })
-      const promise = new Promise<void>((resolve) => {
-        events.subscribe('MonsterCreated', (payload) => {
-          expectToHaveProperty(payload, 'monster')
-          expectToHaveProperty(payload, 'at')
-          expect(payload.at).toEqual({ x: 1, y: 0 })
-          resolve()
-        })
-      })
+      const listener = jest.fn()
+      events.subscribe('MonsterCreated', listener)
 
-      subject.handle({ levelId })
+      const result = subject.handle({ levelId })
 
-      await promise
+      expectToBe(result.success, true)
+      expect(listener).toHaveBeenCalledTimes(1)
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          monster: result.monster,
+          at: expect.objectContaining({
+            x: result.monster.x,
+            y: result.monster.y,
+          }),
+        }),
+      )
     })
   })
 

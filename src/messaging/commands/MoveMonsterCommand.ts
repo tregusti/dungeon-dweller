@@ -51,7 +51,7 @@ export class MoveMonsterCommandHandler {
   constructor(
     private readonly hero: Hero,
     private readonly collision: MoveCreatureCollisionService,
-    private readonly random: RandomGenerator,
+    private readonly random: Pick<RandomGenerator, 'int'>,
     private readonly events: EventBus<Events>,
   ) {}
 

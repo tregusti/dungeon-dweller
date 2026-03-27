@@ -47,8 +47,10 @@ describe('ProcessMonsterRoundCommandHandler', () => {
 
   it('processes monsters until they can no longer act', async () => {
     const { monsters, moveMonster, subject } = createSUT()
-    const fastMonster = new Monster({ x: 1, y: 1, speed: 25, levelId: '1' })
-    const normalMonster = new Monster({ x: 2, y: 2, speed: 12, levelId: '1' })
+    const fastMonster = Monster.create('orc', { x: 1, y: 1, levelId: '1' })
+    fastMonster.speed = 25
+    const normalMonster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
+    normalMonster.speed = 12
 
     monsters.add(normalMonster)
     monsters.add(fastMonster)
@@ -66,7 +68,9 @@ describe('ProcessMonsterRoundCommandHandler', () => {
 
   it('skips monsters that do not have enough energy to act', async () => {
     const { monsters, moveMonster, subject } = createSUT()
-    monsters.add(new Monster({ x: 1, y: 1, speed: 5, levelId: '1' }))
+    const monster = Monster.create('orc', { x: 1, y: 1, levelId: '1' })
+    monster.speed = 5
+    monsters.add(monster)
 
     const result = await subject.handle()
 

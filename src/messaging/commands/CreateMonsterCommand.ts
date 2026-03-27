@@ -1,7 +1,9 @@
+import { CreatureTypes } from '../../entities/CreatureDefinitions'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Dungeon } from '../../levels/Dungeon'
 import { RandomGenerator } from '../../Random'
+import { Cell } from '../../types'
 import { EventBus, Events } from '../core'
 import type { CommandDef } from '../core/Commands'
 
@@ -45,13 +47,10 @@ export class CreateMonsterCommandHandler {
       }
     }
 
-    const idx = this.random.int(freeCoords.length - 1)
-    const spawnAt = freeCoords[idx]
-    const monster = new Monster({
-      ...spawnAt,
-      levelId,
-      speed: this.random.int(3, 15),
-    })
+    const coords = freeCoords[this.random.int(freeCoords.length - 1)]
+    const spawnAt: Cell = { ...coords, levelId }
+    const type = this.random.choice(CreatureTypes)
+    const monster = Monster.create(type, spawnAt)
     this.monsters.add(monster)
 
     this.events.publish('MonsterCreated', {

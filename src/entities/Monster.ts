@@ -1,13 +1,27 @@
 import { Cell, Coords } from '../types'
-import { Creature } from './Creature'
+import { Creature, CreatureProps } from './Creature'
+import { CreatureDefinitions } from './CreatureDefinitions'
 
 export class Monster extends Creature {
-  constructor({ x, y, levelId, speed }: Cell & { speed: number }) {
-    // pick random character
-    const choices = ['x', 'm', 'M', '&', '£']
-    const char = choices[Math.floor(Math.random() * choices.length)]
+  static create(type: string, cell: Cell): Monster {
+    const definition = CreatureDefinitions.find((def) => def.type === type)
+    if (!definition) {
+      throw new Error(`Unknown monster type: ${type}`)
+    }
+    return new Monster({
+      ...cell,
+      definition,
+    })
+  }
 
-    super({ x, y, char, levelId, speed })
+  constructor({ x, y, levelId, name, definition }: CreatureProps) {
+    super({
+      x,
+      y,
+      levelId,
+      definition,
+      name,
+    })
   }
   giveEnergy() {
     this._energy += this.speed

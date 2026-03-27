@@ -59,7 +59,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 7, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
+    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -76,7 +76,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 7, y: 5, levelId: '1' },
       randomInts: [100, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
+    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -93,7 +93,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 2, y: 0, levelId: '1' },
       randomInts: [100, 2, 1, 0],
     })
-    const monster = new Monster({ x: 0, y: 0, speed: 10, levelId: '1' })
+    const monster = Monster.create('orc', { x: 0, y: 0, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -110,7 +110,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 6, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
+    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -127,7 +127,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 7, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = new Monster({ x: 5, y: 5, speed: 10, levelId: '1' })
+    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
     monsters.add(monster)
 
     const movedEvents: EventPayload<'MonsterMoved'>[] = []

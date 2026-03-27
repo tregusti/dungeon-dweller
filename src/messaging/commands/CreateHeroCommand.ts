@@ -19,7 +19,7 @@ export type CreateHeroCommandResult = {
 export class CreateHeroCommandHandler {
   constructor(
     private readonly dungeon: Readonly<Size>,
-    private readonly random: RandomGenerator,
+    private readonly random: Pick<RandomGenerator, 'int'>,
     private readonly startingLevelId: string,
   ) {}
 

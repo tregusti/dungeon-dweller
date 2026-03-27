@@ -64,7 +64,7 @@ describe('Dungeon', () => {
     })
     it('should return the monster', () => {
       const { dungeon, monsters } = createSUT()
-      const monster = new Monster({ x: 2, y: 2, speed: 10, levelId: '1' })
+      const monster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
       monsters.add(monster)
 
       const list = dungeon.at(2, 2)
@@ -78,7 +78,7 @@ describe('Dungeon', () => {
       const { dungeon, monsters } = createSUT({
         heroCell: { x: 2, y: 2, levelId: '2' },
       })
-      monsters.add(new Monster({ x: 1, y: 1, speed: 10, levelId: '2' }))
+      monsters.add(Monster.create('orc', { x: 1, y: 1, levelId: '2' }))
 
       expect(dungeon.at(2, 2, '1')).toHaveLength(0)
       expect(dungeon.at(1, 1, '1')).toHaveLength(0)
@@ -99,7 +99,7 @@ describe('Dungeon', () => {
     })
     it('should return false if monster is on the cell', () => {
       const { dungeon, monsters } = createSUT()
-      const monster = new Monster({ x: 2, y: 2, speed: 10, levelId: '1' })
+      const monster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
       monsters.add(monster)
 
       expect(dungeon.isOccupied(2, 2)).toBe(true)
@@ -129,8 +129,8 @@ describe('Dungeon', () => {
         heroCell: { ...AA, levelId: '1' },
         size: { width: 2, height: 2 },
       })
-      monsters.add(new Monster({ ...CC, speed: 10, levelId: '1' }))
-      monsters.add(new Monster({ ...DD, speed: 10, levelId: '1' }))
+      monsters.add(Monster.create('orc', { ...CC, levelId: '1' }))
+      monsters.add(Monster.create('orc', { ...DD, levelId: '1' }))
 
       const result = dungeon.getFreeCoords()
       expect(result).toHaveLength(1)
@@ -142,7 +142,7 @@ describe('Dungeon', () => {
         heroCell: { ...AA, levelId: '2' },
         size: { width: 2, height: 2 },
       })
-      monsters.add(new Monster({ ...CC, speed: 10, levelId: '2' }))
+      monsters.add(Monster.create('orc', { ...CC, levelId: '2' }))
 
       const result = dungeon.getFreeCoords('1')
 

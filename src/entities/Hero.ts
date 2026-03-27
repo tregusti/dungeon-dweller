@@ -1,5 +1,6 @@
 import { Cell, Coords } from '../types'
 import { Creature } from './Creature'
+import { CreatureDefinitions } from './CreatureDefinitions'
 
 export class Hero extends Creature {
   kills: number = 0
@@ -10,9 +11,16 @@ export class Hero extends Creature {
   }
 
   constructor({ x, y, levelId }: Cell) {
-    super({ x, y, char: '@', speed: 10, levelId })
+    super({
+      x,
+      y,
+      levelId,
+      definition: CreatureDefinitions.find((def) => def.type === 'human')!,
+    })
     // For hero, energy starts at full so they can act immediately
     this._energy = this.speed
+    this.char = '@'
+    this.description = 'You, the intrepid adventurer.'
   }
 
   giveEnergy() {

@@ -39,7 +39,7 @@ describe('MoveCreatureCollisionService', () => {
 
   it('evaluate move into monster as unsuccessful and return monster', () => {
     const { subject, monsters } = createSUT()
-    const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
+    const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
     monsters.add(monster)
     const result = subject.evaluate({
       from: { x: 5, y: 5 },

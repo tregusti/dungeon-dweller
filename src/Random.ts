@@ -3,6 +3,9 @@ import seedrandom from 'seedrandom'
 export type RandomGenerator = {
   int(max: number): number
   int(min: number, max: number): number
+  float(): number
+  choice<T>(arr: T[]): T
+  create(seed: string): RandomGenerator
 }
 
 export class Random implements RandomGenerator {
@@ -36,6 +39,15 @@ export class Random implements RandomGenerator {
     let { min, max } = getMinMax(...(args as [number]))
     return Math.floor(this.prng() * (max - min + 1)) + min
   }
+
+  choice<T>(arr: T[]): T {
+    if (arr.length === 0) {
+      throw new Error('Cannot choose from an empty array')
+    }
+    const idx = this.int(arr.length - 1)
+    return arr[idx]
+  }
+
   /** Create child Random instance with a new seed based on its parent seed. */
   create(seed: string): Random {
     const childSeed = `${this.seed}:${seed}`
