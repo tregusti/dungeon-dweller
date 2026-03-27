@@ -1,7 +1,7 @@
-import { Position, Size } from '../types'
+import { Coords, Size } from '../types'
 import { Buffer, BufferEntry } from './Buffer'
 
-type CompositorEntry = Position & { buffer: Buffer; layer: number }
+type CompositorEntry = Coords & { buffer: Buffer; layer: number }
 
 export class BufferCompositor {
   #buffers: CompositorEntry[] = []

@@ -2,7 +2,7 @@ import { Buffer } from '../buffer/Buffer'
 import { BufferCompositor } from '../buffer/BufferCompositor'
 import { Hero } from '../entities/Hero'
 import { EventBus, Events } from '../messaging/core'
-import { Position, Size } from '../types'
+import { Coords, Size } from '../types'
 import { BaseRenderer } from './BaseRenderer'
 import { Terminal } from './Terminal'
 
@@ -15,21 +15,21 @@ export class StatusRenderer extends BaseRenderer {
     terminal,
     eventBus,
     size,
-    position,
+    coords,
   }: {
     bufferCompositor: BufferCompositor
     terminal: Terminal
     eventBus: EventBus<Events>
     size: Size
-    position: Position
+    coords: Coords
   }) {
     super({ bufferCompositor, terminal })
     this.eventBus = eventBus
 
     this.buffer = this.bufferCompositor.add({
       buffer: new Buffer(size),
-      x: position.x,
-      y: position.y,
+      x: coords.x,
+      y: coords.y,
       layer: 1,
     })
     this.buffer.clear()

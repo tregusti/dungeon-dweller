@@ -1,4 +1,4 @@
-import { Position, Size } from '../types'
+import { Coords, Size } from '../types'
 
 type Char = string | null
 
@@ -9,7 +9,7 @@ type Cell = {
 
 export type BufferEntry = {
   char: Char
-} & Position
+} & Coords
 
 export class Buffer {
   readonly width: number

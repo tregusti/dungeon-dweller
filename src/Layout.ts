@@ -14,7 +14,7 @@ export const Layout = {
     },
   },
   dungeon: {
-    position: {
+    coords: {
       x: 0,
       y: 0,
     },
@@ -34,7 +34,7 @@ export const Layout = {
     },
   },
   status: {
-    position: {
+    coords: {
       x: 0,
       y: dungeonViewportHeight + statusOffset,
     },

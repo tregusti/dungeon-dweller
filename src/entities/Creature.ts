@@ -1,4 +1,4 @@
-import { Spot } from '../types'
+import { Cell } from '../types'
 
 export abstract class Creature {
   x: number
@@ -21,7 +21,7 @@ export abstract class Creature {
   }: {
     char: string
     speed: number
-  } & Spot) {
+  } & Cell) {
     this.x = x
     this.y = y
     this.levelId = levelId

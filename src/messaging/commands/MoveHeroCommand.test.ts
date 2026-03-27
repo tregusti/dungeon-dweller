@@ -1,7 +1,7 @@
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Spot } from '../../types'
+import { Cell } from '../../types'
 import { EventBus } from '../core/EventBus'
 import { EventPayload, Events } from '../core/Events'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
@@ -9,8 +9,8 @@ import { MoveHeroCommandHandler, Movement } from './MoveHeroCommand'
 
 describe('MoveHeroCommandHandler', () => {
   const createSUT = ({
-    heroPosition = { x: 5, y: 5, levelId: '1' },
-  }: { heroPosition?: Spot } = {}) => {
+    heroCell = { x: 5, y: 5, levelId: '1' },
+  }: { heroCell?: Cell } = {}) => {
     const level = {
       width: 10,
       height: 10,
@@ -19,7 +19,7 @@ describe('MoveHeroCommandHandler', () => {
     const dungeon = {
       getLevel: jest.fn(() => level),
     } as any
-    const hero = new Hero(heroPosition)
+    const hero = new Hero(heroCell)
     const monsters = new MonsterCollection()
     const events = new EventBus<Events>()
     const collision = new MoveCreatureCollisionService(dungeon, monsters, hero)
@@ -36,7 +36,7 @@ describe('MoveHeroCommandHandler', () => {
   describe('when move is successful', () => {
     it('should move the hero', () => {
       const { hero, subject } = createSUT({
-        heroPosition: { x: 5, y: 5, levelId: '1' },
+        heroCell: { x: 5, y: 5, levelId: '1' },
       })
 
       subject.handle({ dx: 1, dy: 0 })
@@ -46,7 +46,7 @@ describe('MoveHeroCommandHandler', () => {
     })
     it('should emit the HeroMoved event', async () => {
       const { events, subject, hero } = createSUT({
-        heroPosition: { x: 5, y: 5, levelId: '1' },
+        heroCell: { x: 5, y: 5, levelId: '1' },
       })
       const movedEvents: EventPayload<'HeroMoved'>[] = []
       events.subscribe('HeroMoved', (payload) => {
@@ -63,7 +63,7 @@ describe('MoveHeroCommandHandler', () => {
     })
     it('should return success in the result', async () => {
       const { subject } = createSUT({
-        heroPosition: { x: 5, y: 5, levelId: '1' },
+        heroCell: { x: 5, y: 5, levelId: '1' },
       })
 
       const result = await subject.handle({ dx: 1, dy: 0 })
@@ -78,7 +78,7 @@ describe('MoveHeroCommandHandler', () => {
   describe('when monster is in the way', () => {
     it('should not move the hero', async () => {
       const { hero, monsters, subject } = createSUT({
-        heroPosition: { x: 5, y: 5, levelId: '1' },
+        heroCell: { x: 5, y: 5, levelId: '1' },
       })
       const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
       monsters.add(monster)
@@ -91,7 +91,7 @@ describe('MoveHeroCommandHandler', () => {
     it('should not emit the HeroMoved event', async () => {
       // Arrange
       const { monsters, events, subject } = createSUT({
-        heroPosition: { x: 5, y: 5, levelId: '1' },
+        heroCell: { x: 5, y: 5, levelId: '1' },
       })
       const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
       monsters.add(monster)
@@ -109,7 +109,7 @@ describe('MoveHeroCommandHandler', () => {
     })
     it('should return the reason in the result', async () => {
       const { monsters, subject } = createSUT({
-        heroPosition: { x: 5, y: 5, levelId: '1' },
+        heroCell: { x: 5, y: 5, levelId: '1' },
       })
       const monster = new Monster({ x: 6, y: 5, speed: 10, levelId: '1' })
       monsters.add(monster)
@@ -126,7 +126,7 @@ describe('MoveHeroCommandHandler', () => {
   describe('when wall is in the way', () => {
     it('should not move the hero', async () => {
       const { hero, subject } = createSUT({
-        heroPosition: { x: 0, y: 0, levelId: '1' },
+        heroCell: { x: 0, y: 0, levelId: '1' },
       })
 
       await subject.handle(Movement.Left)
@@ -137,7 +137,7 @@ describe('MoveHeroCommandHandler', () => {
     it('should not emit the HeroMoved event', async () => {
       // Arrange
       const { events, subject } = createSUT({
-        heroPosition: { x: 0, y: 0, levelId: '1' },
+        heroCell: { x: 0, y: 0, levelId: '1' },
       })
 
       const movedEvents: unknown[] = []
@@ -153,7 +153,7 @@ describe('MoveHeroCommandHandler', () => {
     })
     it('should return the reason in the result', async () => {
       const { subject } = createSUT({
-        heroPosition: { x: 0, y: 0, levelId: '1' },
+        heroCell: { x: 0, y: 0, levelId: '1' },
       })
 
       const result = await subject.handle(Movement.Left)

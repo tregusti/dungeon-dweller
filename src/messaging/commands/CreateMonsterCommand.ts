@@ -37,16 +37,16 @@ export class CreateMonsterCommandHandler {
   ) {}
 
   handle({ levelId }: CreateMonsterCommandPayload): CreateMonsterCommandResult {
-    const freePositions = this.dungeon.getFreePositions(levelId)
-    if (freePositions.length === 0) {
+    const freeCoords = this.dungeon.getFreeCoords(levelId)
+    if (freeCoords.length === 0) {
       return {
         success: false,
         reason: 'dungeon-full',
       }
     }
 
-    const idx = this.random.int(freePositions.length - 1)
-    const spawnAt = freePositions[idx]
+    const idx = this.random.int(freeCoords.length - 1)
+    const spawnAt = freeCoords[idx]
     const monster = new Monster({
       ...spawnAt,
       levelId,

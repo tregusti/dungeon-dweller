@@ -7,10 +7,10 @@ export type Size = {
   height: number
 }
 
-export type Position = {
+export type Coords = {
   x: number
   y: number
 }
-export type Spot = Position & {
+export type Cell = Coords & {
   levelId: string
 }

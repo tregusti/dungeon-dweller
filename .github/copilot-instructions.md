@@ -10,10 +10,10 @@ code.
 
 # Terminology
 
-- `spot` is a specific location in the dungeon, defined by its x and y
-  coordinates, together with a level.
-- `coords` is a location without a level, just x and y coordinates. A spot is a
-  coords with a level.
+- `cell` is a specific location in the dungeon, defined by its x and y
+  coordinates, together with a levelId.
+- `coords` is a location without a level, just x and y coordinates. A cell is a
+  coords with a levelId.
 - `level` is a specific floor in the dungeon, defined by its id. The level id is
   a string, which can be used to look up the level's layout and other
   properties.

@@ -1,8 +1,8 @@
-import { Position, Spot } from '../types'
+import { Cell, Coords } from '../types'
 import { Creature } from './Creature'
 
 export class Monster extends Creature {
-  constructor({ x, y, levelId, speed }: Spot & { speed: number }) {
+  constructor({ x, y, levelId, speed }: Cell & { speed: number }) {
     // pick random character
     const choices = ['x', 'm', 'M', '&', '£']
     const char = choices[Math.floor(Math.random() * choices.length)]
@@ -12,7 +12,7 @@ export class Monster extends Creature {
   giveEnergy() {
     this._energy += this.speed
   }
-  move(dx: number, dy: number): { from: Position; to: Position } {
+  move(dx: number, dy: number): { from: Coords; to: Coords } {
     const from = { x: this.x, y: this.y }
     this.x += dx
     this.y += dy

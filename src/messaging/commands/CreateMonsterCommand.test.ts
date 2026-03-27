@@ -4,24 +4,24 @@ import { Dungeon } from '../../levels/Dungeon'
 import { Level } from '../../levels/Level'
 import { Random, RandomGenerator } from '../../Random'
 import { expectToBe, expectToHaveProperty } from '../../test/expect'
-import { Size, Spot } from '../../types'
+import { Cell, Size } from '../../types'
 import { EventBus, Events } from '../core'
 import { CreateMonsterCommandHandler } from './CreateMonsterCommand'
 
 describe('CreateMonsterCommandHandler', () => {
   const createSUT = ({
     dungeonSize = { width: 5, height: 5 },
-    heroPosition = { x: 1, y: 1, levelId: '1' },
+    heroCell = { x: 1, y: 1, levelId: '1' },
     levelId = '1',
     random = new Random('test-seed'),
   }: {
     dungeonSize?: Size
-    heroPosition?: Spot
+    heroCell?: Cell
     levelId?: string
     random?: RandomGenerator
   } = {}) => {
     const monsters = new MonsterCollection()
-    const hero = new Hero(heroPosition)
+    const hero = new Hero(heroCell)
     const level = new Level(
       levelId,
       Array.from({ length: dungeonSize.height }, () =>
@@ -46,7 +46,7 @@ describe('CreateMonsterCommandHandler', () => {
     }
   }
 
-  describe('when there is at least one free position', () => {
+  describe('when there is at least one free coords', () => {
     it('should create and add a monster', () => {
       const { subject, monsters, levelId } = createSUT()
 
@@ -59,9 +59,9 @@ describe('CreateMonsterCommandHandler', () => {
       expect(monsters.list().at(0)).toBe(result.monster)
     })
 
-    it('should only spawn on free positions', () => {
+    it('should only spawn on free coords', () => {
       const { subject, dungeon, levelId } = createSUT()
-      jest.spyOn(dungeon, 'getFreePositions').mockReturnValue([{ x: 1, y: 1 }])
+      jest.spyOn(dungeon, 'getFreeCoords').mockReturnValue([{ x: 1, y: 1 }])
       const result = subject.handle({ levelId })
       expectToBe(result.success, true)
       expect(result.monster.x).toEqual(1)
@@ -86,11 +86,11 @@ describe('CreateMonsterCommandHandler', () => {
     })
   })
 
-  describe('when dungeon has no free position', () => {
+  describe('when dungeon has no free coords', () => {
     it('should return dungeon-full and not create a monster', () => {
       const { subject, monsters, levelId } = createSUT({
         dungeonSize: { width: 1, height: 1 },
-        heroPosition: { x: 0, y: 0, levelId: '1' },
+        heroCell: { x: 0, y: 0, levelId: '1' },
       })
 
       const result = subject.handle({ levelId })

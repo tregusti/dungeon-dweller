@@ -1,7 +1,7 @@
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Position } from '../../types'
+import { Coords } from '../../types'
 import { CommandBus } from '../core/CommandBus'
 import { Commands } from '../core/Commands'
 import { ProcessMonsterRoundCommandHandler } from './ProcessMonsterRoundCommand'
@@ -18,7 +18,7 @@ describe('ProcessMonsterRoundCommandHandler', () => {
       }: {
         monster: Monster
       }): Commands['MoveMonster']['result'] => {
-        const from: Position = { x: monster.x, y: monster.y }
+        const from: Coords = { x: monster.x, y: monster.y }
         const to = monster.move(0, 0).to
 
         return {

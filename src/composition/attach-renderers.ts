@@ -27,7 +27,7 @@ export function attachRenderers({
     terminal,
     eventBus,
     size: Layout.status.size,
-    position: Layout.status.position,
+    coords: Layout.status.coords,
   })
   statusRenderer.attach()
 
@@ -37,7 +37,7 @@ export function attachRenderers({
     eventBus,
     dungeon,
     size: Layout.dungeon.size,
-    position: Layout.dungeon.position,
+    coords: Layout.dungeon.coords,
     scrollMargin: Layout.dungeon.scrollMargin,
   })
   dungeonRenderer.attach()

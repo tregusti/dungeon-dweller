@@ -1,7 +1,7 @@
 import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { RandomGenerator } from '../../Random'
-import { Position } from '../../types'
+import { Coords } from '../../types'
 import type { CommandDef } from '../core/Commands'
 import { EventBus } from '../core/EventBus'
 import { Events } from '../core/Events'
@@ -34,8 +34,8 @@ export type MoveMonsterCommandResult =
     }
   | {
       success: true
-      from: Position
-      to: Position
+      from: Coords
+      to: Coords
     }
 
 type Direction = { dx: number; dy: number }

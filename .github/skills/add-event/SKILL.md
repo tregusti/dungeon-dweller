@@ -53,8 +53,7 @@ Collect these before editing:
 - Use event for notifications after actions complete.
 - Payload design:
   - Include only data subscribers need.
-  - Prefer existing domain types (Hero, Monster, Position, Spot) when
-    appropriate.
+  - Prefer existing domain types (Hero, Monster, Coords, Cell) when appropriate.
 - Publishing timing:
   - Publish after successful state mutation.
   - Do not publish success events for failed actions.
@@ -77,7 +76,7 @@ An event change is complete when all checks pass:
 
 ## Quick Prompt Examples
 
-- Add HeroHealed event with hero, amount, and at position; publish from
+- Add HeroHealed event with hero, amount, and at coords; publish from
   HealHeroCommand and test payload.
 - Add TrapTriggered event and publish only on successful trap activation.
 - Add LevelEntered event and subscribe in renderer to refresh viewport state.

@@ -1,5 +1,5 @@
 import { Hero } from '../../entities/Hero'
-import { Position, Spot } from '../../types'
+import { Cell, Coords } from '../../types'
 import { EventBus } from '../core/EventBus'
 import { Events } from '../core/Events'
 
@@ -10,13 +10,13 @@ declare module '../core/Commands' {
 }
 export type SwitchLevelCommandPayload = {
   levelId: string
-  to: Position
+  to: Coords
 }
 
 export type SwitchLevelCommandResult = {
   success: true
-  from: Spot
-  to: Spot
+  from: Cell
+  to: Cell
 }
 
 export class SwitchLevelCommandHandler {
@@ -29,7 +29,7 @@ export class SwitchLevelCommandHandler {
     levelId,
     to,
   }: SwitchLevelCommandPayload): Promise<SwitchLevelCommandResult> {
-    const from: Spot = {
+    const from: Cell = {
       x: this.hero.x,
       y: this.hero.y,
       levelId: this.hero.levelId,
@@ -39,14 +39,14 @@ export class SwitchLevelCommandHandler {
     this.hero.y = to.y
     this.hero.levelId = levelId
 
-    const toSpot: Spot = { x: to.x, y: to.y, levelId }
+    const toCell: Cell = { x: to.x, y: to.y, levelId }
 
     await this.events.publish('LevelSwitched', {
       from,
-      to: toSpot,
+      to: toCell,
       hero: this.hero,
     })
 
-    return { success: true, from, to: toSpot }
+    return { success: true, from, to: toCell }
   }
 }

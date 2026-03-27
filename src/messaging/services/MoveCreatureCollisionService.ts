@@ -2,7 +2,7 @@ import { Hero } from '../../entities/Hero'
 import { Monster } from '../../entities/Monster'
 import { MonsterCollection } from '../../entities/MonsterCollection'
 import { Dungeon } from '../../levels/Dungeon'
-import { Position } from '../../types'
+import { Coords } from '../../types'
 
 type LevelLookup = Pick<Dungeon, 'getLevel'>
 
@@ -36,7 +36,7 @@ export class MoveCreatureCollisionService {
     dy,
     levelId,
   }: {
-    from: Position
+    from: Coords
     dx: number
     dy: number
     levelId: string

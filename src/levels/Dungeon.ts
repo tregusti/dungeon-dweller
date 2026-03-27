@@ -1,11 +1,11 @@
 import { Hero } from '../entities/Hero'
 import { Monster } from '../entities/Monster'
 import { MonsterCollection } from '../entities/MonsterCollection'
-import { DeepReadonly, Position, Size } from '../types'
+import { Coords, DeepReadonly, Size } from '../types'
 import { Level } from './Level'
 
-export type SpotContent = Readonly<
-  Position &
+export type CellContent = Readonly<
+  Coords &
     (
       | {
           type: 'hero'
@@ -34,7 +34,7 @@ export class Dungeon {
     this.levels = levels
   }
 
-  at(x: number, y: number, levelId: string = this.hero.levelId): SpotContent[] {
+  at(x: number, y: number, levelId: string = this.hero.levelId): CellContent[] {
     if (
       this.hero.levelId === levelId &&
       this.hero.x === x &&
@@ -75,14 +75,14 @@ export class Dungeon {
     return this.getLevel(this.hero.levelId)
   }
 
-  getFreePositions(levelId: string = this.hero.levelId): Position[] {
+  getFreeCoords(levelId: string = this.hero.levelId): Coords[] {
     const level = this.getLevel(levelId)
-    const freePositions: Position[] = []
-    for (const position of level.positions()) {
-      if (this.isFree(position.x, position.y, levelId)) {
-        freePositions.push(position)
+    const freeCoords: Coords[] = []
+    for (const coords of level.coords()) {
+      if (this.isFree(coords.x, coords.y, levelId)) {
+        freeCoords.push(coords)
       }
     }
-    return freePositions
+    return freeCoords
   }
 }

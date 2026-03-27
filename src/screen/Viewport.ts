@@ -1,5 +1,5 @@
 import { Level } from '../levels/Level'
-import { Position, Size } from '../types'
+import { Coords, Size } from '../types'
 
 type ViewportLevel = Pick<Level, 'at' | 'width' | 'height'>
 
@@ -10,23 +10,23 @@ export class Viewport {
   constructor(
     readonly width: number,
     readonly height: number,
-    private readonly scrollMargin: Position,
+    private readonly scrollMargin: Coords,
   ) {}
 
-  get origin(): Position {
+  get origin(): Coords {
     return { x: this.x, y: this.y }
   }
 
-  update(position: Position, bounds: Size): Position {
+  update(coords: Coords, bounds: Size): Coords {
     this.x = this.getNextOrigin(
-      position.x,
+      coords.x,
       this.x,
       this.width,
       bounds.width,
       this.scrollMargin.x,
     )
     this.y = this.getNextOrigin(
-      position.y,
+      coords.y,
       this.y,
       this.height,
       bounds.height,
@@ -36,23 +36,23 @@ export class Viewport {
     return this.origin
   }
 
-  contains(position: Position): boolean {
+  contains(coords: Coords): boolean {
     return (
-      position.x >= this.x &&
-      position.x < this.x + this.width &&
-      position.y >= this.y &&
-      position.y < this.y + this.height
+      coords.x >= this.x &&
+      coords.x < this.x + this.width &&
+      coords.y >= this.y &&
+      coords.y < this.y + this.height
     )
   }
 
-  toScreen(position: Position): Position | null {
-    if (!this.contains(position)) {
+  toScreen(coords: Coords): Coords | null {
+    if (!this.contains(coords)) {
       return null
     }
 
     return {
-      x: position.x - this.x,
-      y: position.y - this.y,
+      x: coords.x - this.x,
+      y: coords.y - this.y,
     }
   }
 

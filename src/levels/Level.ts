@@ -1,4 +1,4 @@
-import { Position } from '../types'
+import { Coords } from '../types'
 
 export class Level {
   constructor(
@@ -22,7 +22,7 @@ export class Level {
     return x >= 0 && y >= 0 && x < this.width && y < this.height
   }
 
-  *positions(): Generator<Position> {
+  *coords(): Generator<Coords> {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         yield { x, y }

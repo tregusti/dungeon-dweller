@@ -2,7 +2,7 @@ import { Buffer } from '../buffer/Buffer'
 import { BufferCompositor } from '../buffer/BufferCompositor'
 import { Dungeon } from '../levels/Dungeon'
 import { EventBus, Events } from '../messaging/core'
-import { Position, Size } from '../types'
+import { Coords, Size } from '../types'
 import { BaseRenderer } from './BaseRenderer'
 import { Terminal } from './Terminal'
 import { Viewport } from './Viewport'
@@ -12,8 +12,8 @@ type DungeonRendererArgs = {
   terminal: Terminal
   eventBus: EventBus<Events>
   size: Size
-  position: Position
-  scrollMargin: Position
+  coords: Coords
+  scrollMargin: Coords
   dungeon: Dungeon
 }
 
@@ -23,14 +23,14 @@ export class DungeonRenderer extends BaseRenderer {
   private readonly eventBus: EventBus<Events>
   private readonly dungeon: Dungeon
   private readonly viewport: Viewport
-  private heroPosition: Position | null = null
+  private heroCoords: Coords | null = null
 
   constructor({
     bufferCompositor,
     terminal,
     eventBus,
     size,
-    position,
+    coords,
     scrollMargin,
     dungeon,
   }: DungeonRendererArgs) {
@@ -41,16 +41,16 @@ export class DungeonRenderer extends BaseRenderer {
 
     this.levelBuffer = bufferCompositor.add({
       buffer: new Buffer(size),
-      x: position.x,
-      y: position.y,
+      x: coords.x,
+      y: coords.y,
       layer: 0,
     })
     this.levelBuffer.clear()
 
     this.entityBuffer = bufferCompositor.add({
       buffer: new Buffer(size),
-      x: position.x,
-      y: position.y,
+      x: coords.x,
+      y: coords.y,
       layer: 1,
     })
     this.entityBuffer.clear()
@@ -58,12 +58,12 @@ export class DungeonRenderer extends BaseRenderer {
 
   attach() {
     this.eventBus.subscribe('GameInitialized', ({ hero }) => {
-      this.heroPosition = { x: hero.x, y: hero.y }
+      this.heroCoords = { x: hero.x, y: hero.y }
       this.renderScene()
       this.redraw()
     })
     this.eventBus.subscribe('HeroMoved', ({ hero, to }) => {
-      this.heroPosition = { x: to.x, y: to.y }
+      this.heroCoords = { x: to.x, y: to.y }
       this.renderScene()
       this.redraw()
     })
@@ -92,19 +92,19 @@ export class DungeonRenderer extends BaseRenderer {
       this.redraw()
     })
     this.eventBus.subscribe('LevelSwitched', ({ to }) => {
-      this.heroPosition = { x: to.x, y: to.y }
+      this.heroCoords = { x: to.x, y: to.y }
       this.renderScene()
       this.redraw()
     })
   }
 
   private renderScene() {
-    if (!this.heroPosition) {
+    if (!this.heroCoords) {
       return
     }
 
     const level = this.dungeon.currentLevel
-    this.viewport.update(this.heroPosition, {
+    this.viewport.update(this.heroCoords, {
       width: level.width,
       height: level.height,
     })
@@ -135,17 +135,17 @@ export class DungeonRenderer extends BaseRenderer {
           continue
         }
 
-        const screenPosition = this.viewport.toScreen({
+        const screenCoords = this.viewport.toScreen({
           x: content.x,
           y: content.y,
         })
-        if (!screenPosition) {
+        if (!screenCoords) {
           continue
         }
 
         const char =
           content.type === 'hero' ? content.hero.char : content.monster.char
-        this.entityBuffer.set(screenPosition.x, screenPosition.y, char)
+        this.entityBuffer.set(screenCoords.x, screenCoords.y, char)
       }
     }
   }
