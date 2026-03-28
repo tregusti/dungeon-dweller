@@ -2,6 +2,7 @@ import { Debug } from '../Debug'
 import { Hero } from '../entities/Hero'
 import { Layout } from '../Layout'
 import { CommandBus, Commands } from '../messaging/core'
+import { ana, sentence } from '../test-utils'
 
 type CreateInputHandlerArgs = {
   commandBus: CommandBus<Commands>
@@ -76,17 +77,17 @@ export function createInputHandler({
 
     if (result.success) {
       Debug.write(
-        `Hero moves to (${result.to.x},${result.to.y}) at turn ${hero.turns}.`,
+        `You move to (${result.to.x},${result.to.y}) at turn ${hero.turns}.`,
       )
       await handleMonsterRounds()
     } else if (result.reason === 'wall') {
-      Debug.write(`Hero bumps into a wall at turn ${hero.turns}`)
+      Debug.write(`You bump into a wall at turn ${hero.turns}`)
     } else if (result.reason === 'monster') {
       await commandBus.execute('MeleeAttackCreature', {
         attacker: hero,
         target: result.monster,
       })
-      Debug.write(`Hero attacks ${result.monster.char} at turn ${hero.turns}`)
+      Debug.write(`You attack the ${result.monster.type} at turn ${hero.turns}`)
     }
   }
 
@@ -100,7 +101,7 @@ export function createInputHandler({
 
         if (monsterResult.success) {
           Debug.write(
-            `${monster.char} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
+            `${sentence(ana(monster.type))} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
           )
         } else if (monsterResult.reason === 'hero') {
           await commandBus.execute('MeleeAttackCreature', {
@@ -109,7 +110,7 @@ export function createInputHandler({
           })
         } else {
           Debug.write(
-            `${monster.char} bumps into a ${monsterResult.reason} at turn ${hero.turns}`,
+            `${sentence(ana(monster.type))} bumps into ${ana(monsterResult.reason)} at turn ${hero.turns}`,
           )
         }
       }
