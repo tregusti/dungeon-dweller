@@ -3,8 +3,9 @@ import assert from 'assert'
 import { Hero } from '../entities/Hero'
 import { Monster } from '../entities/Monster'
 import { MonsterCollection } from '../entities/MonsterCollection'
+import { Tile } from '../entities/Tile'
 import { Cell, Size } from '../types'
-import { CellContent, Dungeon } from './Dungeon'
+import { Dungeon } from './Dungeon'
 import { Level } from './Level'
 
 const createSUT = ({
@@ -13,11 +14,11 @@ const createSUT = ({
   levels = [
     new Level(
       '1',
-      Array.from({ length: size.height }, () => Array(size.width).fill('.')),
+      Array.from({ length: size.height }, () => Array(size.width).fill(' ')),
     ),
     new Level(
       '2',
-      Array.from({ length: size.height }, () => Array(size.width).fill('.')),
+      Array.from({ length: size.height }, () => Array(size.width).fill(' ')),
     ),
   ],
 }: {
@@ -48,40 +49,48 @@ describe('Dungeon', () => {
   })
 
   describe('.at()', () => {
-    it('should return empty list for an empty cell', () => {
+    it('should return the tile only for an unoccupied cell', () => {
       const { dungeon } = createSUT()
       const result = dungeon.at(1, 1)
-      expect(result).toHaveLength(0)
+      expect(result).toHaveLength(1)
+      expect(result[0]).toHaveProperty('type', 'tile')
     })
-
-    it('should return the hero', () => {
-      const { dungeon } = createSUT()
-      const list = dungeon.at(0, 0)
-      expect(list).toHaveLength(1)
-      const cell = list.at(0) as CellContent
-      assert(cell.type === 'hero')
-      expect(cell.hero).toBeInstanceOf(Hero)
-    })
-    it('should return the monster', () => {
-      const { dungeon, monsters } = createSUT()
-      const monster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
-      monsters.add(monster)
-
-      const list = dungeon.at(2, 2)
-      expect(list).toHaveLength(1)
-      const cell = list.at(0) as CellContent
-      assert(cell.type === 'monster')
-      expect(cell.monster).toBe(monster)
-    })
-
-    it('should ignore occupants from other levels', () => {
-      const { dungeon, monsters } = createSUT({
-        heroCell: { x: 2, y: 2, levelId: '2' },
+    describe('when the cell is occupied', () => {
+      it('should return the hero', () => {
+        const { dungeon } = createSUT()
+        const list = dungeon.at(0, 0)
+        const cell = list.find((c) => c.type === 'hero')
+        assert(cell)
+        expect(cell.content).toBeInstanceOf(Hero)
       })
-      monsters.add(Monster.create('orc', { x: 1, y: 1, levelId: '2' }))
+      it('should return the tile as well', () => {
+        const { dungeon } = createSUT()
+        const list = dungeon.at(0, 0)
+        const cell = list.find((c) => c.type === 'tile')
+        assert(cell)
+        expect(cell.content).toBeInstanceOf(Tile)
+      })
+      it('should return the monster', () => {
+        const { dungeon, monsters } = createSUT()
+        const monster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
+        monsters.add(monster)
 
-      expect(dungeon.at(2, 2, '1')).toHaveLength(0)
-      expect(dungeon.at(1, 1, '1')).toHaveLength(0)
+        const list = dungeon.at(2, 2)
+        const cell = list.find((c) => c.type === 'monster')
+        assert(cell)
+        expect(cell.content).toBe(monster)
+      })
+
+      it('should ignore occupants from other levels', () => {
+        const { dungeon, monsters } = createSUT({
+          heroCell: { x: 2, y: 2, levelId: '2' },
+        })
+        const monster = Monster.create('orc', { x: 1, y: 1, levelId: '2' })
+        monsters.add(monster)
+
+        expect(dungeon.at(2, 2, '1')).not.toContain(monster)
+        expect(dungeon.at(1, 1, '1')).not.toContain(monster)
+      })
     })
   })
   describe('.isOccupied() and .isFree()', () => {

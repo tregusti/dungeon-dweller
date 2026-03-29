@@ -1,5 +1,6 @@
 import { createNoise2D } from 'simplex-noise'
 
+import { TileDefinitions, TileTypes } from '../entities/Tile'
 import { Random } from '../Random'
 import { Size } from '../types'
 import { Level } from './Level'
@@ -25,9 +26,17 @@ function createLayout(random: Random, size: Size): string[][] {
     for (let x = 0; x < size.width; x++) {
       const value = noise2D(x * scale, y * scale)
       // TODO: Colorize the tiles based on the value (e.g. darker for lower values)
-      row.push(value > 0 ? '░' : '.')
+      row.push(value > 0 ? charFor('rock') : charFor('floor'))
     }
     layout.push(row)
   }
   return layout
+}
+
+function charFor(type: string): string {
+  const def = TileDefinitions.find((t) => t.type === type)
+  if (!def) {
+    throw new Error(`Unknown tile type: ${type}`)
+  }
+  return def.char
 }

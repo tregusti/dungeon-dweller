@@ -22,10 +22,12 @@ describe('CreateMonsterCommandHandler', () => {
   } = {}) => {
     const monsters = new MonsterCollection()
     const hero = new Hero(heroCell)
+    // TODO Add a LevelBuilder or something similar to make it easier to create
+    // levels for testing.
     const level = new Level(
       levelId,
       Array.from({ length: dungeonSize.height }, () =>
-        Array(dungeonSize.width).fill('.'),
+        Array(dungeonSize.width).fill(' '),
       ),
     )
     const dungeon = new Dungeon(dungeonSize, hero, monsters, [level])

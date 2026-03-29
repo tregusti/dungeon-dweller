@@ -1,5 +1,5 @@
 import { Color } from '../Color'
-import { Cell } from '../types'
+import { CanBeRendered, Cell } from '../types'
 import { CreatureDefinition } from './CreatureDefinitions'
 
 export type NamedCreature = {
@@ -11,7 +11,7 @@ export type CreatureProps = Cell &
   }
 
 export abstract class Creature
-  implements CreatureDefinition, Cell, NamedCreature
+  implements CreatureDefinition, Cell, NamedCreature, CanBeRendered
 {
   private definition: CreatureDefinition
   x: number

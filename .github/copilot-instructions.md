@@ -18,6 +18,17 @@ code.
   a string, which can be used to look up the level's layout and other
   properties.
 - `dungeon` is the entire game world, which consists of multiple levels.
+- `hero` is the player character, which is a specific type of creature. The hero
+  has properties like health, energy, and inventory, and can perform actions
+  like moving, attacking, and using items.
+- `creature` is any living entity in the game, including the hero and monsters.
+  Each creature has properties like health, energy, and speed, and can perform
+  actions like moving and attacking.
+- `monster` is a specific type of creature that could be an enemy of the hero.
+  Monsters have different types, such as goblins and trolls, each with their own
+  properties and behaviors.
+- `tile` is the level content of a cell, such as floor, wall, stone, or door.
+  Tiles can have properties like whether they are passable or not.
 
 # Commands and events
 

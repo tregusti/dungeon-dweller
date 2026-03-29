@@ -1,22 +1,28 @@
 import { Hero } from '../entities/Hero'
 import { Monster } from '../entities/Monster'
 import { MonsterCollection } from '../entities/MonsterCollection'
-import { Coords, DeepReadonly, Size } from '../types'
+import { Tile } from '../entities/Tile'
+import { CanBeRendered, Coords, DeepReadonly, Size } from '../types'
 import { Level } from './Level'
 
-export type CellContent = Readonly<
-  Coords &
-    (
-      | {
-          type: 'hero'
-          hero: Hero
-        }
-      | {
-          type: 'monster'
-          monster: Monster
-        }
-    )
->
+type RenderableContentMap<TMap extends Record<string, CanBeRendered>> = TMap
+
+type CellContentMap = RenderableContentMap<{
+  hero: Hero
+  monster: Monster
+  tile: Tile
+}>
+
+type CellContentType = keyof CellContentMap
+
+export type CellContent = {
+  [K in CellContentType]: Readonly<
+    Coords & {
+      type: K
+      content: CellContentMap[K]
+    }
+  >
+}[CellContentType]
 
 export class Dungeon {
   readonly width: number
@@ -35,22 +41,25 @@ export class Dungeon {
   }
 
   at(x: number, y: number, levelId: string = this.hero.levelId): CellContent[] {
+    const tileType = Tile.typeForChar(this.getLevel(levelId).at(x, y))
+    const tile = Tile.create({ x, y, levelId }, tileType)
+    const contents: CellContent[] = [{ type: 'tile', content: tile, x, y }]
     if (
       this.hero.levelId === levelId &&
       this.hero.x === x &&
       this.hero.y === y
     ) {
-      return [{ type: 'hero', hero: this.hero, x, y }]
+      contents.push({ type: 'hero', content: this.hero, x, y })
     }
 
     const monster = this.monsters
       .list({ levelId })
       .find((m) => m.x === x && m.y === y)
     if (monster) {
-      return [{ type: 'monster', monster, x, y }]
+      contents.push({ type: 'monster', content: monster, x, y })
     }
 
-    return []
+    return contents
   }
 
   isOccupied(
@@ -58,7 +67,12 @@ export class Dungeon {
     y: number,
     levelId: string = this.hero.levelId,
   ): boolean {
-    return this.at(x, y, levelId).length > 0
+    return this.at(x, y, levelId).some((content) =>
+      // TODO: This is a bit hacky, we should have a more explicit way to
+      // determine if a cell is occupied. Maybe a BLOCKING flag for anything
+      // that can go in the dungeon?
+      ['hero', 'monster', 'rock', 'wall'].includes(content.type),
+    )
   }
 
   isFree(x: number, y: number, levelId: string = this.hero.levelId): boolean {

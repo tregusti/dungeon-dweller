@@ -131,7 +131,7 @@ export class DungeonRenderer extends BaseRenderer {
       for (let x = 0; x < this.entityBuffer.width; x++) {
         const content = this.dungeon
           .at(origin.x + x, origin.y + y, levelId)
-          .at(0)
+          .at(-1)
         if (!content) {
           continue
         }
@@ -144,12 +144,10 @@ export class DungeonRenderer extends BaseRenderer {
           continue
         }
 
-        const creature =
-          content.type === 'hero' ? content.hero : content.monster
         this.entityBuffer.set(
           screenCoords.x,
           screenCoords.y,
-          colorize(creature.char, creature.color),
+          colorize(content.content.char, content.content.color),
         )
       }
     }

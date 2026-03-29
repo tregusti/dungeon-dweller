@@ -2,7 +2,7 @@ import { Color } from '../Color'
 import { PickValues } from '../types'
 
 // prettier-ignore
-const list: CreatureDefinitionValues = [
+const list: CreatureDefinitionValues[] = [
 // TABLE-START
 //  char  type               color          speed  description
   ['e',  'elf',             'brightgreen',   12,   'A graceful, pointy-eared creature with a love for nature and magic.'],
@@ -23,7 +23,7 @@ const list: CreatureDefinitionValues = [
 type CreatureDefinitionValues = PickValues<
   CreatureDefinition,
   ['char', 'type', 'color', 'speed', 'description']
->[]
+>
 
 export type CreatureDefinition = {
   char: string
@@ -42,4 +42,5 @@ export const CreatureDefinitions: CreatureDefinition[] = list.map(
     description,
   }),
 )
+
 export const CreatureTypes = CreatureDefinitions.map((def) => def.type)
