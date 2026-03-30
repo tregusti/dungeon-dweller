@@ -6,6 +6,7 @@ export const ana = (input: string) => {
   return `${prefix} ${input}`
 }
 
+/** Uppercase the first letter of a string. */
 export const sentence = (input: string) => {
   if (!input) return input
   return input.charAt(0).toUpperCase() + input.slice(1)

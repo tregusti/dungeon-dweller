@@ -1,5 +1,6 @@
 import { Buffer } from '../buffer/Buffer'
 import { BufferCompositor } from '../buffer/BufferCompositor'
+import { colorize } from '../Color'
 import { Dungeon } from '../levels/Dungeon'
 import { EventBus, Events } from '../messaging/core'
 import { Coords, Size } from '../types'
@@ -143,9 +144,13 @@ export class DungeonRenderer extends BaseRenderer {
           continue
         }
 
-        const char =
-          content.type === 'hero' ? content.hero.char : content.monster.char
-        this.entityBuffer.set(screenCoords.x, screenCoords.y, char)
+        const creature =
+          content.type === 'hero' ? content.hero : content.monster
+        this.entityBuffer.set(
+          screenCoords.x,
+          screenCoords.y,
+          colorize(creature.char, creature.color),
+        )
       }
     }
   }

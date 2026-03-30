@@ -24,6 +24,7 @@ function createLayout(random: Random, size: Size): string[][] {
     const row: string[] = []
     for (let x = 0; x < size.width; x++) {
       const value = noise2D(x * scale, y * scale)
+      // TODO: Colorize the tiles based on the value (e.g. darker for lower values)
       row.push(value > 0 ? '░' : '.')
     }
     layout.push(row)

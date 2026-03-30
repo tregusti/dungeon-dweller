@@ -2,7 +2,7 @@ import { Debug } from '../Debug'
 import { Hero } from '../entities/Hero'
 import { Layout } from '../Layout'
 import { CommandBus, Commands } from '../messaging/core'
-import { ana, sentence } from '../test-utils'
+import { ana, sentence } from '../utils/text'
 
 type CreateInputHandlerArgs = {
   commandBus: CommandBus<Commands>

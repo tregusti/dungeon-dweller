@@ -1,22 +1,6 @@
-export type MaybePromise<T> = T | Promise<T>
-
-export type Color =
-  | 'red'
-  | 'brightred'
-  | 'green'
-  | 'brightgreen'
-  | 'blue'
-  | 'brightblue'
-  | 'yellow'
-  | 'brightyellow'
-  | 'magenta'
-  | 'brightmagenta'
-  | 'cyan'
-  | 'brightcyan'
-  | 'white'
-  | 'brightwhite'
-
 export * from 'ts-essentials'
+
+export type MaybePromise<T> = T | Promise<T>
 
 export type Size = {
   width: number

@@ -1,4 +1,5 @@
-import { Cell, Color } from '../types'
+import { Color } from '../Color'
+import { Cell } from '../types'
 import { CreatureDefinition } from './CreatureDefinitions'
 
 export type NamedCreature = {
