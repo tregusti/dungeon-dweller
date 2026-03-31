@@ -1,12 +1,12 @@
-import type { Hero } from '../entities/Hero'
-import { HeroCreator } from '../entities/HeroCreator'
-import { MonsterCollection } from '../entities/MonsterCollection'
-import { Layout } from '../Layout'
-import { Dungeon } from '../levels/Dungeon'
-import { DungeonCreator } from '../levels/DungeonCreator'
-import { CommandBus, Commands, EventBus, Events } from '../messaging/core'
-import { Random } from '../Random'
-import { Terminal } from '../screen/Terminal'
+import type { Hero } from '../entities/Hero.js'
+import { HeroCreator } from '../entities/HeroCreator.js'
+import { MonsterCollection } from '../entities/MonsterCollection.js'
+import { Layout } from '../Layout.js'
+import { Dungeon } from '../levels/Dungeon.js'
+import { DungeonCreator } from '../levels/DungeonCreator.js'
+import { CommandBus, Commands, EventBus, Events } from '../messaging/core/main.js'
+import { Random } from '../Random.js'
+import { Terminal } from '../screen/Terminal.js'
 
 export type GameContext = {
   random: Random

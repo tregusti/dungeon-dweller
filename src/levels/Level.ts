@@ -1,4 +1,4 @@
-import { Coords } from '../types'
+import { Coords } from '../types.js'
 
 export class Level {
   constructor(

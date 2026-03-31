@@ -1,4 +1,4 @@
-import { Viewport } from './Viewport'
+import { Viewport } from './Viewport.js'
 
 describe('Viewport', () => {
   const bounds = { width: 500, height: 500 }

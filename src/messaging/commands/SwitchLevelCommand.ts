@@ -1,9 +1,9 @@
-import { Hero } from '../../entities/Hero'
-import { Cell, Coords } from '../../types'
-import { EventBus } from '../core/EventBus'
-import { Events } from '../core/Events'
+import { Hero } from '../../entities/Hero.js'
+import { Cell, Coords } from '../../types.js'
+import { EventBus } from '../core/EventBus.js'
+import { Events } from '../core/Events.js'
 
-declare module '../core/Commands' {
+declare module '../core/Commands.js' {
   interface Commands {
     SwitchLevel: CommandDef<SwitchLevelCommandPayload, SwitchLevelCommandResult>
   }

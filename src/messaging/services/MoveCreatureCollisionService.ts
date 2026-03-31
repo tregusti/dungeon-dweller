@@ -1,8 +1,8 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Dungeon } from '../../levels/Dungeon'
-import { Coords } from '../../types'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Dungeon } from '../../levels/Dungeon.js'
+import { Coords } from '../../types.js'
 
 type LevelLookup = Pick<Dungeon, 'getLevel'>
 

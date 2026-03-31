@@ -2,10 +2,11 @@
   "name": "dungeon-dweller",
   "version": "1.0.0",
   "description": "A simple CLI dungeon-like game using TypeScript",
-  "main": "build/index.js",
+  "main": "build/main.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node src/index.ts",
+    "start": "node --loader ts-node/esm src/main.ts",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "# https://github.com/nodejs/node/issues/60704#issuecomment-3529614006": "",
     "test": "NODE_OPTIONS='--no-experimental-webstorage' jest",

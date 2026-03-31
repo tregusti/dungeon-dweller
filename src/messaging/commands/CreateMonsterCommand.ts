@@ -1,13 +1,13 @@
-import { CreatureTypes } from '../../entities/CreatureDefinitions'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Dungeon } from '../../levels/Dungeon'
-import { RandomGenerator } from '../../Random'
-import { Cell } from '../../types'
-import { EventBus, Events } from '../core'
-import type { CommandDef } from '../core/Commands'
+import { CreatureTypes } from '../../entities/CreatureDefinitions.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Dungeon } from '../../levels/Dungeon.js'
+import { RandomGenerator } from '../../Random.js'
+import { Cell } from '../../types.js'
+import { EventBus, Events } from '../core/main.js'
+import type { CommandDef } from '../core/Commands.js'
 
-declare module '../core/Commands' {
+declare module '../core/Commands.js' {
   interface Commands {
     CreateMonster: CommandDef<
       CreateMonsterCommandPayload,

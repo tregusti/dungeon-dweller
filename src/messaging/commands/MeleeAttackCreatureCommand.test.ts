@@ -1,10 +1,10 @@
-import { Debug } from '../../Debug'
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { EventBus } from '../core/EventBus'
-import { EventPayload, Events } from '../core/Events'
-import { MeleeAttackCreatureCommandHandler } from './MeleeAttackCreatureCommand'
+import { Debug } from '../../Debug.js'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { EventBus } from '../core/EventBus.js'
+import { EventPayload, Events } from '../core/Events.js'
+import { MeleeAttackCreatureCommandHandler } from './MeleeAttackCreatureCommand.js'
 
 describe('MeleeAttackCreatureCommandHandler', () => {
   const createSUT = () => {

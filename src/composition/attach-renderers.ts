@@ -1,10 +1,10 @@
-import { BufferCompositor } from '../buffer/BufferCompositor'
-import { Layout } from '../Layout'
-import { Dungeon } from '../levels/Dungeon'
-import { EventBus, Events } from '../messaging/core'
-import { DungeonRenderer } from '../screen/DungeonRenderer'
-import { StatusRenderer } from '../screen/StatusRenderer'
-import { Terminal } from '../screen/Terminal'
+import { BufferCompositor } from '../buffer/BufferCompositor.js'
+import { Layout } from '../Layout.js'
+import { Dungeon } from '../levels/Dungeon.js'
+import { EventBus, Events } from '../messaging/core/main.js'
+import { DungeonRenderer } from '../screen/DungeonRenderer.js'
+import { StatusRenderer } from '../screen/StatusRenderer.js'
+import { Terminal } from '../screen/Terminal.js'
 
 type AttachRenderersArgs = {
   terminal: Terminal

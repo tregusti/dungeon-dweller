@@ -1,5 +1,5 @@
-import { Color } from '../Color'
-import { PickValues } from '../types'
+import { Color } from '../Color.js'
+import { PickValues } from '../types.js'
 
 // prettier-ignore
 const list: CreatureDefinitionValues[] = [

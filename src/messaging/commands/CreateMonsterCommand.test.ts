@@ -1,12 +1,12 @@
-import { Hero } from '../../entities/Hero'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Dungeon } from '../../levels/Dungeon'
-import { Level } from '../../levels/Level'
-import { Random, RandomGenerator } from '../../Random'
-import { expectToBe, expectToHaveProperty } from '../../test/expect'
-import { Cell, Size } from '../../types'
-import { EventBus, Events } from '../core'
-import { CreateMonsterCommandHandler } from './CreateMonsterCommand'
+import { Hero } from '../../entities/Hero.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Dungeon } from '../../levels/Dungeon.js'
+import { Level } from '../../levels/Level.js'
+import { Random, RandomGenerator } from '../../Random.js'
+import { expectToBe, expectToHaveProperty } from '../../test/expect.js'
+import { Cell, Size } from '../../types.js'
+import { EventBus, Events } from '../core/main.js'
+import { CreateMonsterCommandHandler } from './CreateMonsterCommand.js'
 
 describe('CreateMonsterCommandHandler', () => {
   const createSUT = ({

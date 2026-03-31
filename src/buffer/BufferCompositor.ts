@@ -1,5 +1,5 @@
-import { Coords, Size } from '../types'
-import { Buffer, BufferEntry } from './Buffer'
+import { Coords, Size } from '../types.js'
+import { Buffer, BufferEntry } from './Buffer.js'
 
 type CompositorEntry = Coords & { buffer: Buffer; layer: number }
 

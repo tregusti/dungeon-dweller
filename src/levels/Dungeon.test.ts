@@ -1,12 +1,12 @@
 import assert from 'assert'
 
-import { Hero } from '../entities/Hero'
-import { Monster } from '../entities/Monster'
-import { MonsterCollection } from '../entities/MonsterCollection'
-import { Tile } from '../entities/Tile'
-import { Cell, Size } from '../types'
-import { Dungeon } from './Dungeon'
-import { Level } from './Level'
+import { Hero } from '../entities/Hero.js'
+import { Monster } from '../entities/Monster.js'
+import { MonsterCollection } from '../entities/MonsterCollection.js'
+import { Tile } from '../entities/Tile.js'
+import { Cell, Size } from '../types.js'
+import { Dungeon } from './Dungeon.js'
+import { Level } from './Level.js'
 
 const createSUT = ({
   heroCell = { x: 0, y: 0, levelId: '1' },

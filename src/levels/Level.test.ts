@@ -1,4 +1,4 @@
-import { Level } from './Level'
+import { Level } from './Level.js'
 
 describe('Level', () => {
   const createSUT = () =>

@@ -1,10 +1,10 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Coords } from '../../types'
-import { CommandBus } from '../core/CommandBus'
-import { Commands } from '../core/Commands'
-import { ProcessMonsterRoundCommandHandler } from './ProcessMonsterRoundCommand'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Coords } from '../../types.js'
+import { CommandBus } from '../core/CommandBus.js'
+import { Commands } from '../core/Commands.js'
+import { ProcessMonsterRoundCommandHandler } from './ProcessMonsterRoundCommand.js'
 
 describe('ProcessMonsterRoundCommandHandler', () => {
   const createSUT = () => {

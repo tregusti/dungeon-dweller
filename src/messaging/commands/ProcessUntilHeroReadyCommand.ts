@@ -1,9 +1,9 @@
-import { Hero } from '../../entities/Hero'
-import { CommandBus } from '../core/CommandBus'
-import type { CommandDef, Commands } from '../core/Commands'
-import { ProcessMonsterRoundCommandResult } from './ProcessMonsterRoundCommand'
+import { Hero } from '../../entities/Hero.js'
+import { CommandBus } from '../core/CommandBus.js'
+import type { CommandDef, Commands } from '../core/Commands.js'
+import { ProcessMonsterRoundCommandResult } from './ProcessMonsterRoundCommand.js'
 
-declare module '../core/Commands' {
+declare module '../core/Commands.js' {
   interface Commands {
     ProcessUntilHeroReady: CommandDef<
       ProcessUntilHeroReadyCommandPayload,

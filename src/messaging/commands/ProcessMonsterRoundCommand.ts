@@ -1,11 +1,11 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { CommandBus } from '../core/CommandBus'
-import type { CommandDef, Commands } from '../core/Commands'
-import { MoveMonsterCommandResult } from './MoveMonsterCommand'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { CommandBus } from '../core/CommandBus.js'
+import type { CommandDef, Commands } from '../core/Commands.js'
+import { MoveMonsterCommandResult } from './MoveMonsterCommand.js'
 
-declare module '../core/Commands' {
+declare module '../core/Commands.js' {
   interface Commands {
     ProcessMonsterRound: CommandDef<
       ProcessMonsterRoundCommandPayload,

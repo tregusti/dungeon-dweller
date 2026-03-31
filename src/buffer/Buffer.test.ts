@@ -1,4 +1,4 @@
-import { Buffer } from './Buffer'
+import { Buffer } from './Buffer.js'
 
 describe('Buffer', () => {
   it('should expose the size', () => {

@@ -5,7 +5,7 @@
  * https://github.com/8hobbies/test-utils/blob/69e4434248d600d9e2eaf2c553e305cd0a2dc521/src/expect.ts
  */
 
-export * from './_expect'
+export * from './_expect.js'
 
 export function expectToHaveProperty<
   T extends Record<K, any>,

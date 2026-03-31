@@ -1,9 +1,9 @@
 import { createNoise2D } from 'simplex-noise'
 
-import { TileDefinitions, TileTypes } from '../entities/Tile'
-import { Random } from '../Random'
-import { Size } from '../types'
-import { Level } from './Level'
+import { TileDefinitions, TileTypes } from '../entities/Tile.js'
+import { Random } from '../Random.js'
+import { Size } from '../types.js'
+import { Level } from './Level.js'
 
 export class LevelCreator {
   constructor(private random: Random) {}

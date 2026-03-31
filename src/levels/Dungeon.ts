@@ -1,9 +1,9 @@
-import { Hero } from '../entities/Hero'
-import { Monster } from '../entities/Monster'
-import { MonsterCollection } from '../entities/MonsterCollection'
-import { Tile } from '../entities/Tile'
-import { CanBeRendered, Coords, DeepReadonly, Size } from '../types'
-import { Level } from './Level'
+import { Hero } from '../entities/Hero.js'
+import { Monster } from '../entities/Monster.js'
+import { MonsterCollection } from '../entities/MonsterCollection.js'
+import { Tile } from '../entities/Tile.js'
+import { CanBeRendered, Coords, DeepReadonly, Size } from '../types.js'
+import { Level } from './Level.js'
 
 type RenderableContentMap<TMap extends Record<string, CanBeRendered>> = TMap
 
