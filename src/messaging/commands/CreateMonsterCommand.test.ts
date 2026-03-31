@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { Hero } from '../../entities/Hero.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
 import { Dungeon } from '../../levels/Dungeon.js'
@@ -5,7 +7,8 @@ import { Level } from '../../levels/Level.js'
 import { Random, RandomGenerator } from '../../Random.js'
 import { expectToBe, expectToHaveProperty } from '../../test/expect.js'
 import { Cell, Size } from '../../types.js'
-import { EventBus, Events } from '../core/main.js'
+import { EventBus } from '../core/main.js'
+import type { EventHandler, Events } from '../core/main.js'
 import { CreateMonsterCommandHandler } from './CreateMonsterCommand.js'
 
 describe('CreateMonsterCommandHandler', () => {
@@ -73,7 +76,7 @@ describe('CreateMonsterCommandHandler', () => {
       const { subject, events, levelId } = createSUT({
         dungeonSize: { width: 2, height: 1 },
       })
-      const listener = jest.fn()
+      const listener = jest.fn<EventHandler<'MonsterCreated'>>()
       events.subscribe('MonsterCreated', listener)
 
       const result = subject.handle({ levelId })

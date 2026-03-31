@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { Debug } from '../../Debug.js'
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'

@@ -37,3 +37,7 @@ export type Events = {
 }
 
 export type EventPayload<TType extends keyof Events> = Events[TType]['payload']
+
+export type EventHandler<TType extends keyof Events> = (
+  payload: EventPayload<TType>,
+) => void | Promise<void>

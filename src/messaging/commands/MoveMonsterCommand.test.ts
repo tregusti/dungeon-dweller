@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { assert } from 'ts-essentials'
 
 import { Hero } from '../../entities/Hero.js'

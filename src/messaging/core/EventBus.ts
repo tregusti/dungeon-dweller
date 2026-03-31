@@ -1,7 +1,7 @@
 import { Debug } from '../../Debug.js'
 import type { EventDef } from './Events.js'
 
-type EventHandler<TPayload> = (payload: TPayload) => void | Promise<void>
+type EventListener<TPayload> = (payload: TPayload) => void | Promise<void>
 
 type EventBusPayload<TEvents, K extends keyof TEvents> =
   TEvents[K] extends EventDef<infer TPayload> ? TPayload : never
@@ -9,11 +9,11 @@ type EventBusPayload<TEvents, K extends keyof TEvents> =
 export class EventBus<
   TEvents extends { [K in keyof TEvents]: EventDef<unknown> },
 > {
-  private listeners = new Map<keyof TEvents, EventHandler<any>[]>()
+  private listeners = new Map<keyof TEvents, EventListener<any>[]>()
 
   subscribe<K extends keyof TEvents>(
     type: K,
-    handler: EventHandler<EventBusPayload<TEvents, K>>,
+    handler: EventListener<EventBusPayload<TEvents, K>>,
   ): () => void {
     const list = this.listeners.get(type) ?? []
     list.push(handler)

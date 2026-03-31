@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { Hero } from '../../entities/Hero.js'
 import { CommandBus } from '../core/CommandBus.js'
 import { Commands } from '../core/Commands.js'
