@@ -1,6 +1,6 @@
-import { Cell, Coords } from '../types'
-import { Creature } from './Creature'
-import { CreatureDefinitions } from './CreatureDefinitions'
+import { Cell, Coords } from '../types.js'
+import { Creature } from './Creature.js'
+import { CreatureDefinitions } from './CreatureDefinitions.js'
 
 export class Hero extends Creature {
   kills: number = 0

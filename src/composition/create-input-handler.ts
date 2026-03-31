@@ -1,8 +1,8 @@
-import { Debug } from '../Debug'
-import { Hero } from '../entities/Hero'
-import { Layout } from '../Layout'
-import { CommandBus, Commands } from '../messaging/core'
-import { ana, sentence } from '../utils/text'
+import { Debug } from '../Debug.js'
+import { Hero } from '../entities/Hero.js'
+import { Layout } from '../Layout.js'
+import { CommandBus, Commands } from '../messaging/core/main.js'
+import { ana, sentence } from '../utils/text.js'
 
 type CreateInputHandlerArgs = {
   commandBus: CommandBus<Commands>

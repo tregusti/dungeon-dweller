@@ -1,11 +1,11 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { Cell } from '../../types'
-import { EventBus } from '../core/EventBus'
-import { EventPayload, Events } from '../core/Events'
-import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
-import { MoveHeroCommandHandler, Movement } from './MoveHeroCommand'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Cell } from '../../types.js'
+import { EventBus } from '../core/EventBus.js'
+import { EventPayload, Events } from '../core/Events.js'
+import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService.js'
+import { MoveHeroCommandHandler, Movement } from './MoveHeroCommand.js'
 
 describe('MoveHeroCommandHandler', () => {
   const createSUT = ({

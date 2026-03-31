@@ -1,7 +1,7 @@
-import { Hero } from '../../entities/Hero'
-import { CommandBus } from '../core/CommandBus'
-import { Commands } from '../core/Commands'
-import { ProcessUntilHeroReadyCommandHandler } from './ProcessUntilHeroReadyCommand'
+import { Hero } from '../../entities/Hero.js'
+import { CommandBus } from '../core/CommandBus.js'
+import { Commands } from '../core/Commands.js'
+import { ProcessUntilHeroReadyCommandHandler } from './ProcessUntilHeroReadyCommand.js'
 
 describe('ProcessUntilHeroReadyCommandHandler', () => {
   const createSUT = () => {

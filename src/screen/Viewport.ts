@@ -1,5 +1,5 @@
-import { Level } from '../levels/Level'
-import { Coords, Size } from '../types'
+import { Level } from '../levels/Level.js'
+import { Coords, Size } from '../types.js'
 
 type ViewportLevel = Pick<Level, 'at' | 'width' | 'height'>
 

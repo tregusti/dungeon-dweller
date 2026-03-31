@@ -1,10 +1,10 @@
-import { Buffer } from '../buffer/Buffer'
-import { BufferCompositor } from '../buffer/BufferCompositor'
-import { Hero } from '../entities/Hero'
-import { EventBus, Events } from '../messaging/core'
-import { Coords, Size } from '../types'
-import { BaseRenderer } from './BaseRenderer'
-import { Terminal } from './Terminal'
+import { Buffer } from '../buffer/Buffer.js'
+import { BufferCompositor } from '../buffer/BufferCompositor.js'
+import { Hero } from '../entities/Hero.js'
+import { EventBus, Events } from '../messaging/core/main.js'
+import { Coords, Size } from '../types.js'
+import { BaseRenderer } from './BaseRenderer.js'
+import { Terminal } from './Terminal.js'
 
 export class StatusRenderer extends BaseRenderer {
   private readonly buffer: Buffer

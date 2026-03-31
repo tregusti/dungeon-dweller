@@ -1,7 +1,7 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import { MoveCreatureCollisionService } from './MoveCreatureCollisionService'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { MoveCreatureCollisionService } from './MoveCreatureCollisionService.js'
 
 describe('MoveCreatureCollisionService', () => {
   const createSUT = () => {

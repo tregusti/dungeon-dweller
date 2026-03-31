@@ -1,4 +1,4 @@
-import { Coords, Size } from '../types'
+import { Coords, Size } from '../types.js'
 
 type Char = string | null
 

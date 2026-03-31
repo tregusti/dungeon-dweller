@@ -1,9 +1,9 @@
-import { Hero } from '../entities/Hero'
-import { MonsterCollection } from '../entities/MonsterCollection'
-import { Random } from '../Random'
-import { Size } from '../types'
-import { Dungeon } from './Dungeon'
-import { LevelCreator } from './LevelCreator'
+import { Hero } from '../entities/Hero.js'
+import { MonsterCollection } from '../entities/MonsterCollection.js'
+import { Random } from '../Random.js'
+import { Size } from '../types.js'
+import { Dungeon } from './Dungeon.js'
+import { LevelCreator } from './LevelCreator.js'
 
 export class DungeonCreator {
   constructor(

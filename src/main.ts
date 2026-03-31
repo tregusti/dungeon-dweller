@@ -1,8 +1,8 @@
-import { attachRenderers } from './composition/attach-renderers'
-import { createGameContext } from './composition/create-game-context'
-import { createInputHandler } from './composition/create-input-handler'
-import { registerCommandHandlers } from './composition/register-command-handlers'
-import { Debug } from './Debug'
+import { attachRenderers } from './composition/attach-renderers.js'
+import { createGameContext } from './composition/create-game-context.js'
+import { createInputHandler } from './composition/create-input-handler.js'
+import { registerCommandHandlers } from './composition/register-command-handlers.js'
+import { Debug } from './Debug.js'
 
 const { random, hero, monsters, dungeon, commandBus, eventBus, terminal } =
   createGameContext()

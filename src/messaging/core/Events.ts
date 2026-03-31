@@ -1,6 +1,6 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { Cell, Coords } from '../../types'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { Cell, Coords } from '../../types.js'
 
 export type EventDef<TPayload> = {
   payload: TPayload

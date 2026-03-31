@@ -1,5 +1,5 @@
-import { Layout } from './Layout'
-import type { Terminal } from './screen/Terminal'
+import { Layout } from './Layout.js'
+import type { Terminal } from './screen/Terminal.js'
 
 const DEBUG = true
 

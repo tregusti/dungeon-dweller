@@ -1,5 +1,5 @@
-import { Debug } from '../../Debug'
-import type { EventDef } from './Events'
+import { Debug } from '../../Debug.js'
+import type { EventDef } from './Events.js'
 
 type EventHandler<TPayload> = (payload: TPayload) => void | Promise<void>
 

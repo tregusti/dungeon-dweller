@@ -1,12 +1,12 @@
-import { Buffer } from '../buffer/Buffer'
-import { BufferCompositor } from '../buffer/BufferCompositor'
-import { colorize } from '../Color'
-import { Dungeon } from '../levels/Dungeon'
-import { EventBus, Events } from '../messaging/core'
-import { Coords, Size } from '../types'
-import { BaseRenderer } from './BaseRenderer'
-import { Terminal } from './Terminal'
-import { Viewport } from './Viewport'
+import { Buffer } from '../buffer/Buffer.js'
+import { BufferCompositor } from '../buffer/BufferCompositor.js'
+import { colorize } from '../Color.js'
+import { Dungeon } from '../levels/Dungeon.js'
+import { EventBus, Events } from '../messaging/core/main.js'
+import { Coords, Size } from '../types.js'
+import { BaseRenderer } from './BaseRenderer.js'
+import { Terminal } from './Terminal.js'
+import { Viewport } from './Viewport.js'
 
 type DungeonRendererArgs = {
   bufferCompositor: BufferCompositor

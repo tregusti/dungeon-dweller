@@ -1,6 +1,6 @@
-import { Random } from '../Random'
-import { Size } from '../types'
-import { Hero } from './Hero'
+import { Random } from '../Random.js'
+import { Size } from '../types.js'
+import { Hero } from './Hero.js'
 
 export class HeroCreator {
   constructor(

@@ -1,13 +1,13 @@
-import { Debug } from '../../Debug'
-import { Creature } from '../../entities/Creature'
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { MonsterCollection } from '../../entities/MonsterCollection'
-import type { CommandDef } from '../core/Commands'
-import { EventBus } from '../core/EventBus'
-import { Events } from '../core/Events'
+import { Debug } from '../../Debug.js'
+import { Creature } from '../../entities/Creature.js'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import type { CommandDef } from '../core/Commands.js'
+import { EventBus } from '../core/EventBus.js'
+import { Events } from '../core/Events.js'
 
-declare module '../core/Commands' {
+declare module '../core/Commands.js' {
   interface Commands {
     MeleeAttackCreature: CommandDef<
       MeleeAttackCreatureCommandPayload,

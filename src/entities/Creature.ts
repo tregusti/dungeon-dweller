@@ -1,6 +1,6 @@
-import { Color } from '../Color'
-import { CanBeRendered, Cell } from '../types'
-import { CreatureDefinition } from './CreatureDefinitions'
+import { Color } from '../Color.js'
+import { CanBeRendered, Cell } from '../types.js'
+import { CreatureDefinition } from './CreatureDefinitions.js'
 
 export type NamedCreature = {
   name?: string

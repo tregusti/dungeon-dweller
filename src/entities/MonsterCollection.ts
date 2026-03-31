@@ -1,4 +1,4 @@
-import { Monster } from './Monster'
+import { Monster } from './Monster.js'
 
 export class MonsterCollection {
   #monsters: Set<Monster> = new Set()

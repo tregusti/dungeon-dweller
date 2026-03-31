@@ -1,5 +1,5 @@
-import { Color } from '../Color'
-import { CanBeRendered, Cell, PickValues } from '../types'
+import { Color } from '../Color.js'
+import { CanBeRendered, Cell, PickValues } from '../types.js'
 
 export class Tile implements TileDefinition, CanBeRendered {
   static typeForChar(char: string): string {

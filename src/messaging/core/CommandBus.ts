@@ -1,5 +1,5 @@
-import { MaybePromise } from '../../types'
-import { CommandDef } from './Commands'
+import { MaybePromise } from '../../types.js'
+import { CommandDef } from './Commands.js'
 
 type CommandPayload<TCommands, K extends keyof TCommands> =
   TCommands[K] extends CommandDef<infer TPayload, unknown> ? TPayload : never

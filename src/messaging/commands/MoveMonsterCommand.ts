@@ -1,13 +1,13 @@
-import { Hero } from '../../entities/Hero'
-import { Monster } from '../../entities/Monster'
-import { RandomGenerator } from '../../Random'
-import { Coords } from '../../types'
-import type { CommandDef } from '../core/Commands'
-import { EventBus } from '../core/EventBus'
-import { Events } from '../core/Events'
-import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService'
+import { Hero } from '../../entities/Hero.js'
+import { Monster } from '../../entities/Monster.js'
+import { RandomGenerator } from '../../Random.js'
+import { Coords } from '../../types.js'
+import type { CommandDef } from '../core/Commands.js'
+import { EventBus } from '../core/EventBus.js'
+import { Events } from '../core/Events.js'
+import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService.js'
 
-declare module '../core/Commands' {
+declare module '../core/Commands.js' {
   interface Commands {
     MoveMonster: CommandDef<MoveMonsterCommandPayload, MoveMonsterCommandResult>
   }

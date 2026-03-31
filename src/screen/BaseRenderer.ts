@@ -1,5 +1,5 @@
-import { BufferCompositor } from '../buffer/BufferCompositor'
-import { Terminal } from './Terminal'
+import { BufferCompositor } from '../buffer/BufferCompositor.js'
+import { Terminal } from './Terminal.js'
 
 export abstract class BaseRenderer {
   protected readonly bufferCompositor: BufferCompositor

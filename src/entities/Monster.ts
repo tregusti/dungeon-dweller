@@ -1,6 +1,6 @@
-import { Cell, Coords } from '../types'
-import { Creature, CreatureProps } from './Creature'
-import { CreatureDefinitions } from './CreatureDefinitions'
+import { Cell, Coords } from '../types.js'
+import { Creature, CreatureProps } from './Creature.js'
+import { CreatureDefinitions } from './CreatureDefinitions.js'
 
 export class Monster extends Creature {
   static create(type: string, cell: Cell): Monster {

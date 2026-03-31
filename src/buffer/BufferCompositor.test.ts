@@ -1,5 +1,5 @@
-import { Buffer, BufferEntry } from './Buffer'
-import { BufferCompositor } from './BufferCompositor'
+import { Buffer, BufferEntry } from './Buffer.js'
+import { BufferCompositor } from './BufferCompositor.js'
 
 const size5x5 = { width: 5, height: 5 }
 
