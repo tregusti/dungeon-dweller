@@ -2,6 +2,7 @@ import { Buffer } from '../buffer/Buffer.js'
 import { BufferCompositor } from '../buffer/BufferCompositor.js'
 import { colorize } from '../Color.js'
 import { Dungeon } from '../levels/Dungeon.js'
+import { Level } from '../levels/Level.js'
 import { EventBus, Events } from '../messaging/core/main.js'
 import { Coords, Size } from '../types.js'
 import { BaseRenderer } from './BaseRenderer.js'
@@ -113,7 +114,7 @@ export class DungeonRenderer extends BaseRenderer {
     this.updateEntityBuffer()
   }
 
-  private updateLevelBuffer(level: ReturnType<Dungeon['getLevel']>) {
+  private updateLevelBuffer(level: Level) {
     const renderedLevel = this.viewport.render(level)
     for (let y = 0; y < this.levelBuffer.height; y++) {
       for (let x = 0; x < this.levelBuffer.width; x++) {
@@ -131,6 +132,7 @@ export class DungeonRenderer extends BaseRenderer {
       for (let x = 0; x < this.entityBuffer.width; x++) {
         const content = this.dungeon
           .at(origin.x + x, origin.y + y, levelId)
+          .filter((c) => c.type !== 'tile')
           .at(-1)
         if (!content) {
           continue

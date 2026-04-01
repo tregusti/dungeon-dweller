@@ -1,9 +1,9 @@
-import { Color } from '../Color.js'
+import { Color, decolorize } from '../Color.js'
 import { CanBeRendered, Cell, PickValues } from '../types.js'
 
 export class Tile implements TileDefinition, CanBeRendered {
   static typeForChar(char: string): string {
-    const def = TileDefinitions.find((def) => def.char === char)
+    const def = TileDefinitions.find((def) => def.char === decolorize(char))
     if (!def) {
       throw new Error(`Unknown tile char: ${char}`)
     }
@@ -44,15 +44,20 @@ export class Tile implements TileDefinition, CanBeRendered {
 // prettier-ignore
 const list: TileDefinitionValues[] = [
 // TABLE-START
-//  char type            color           description
-  [' ', 'rock',         'white',        'An impassable rock. It looks solid and unyielding.'],
-  ['|',  'wall',        'white',        'A stone wall.'],
-  ['·',  'floor',       'white',        'A dusty stone floor.'],
-  ['⎶',  'door',        'red',          'A wooden door, currently closed.'],
-  ['□',  'open door',   'yellow',       'A wooden door, currently open.'],
-  ['>',  'stairs down', 'brightyellow', 'A staircase leading down to the next level.'],
-  ['<',  'stairs up',   'brightyellow', 'A staircase leading up to the previous level.'],
-  ['~',  'water',       'blue',         'A shallow pool of water.'],
+//  char  type               color           description
+  [' ',   'rock',            'white',        'An impassable rock. It looks solid and unyielding.'],
+  ['┌',   'wall:down right', 'white',        'A stone wall.'],
+  ['┐',   'wall:down left',  'red',          'A stone wall.'],
+  ['┘',   'wall:up left',    'white',        'A stone wall.'],
+  ['└',   'wall:up right',   'white',        'A stone wall.'],
+  ['│',   'wall:up down',    'white',        'A stone wall.'],
+  ['─',   'wall:left right', 'white',        'A stone wall.'],
+  ['·',   'floor',           'white',        'A dusty stone floor.'],
+  ['+',   'door:closed',     'red',          'A wooden door, currently closed.'],
+  ['□',   'door:open',       'yellow',       'A wooden door, currently open.'],
+  ['>',   'stairs:down',     'brightyellow', 'A staircase leading down to the next level.'],
+  ['<',   'stairs:up',       'brightyellow', 'A staircase leading up to the previous level.'],
+  ['~',   'water',           'blue',         'A shallow pool of water.'],
 // TABLE-END
 ]
 

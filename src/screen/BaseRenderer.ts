@@ -22,7 +22,7 @@ export abstract class BaseRenderer {
   protected redraw() {
     this.bufferCompositor.flush((entries) => {
       for (const { x, y, char } of entries) {
-        this.terminal.writeAt(x, y, char ?? '.')
+        this.terminal.writeAt(x, y, char ?? ' ')
       }
     })
   }

@@ -43,6 +43,7 @@ export class BufferCompositor {
       height: this.#height,
     })
 
+    // for (let i = 0; i < this.#buffers.length; i = i + 2) {
     for (let i = 0; i < this.#buffers.length; i++) {
       const ce = this.#buffers[i]
       ce.buffer.entries.forEach(({ x, y, char }) => {

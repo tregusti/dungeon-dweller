@@ -4,7 +4,12 @@ import { MonsterCollection } from '../entities/MonsterCollection.js'
 import { Layout } from '../Layout.js'
 import { Dungeon } from '../levels/Dungeon.js'
 import { DungeonCreator } from '../levels/DungeonCreator.js'
-import { CommandBus, Commands, EventBus, Events } from '../messaging/core/main.js'
+import {
+  CommandBus,
+  Commands,
+  EventBus,
+  Events,
+} from '../messaging/core/main.js'
 import { Random } from '../Random.js'
 import { Terminal } from '../screen/Terminal.js'
 
@@ -19,7 +24,7 @@ export type GameContext = {
 }
 
 export function createGameContext(): GameContext {
-  const random = new Random('lenn-seed')
+  const random = new Random('lenn-seed2')
   const levelSize = Layout.levels.defaultSize
 
   const heroCreator = new HeroCreator(

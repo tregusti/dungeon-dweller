@@ -1,11 +1,11 @@
 import { Color } from './Color.js'
 
+export { assert } from 'ts-essentials'
+
 export type CanBeRendered = {
   char: string
   color: Color
 }
-
-export * from 'ts-essentials'
 
 export type MaybePromise<T> = T | Promise<T>
 

@@ -2,7 +2,7 @@ import { Hero } from '../entities/Hero.js'
 import { Monster } from '../entities/Monster.js'
 import { MonsterCollection } from '../entities/MonsterCollection.js'
 import { Tile } from '../entities/Tile.js'
-import { CanBeRendered, Coords, DeepReadonly, Size } from '../types.js'
+import { CanBeRendered, Coords, Size } from '../types.js'
 import { Level } from './Level.js'
 
 type RenderableContentMap<TMap extends Record<string, CanBeRendered>> = TMap
@@ -27,13 +27,13 @@ export type CellContent = {
 export class Dungeon {
   readonly width: number
   readonly height: number
-  readonly levels: DeepReadonly<Level>[] = []
+  readonly levels: Level[] = []
 
   constructor(
     size: Size,
     private hero: Hero,
     private monsters: MonsterCollection,
-    levels: DeepReadonly<Level>[] = [],
+    levels: Level[] = [],
   ) {
     this.width = size.width
     this.height = size.height
@@ -79,13 +79,13 @@ export class Dungeon {
     return !this.isOccupied(x, y, levelId)
   }
 
-  getLevel(id: string): DeepReadonly<Level> {
+  getLevel(id: string): Level {
     const level = this.levels.find((l) => l.id === id)
     if (!level) throw new Error(`Level '${id}' not found`)
     return level
   }
 
-  get currentLevel(): DeepReadonly<Level> {
+  get currentLevel(): Level {
     return this.getLevel(this.hero.levelId)
   }
 

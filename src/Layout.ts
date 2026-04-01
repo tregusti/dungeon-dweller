@@ -27,8 +27,8 @@ export const Layout = {
   },
   levels: {
     defaultSize: {
-      width: 100,
-      height: 30,
+      width: 60,
+      height: 20,
     },
   },
   status: {

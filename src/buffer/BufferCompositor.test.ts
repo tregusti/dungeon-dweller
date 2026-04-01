@@ -1,3 +1,4 @@
+import { undent } from '../utils/text.js'
 import { Buffer, BufferEntry } from './Buffer.js'
 import { BufferCompositor } from './BufferCompositor.js'
 
@@ -80,5 +81,36 @@ describe('BufferCompositor', () => {
 
     entries = getFlushedEntries(compositor)
     expect(entries).toHaveLength(0)
+  })
+  it('should not tamper with the level', () => {
+    const layout = undent`
+      ┌───┐
+      │···│
+      │···│
+      │···│
+      └───┘
+      `
+      .trim()
+      .split('\n')
+      .map((line) => line.split(''))
+    const compositor = new BufferCompositor(size5x5)
+    const buffer = compositor.add({
+      buffer: new Buffer(size5x5),
+      x: 0,
+      y: 0,
+      layer: 0,
+    })
+    layout.forEach((row, y) => {
+      row.forEach((char, x) => {
+        buffer.set(x, y, char)
+      })
+    })
+
+    const entries = getFlushedEntries(compositor)
+
+    expect(entries).toHaveLength(25)
+    entries.forEach(({ x, y, char }) => {
+      expect(char).toEqual(layout[y][x])
+    })
   })
 })
