@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node --loader ts-node/esm src/main.ts",
+    "start": "node --enable-source-maps --loader ts-node/esm src/main.ts",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "# https://github.com/nodejs/node/issues/60704#issuecomment-3529614006": "",
     "test": "NODE_OPTIONS='--experimental-vm-modules --disable-warning=ExperimentalWarning --no-experimental-webstorage' jest --collectCoverage",

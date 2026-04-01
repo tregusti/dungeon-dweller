@@ -3,6 +3,8 @@
     "target": "es2024",
     "module": "nodenext",
     "moduleResolution": "NodeNext",
+    "sourceMap": true,
+    "inlineSources": true,
     "outDir": "build",
     "rootDir": "src",
     "isolatedModules": true,
