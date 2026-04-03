@@ -1,6 +1,27 @@
-import { Coords } from '../types.js'
+import { colorize } from '../Color.js'
+import { Tile, TileDefinitions } from '../entities/Tile.js'
+import { assert, Coords } from '../types.js'
 
 export class Level {
+  static parseLayout(layoutStr: string): string[][] {
+    return layoutStr
+      .replace(/^\n+|\n+$/gm, '')
+      .split('\n')
+      .map((line) => line.split(''))
+  }
+  static fromLayout(id: string, layoutStr: string): Level {
+    const layout = this.parseLayout(layoutStr)
+    layout.forEach((row, y) =>
+      row.forEach((char, x) => {
+        const type = Tile.typeForChar(char)
+        const def = TileDefinitions.find((def) => def.type === type)
+        assert(def, `Unknown tile type: ${type}`)
+        layout[y][x] = colorize(char, def.color)
+      }),
+    )
+    return new Level(id, layout)
+  }
+
   constructor(
     public readonly id: string,
     private readonly layout: string[][],
