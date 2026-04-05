@@ -1,6 +1,9 @@
 /** Add an indefinite form prefix to a word. E.g., "apple" -> "an apple" */
 export const ana = (input: string) => {
   if (!input) return input
+  if (input.toLowerCase() === 'water') {
+    return 'some water'
+  }
   const vowels = ['a', 'e', 'i', 'o', 'u']
   const prefix = vowels.includes(input.toLowerCase().at(0)!) ? 'an' : 'a'
   return `${prefix} ${input}`

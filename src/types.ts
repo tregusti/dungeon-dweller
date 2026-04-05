@@ -3,8 +3,12 @@ import { Color } from './Color.js'
 export { assert } from 'ts-essentials'
 
 export type CanBeRendered = {
+  /** The single char representation of the entity */
   char: string
+  /** The color of the entity */
   color: Color
+  /** The full string representation of the entity, including color codes */
+  value: string
 }
 
 export type MaybePromise<T> = T | Promise<T>

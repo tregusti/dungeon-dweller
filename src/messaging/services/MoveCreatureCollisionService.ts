@@ -1,7 +1,7 @@
 import { Hero } from '../../entities/Hero.js'
-import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
-import { Dungeon } from '../../levels/Dungeon.js'
+import { Trait } from '../../entities/Trait.js'
+import { Dungeon, TypeContentType } from '../../levels/Dungeon.js'
 import { Coords } from '../../types.js'
 
 type LevelLookup = Pick<Dungeon, 'getLevel'>
@@ -10,18 +10,12 @@ type MoveEvaluation =
   | { success: true }
   | {
       success: false
-      reason: 'monster'
-      monster: Monster
+      reason: 'outside'
     }
-  | {
+  | ({
       success: false
-      reason: 'wall'
-    }
-  | {
-      success: false
-      reason: 'hero'
-      hero: Hero
-    }
+      reason: 'blocked'
+    } & TypeContentType)
 
 export class MoveCreatureCollisionService {
   constructor(
@@ -46,7 +40,7 @@ export class MoveCreatureCollisionService {
     if (!level.isInside(attemptedTo.x, attemptedTo.y)) {
       return {
         success: false,
-        reason: 'wall',
+        reason: 'outside',
       }
     }
 
@@ -57,8 +51,9 @@ export class MoveCreatureCollisionService {
     ) {
       return {
         success: false,
-        reason: 'hero',
-        hero: this.hero,
+        reason: 'blocked',
+        type: 'hero',
+        content: this.hero,
       }
     }
 
@@ -68,8 +63,19 @@ export class MoveCreatureCollisionService {
     if (monster) {
       return {
         success: false,
-        reason: 'monster',
-        monster,
+        reason: 'blocked',
+        type: 'monster',
+        content: monster,
+      }
+    }
+
+    const tile = level.at(attemptedTo.x, attemptedTo.y)
+    if (tile.traits & Trait.Blocking) {
+      return {
+        success: false,
+        reason: 'blocked',
+        type: 'tile',
+        content: tile,
       }
     }
 

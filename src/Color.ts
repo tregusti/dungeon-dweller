@@ -23,7 +23,9 @@ type ChalkColorFunctionKey<T> = {
   [K in keyof T]-?: T[K] extends (text: string) => string ? K : never
 }[keyof T]
 
-export const decolorize = (text: string) => stripAnsi(text)
+export const decolorize = (text: string) => {
+  return stripAnsi(text)
+}
 
 export const colorize = (text: string, color: Color) => {
   const translations: Record<Color, ChalkColorFunctionKey<typeof chalk>> = {

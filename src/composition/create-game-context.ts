@@ -27,11 +27,7 @@ export function createGameContext(): GameContext {
   const random = new Random('lenn-seed2')
   const levelSize = Layout.levels.defaultSize
 
-  const heroCreator = new HeroCreator(
-    levelSize,
-    random.create('create-hero'),
-    '1',
-  )
+  const heroCreator = new HeroCreator(random.create('create-hero'), '1')
   const hero = heroCreator.create()
   const monsters = new MonsterCollection()
   const dungeonCreator = new DungeonCreator(

@@ -1,8 +1,6 @@
 import { Level } from '../levels/Level.js'
 import { Coords, Size } from '../types.js'
 
-type ViewportLevel = Pick<Level, 'at' | 'width' | 'height'>
-
 export class Viewport {
   private x: number = 0
   private y: number = 0
@@ -56,16 +54,24 @@ export class Viewport {
     }
   }
 
-  render(level: ViewportLevel): string[][] {
+  render(level: Level): string[][] {
     const output: string[][] = []
     for (let j = 0; j < this.height; j++) {
       const row: string[] = []
       for (let i = 0; i < this.width; i++) {
         const worldX = this.x + i
         const worldY = this.y + j
-        const isWithinLevel = worldX < level.width && worldY < level.height
-
-        row.push(isWithinLevel ? level.at(worldX, worldY) : ' ')
+        // if (!level.isInside(worldX, worldY)) {
+        //   throw new Error(
+        //     `Level ${level.id} is not big enough to fill the viewport at (${worldX}, ${worldY})`,
+        //   )
+        // }
+        if (level.isInside(worldX, worldY)) {
+          row.push(level.at(worldX, worldY).value)
+        } else {
+          // TODO: This should not be allowed to happen. Or?
+          row.push(' ')
+        }
       }
       output.push(row)
     }

@@ -9,8 +9,8 @@
     "start": "node --enable-source-maps --loader ts-node/esm src/main.ts",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "# https://github.com/nodejs/node/issues/60704#issuecomment-3529614006": "",
-    "test": "NODE_OPTIONS='--experimental-vm-modules --disable-warning=ExperimentalWarning --no-experimental-webstorage' jest --collectCoverage",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules --disable-warning=ExperimentalWarning --no-experimental-webstorage' jest --watch"
+    "test": "node --experimental-vm-modules --disable-warning=ExperimentalWarning --no-experimental-webstorage ./node_modules/jest/bin/jest.js --collectCoverage",
+    "test:watch": "node --experimental-vm-modules --disable-warning=ExperimentalWarning --no-experimental-webstorage ./node_modules/jest/bin/jest.js --watch"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",

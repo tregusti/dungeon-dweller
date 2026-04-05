@@ -1,5 +1,6 @@
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
+import { TypeContentType } from '../../levels/Dungeon.js'
 import { RandomGenerator } from '../../Random.js'
 import { Coords } from '../../types.js'
 import type { CommandDef } from '../core/Commands.js'
@@ -19,24 +20,14 @@ export type MoveMonsterCommandPayload = {
 
 export type MoveMonsterCommandResult =
   | {
-      success: false
-      reason: 'wall'
-    }
-  | {
-      success: false
-      reason: 'hero'
-      hero: Hero
-    }
-  | {
-      success: false
-      reason: 'monster'
-      monster: Monster
-    }
-  | {
       success: true
       from: Coords
       to: Coords
     }
+  | (TypeContentType & {
+      success: false
+      reason: 'blocked'
+    })
 
 type Direction = { dx: number; dy: number }
 
@@ -81,22 +72,19 @@ export class MoveMonsterCommandHandler {
         }
       }
 
-      if (evaluation.reason === 'wall') {
+      if (evaluation.reason === 'outside') {
         continue
       }
 
-      if (evaluation.reason === 'monster') {
-        return {
-          success: false,
-          reason: 'monster',
-          monster: evaluation.monster,
+      if (evaluation.reason === 'blocked') {
+        if (evaluation.type === 'hero') {
+          return {
+            success: false,
+            reason: 'blocked',
+            type: 'hero',
+            content: evaluation.content,
+          }
         }
-      }
-
-      return {
-        success: false,
-        reason: 'hero',
-        hero: evaluation.hero,
       }
     }
   }

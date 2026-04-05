@@ -1,9 +1,12 @@
 import assert from 'assert'
 
+import { describe, expect, it } from '@jest/globals'
+
 import { Hero } from '../entities/Hero.js'
 import { Monster } from '../entities/Monster.js'
 import { MonsterCollection } from '../entities/MonsterCollection.js'
 import { Tile } from '../entities/Tile.js'
+import { LevelBuilder } from '../test/LevelBuilder.js'
 import { Cell, Size } from '../types.js'
 import { Dungeon } from './Dungeon.js'
 import { Level } from './Level.js'
@@ -11,35 +14,21 @@ import { Level } from './Level.js'
 const createSUT = ({
   heroCell = { x: 0, y: 0, levelId: '1' },
   size = { width: 5, height: 5 },
-  levels = [
-    new Level(
-      '1',
-      Array.from({ length: size.height }, () => Array(size.width).fill(' ')),
-    ),
-    new Level(
-      '2',
-      Array.from({ length: size.height }, () => Array(size.width).fill(' ')),
-    ),
-  ],
 }: {
   heroCell?: Cell
   size?: Size
-  levels?: Level[]
 } = {}) => {
+  const levels = [
+    LevelBuilder.create().withSize(size).withId('1').build(),
+    LevelBuilder.create().withSize(size).withId('2').build(),
+  ]
   const hero = new Hero(heroCell)
   const monsters = new MonsterCollection()
-  const dungeon = new Dungeon(size, hero, monsters, levels)
+  const dungeon = new Dungeon(hero, monsters, levels)
   return { dungeon, hero, monsters }
 }
 
 describe('Dungeon', () => {
-  it('should have a size', () => {
-    const { dungeon } = createSUT({ size: { width: 4, height: 8 } })
-
-    expect(dungeon.width).toBe(4)
-    expect(dungeon.height).toBe(8)
-  })
-
   it('should expose currentLevel from the hero level id', () => {
     const { dungeon } = createSUT({
       heroCell: { x: 0, y: 0, levelId: '2' },

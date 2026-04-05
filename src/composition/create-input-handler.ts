@@ -80,14 +80,25 @@ export function createInputHandler({
         `You move to (${result.to.x},${result.to.y}) at turn ${hero.turns}.`,
       )
       await handleMonsterRounds()
-    } else if (result.reason === 'wall') {
-      Debug.write(`You bump into a wall at turn ${hero.turns}`)
-    } else if (result.reason === 'monster') {
-      await commandBus.execute('MeleeAttackCreature', {
-        attacker: hero,
-        target: result.monster,
-      })
-      Debug.write(`You attack the ${result.monster.type} at turn ${hero.turns}`)
+    } else if (result.reason === 'blocked') {
+      // monster is blocking the way
+      if (result.type === 'monster') {
+        await commandBus.execute('MeleeAttackCreature', {
+          attacker: hero,
+          target: result.content,
+        })
+        Debug.write(
+          `You attack the ${result.content.type} at turn ${hero.turns}`,
+        )
+      }
+
+      if (result.type === 'tile') {
+        Debug.write(
+          `You bump into ${ana(result.content.type)} at turn ${hero.turns}`,
+        )
+      }
+    } else if (result.reason === 'outside') {
+      Debug.write(`You can't move outside the level at turn ${hero.turns}`)
     }
   }
 
@@ -103,7 +114,10 @@ export function createInputHandler({
           Debug.write(
             `${sentence(ana(monster.type))} moves to (${monsterResult.to.x},${monsterResult.to.y}) at turn ${hero.turns}. Speed: ${monster.speed}, Energy: ${monster.energy}`,
           )
-        } else if (monsterResult.reason === 'hero') {
+        } else if (
+          monsterResult.reason === 'blocked' &&
+          monsterResult.type === 'hero'
+        ) {
           await commandBus.execute('MeleeAttackCreature', {
             attacker: monster,
             target: hero,

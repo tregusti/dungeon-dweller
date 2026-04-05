@@ -1,6 +1,7 @@
-import { Color } from '../Color.js'
+import { Color, colorize } from '../Color.js'
 import { CanBeRendered, Cell } from '../types.js'
 import { CreatureDefinition } from './CreatureDefinitions.js'
+import { Trait } from './Trait.js'
 
 export type NamedCreature = {
   name?: string
@@ -24,11 +25,15 @@ export abstract class Creature
   description: string
   /** A specific name for this creature instance. E.g. "Sir Lancelot" */
   name?: string
+  traits: Trait
 
   protected _energy: number = 0
-
   get energy() {
     return this._energy
+  }
+
+  get value() {
+    return colorize(this.char, this.color)
   }
 
   constructor({ x, y, levelId, definition, name }: CreatureProps) {
@@ -44,5 +49,6 @@ export abstract class Creature
     this.type = definition.type
     this.color = definition.color
     this.description = definition.description
+    this.traits = definition.traits
   }
 }

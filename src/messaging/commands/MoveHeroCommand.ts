@@ -1,5 +1,6 @@
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
+import { TypeContentType } from '../../levels/Dungeon.js'
 import { Coords } from '../../types.js'
 import type { CommandDef } from '../core/Commands.js'
 import { EventBus } from '../core/EventBus.js'
@@ -15,19 +16,18 @@ declare module '../core/Commands.js' {
 export type MoveHeroCommandPayload = { dx: number; dy: number }
 export type MoveHeroCommandResult =
   | {
-      success: false
-      reason: 'wall'
-    }
-  | {
-      success: false
-      reason: 'monster'
-      monster: Monster
-    }
-  | {
       success: true
       from: Coords
       to: Coords
     }
+  | {
+      success: false
+      reason: 'outside'
+    }
+  | (TypeContentType & {
+      success: false
+      reason: 'blocked'
+    })
 
 export const Movement = {
   Up: { dx: 0, dy: -1 },
@@ -55,7 +55,7 @@ export class MoveHeroCommandHandler {
     })
 
     if (evaluation.success) {
-      const { from, to } = this.hero.move(dx, dy)
+      const { from, to } = this.hero.moveBy(dx, dy)
       await this.events.publish('HeroMoved', {
         from: from,
         to: to,
@@ -67,17 +67,16 @@ export class MoveHeroCommandHandler {
         to,
       }
     } else {
-      if (evaluation.reason === 'monster') {
-        return {
-          success: false,
-          reason: 'monster',
-          monster: evaluation.monster,
+      if (evaluation.reason === 'blocked') {
+        if (evaluation.type === 'monster' || evaluation.type === 'tile') {
+          return evaluation
         }
+        throw new Error('Hero should not be blocked by another hero')
       }
-
+      // outside
       return {
         success: false,
-        reason: 'wall',
+        reason: 'outside',
       }
     }
   }

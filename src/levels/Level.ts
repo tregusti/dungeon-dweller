@@ -3,28 +3,29 @@ import { Tile, TileDefinitions } from '../entities/Tile.js'
 import { assert, Coords } from '../types.js'
 
 export class Level {
-  static parseLayout(layoutStr: string): string[][] {
-    return layoutStr
+  static fromLayout(id: string, layoutStr: string): Level {
+    // Parse input string
+    const raw = layoutStr
       .replace(/^\n+|\n+$/gm, '')
       .split('\n')
       .map((line) => line.split(''))
-  }
-  static fromLayout(id: string, layoutStr: string): Level {
-    const layout = this.parseLayout(layoutStr)
-    layout.forEach((row, y) =>
-      row.forEach((char, x) => {
+
+    // Fill layout with tiles
+    const layout = raw.map((row, y) =>
+      row.map((char, x) => {
         const type = Tile.typeForChar(char)
-        const def = TileDefinitions.find((def) => def.type === type)
-        assert(def, `Unknown tile type: ${type}`)
-        layout[y][x] = colorize(char, def.color)
+        const tile = Tile.create({ x, y, levelId: id }, type)
+        return tile
       }),
     )
+
+    // Return new level instance
     return new Level(id, layout)
   }
 
   constructor(
     public readonly id: string,
-    private readonly layout: string[][],
+    private readonly layout: Tile[][],
   ) {}
 
   get width(): number {
@@ -35,7 +36,11 @@ export class Level {
     return this.layout.length
   }
 
-  at(x: number, y: number): string {
+  at(x: number, y: number): Tile {
+    assert(
+      this.isInside(x, y),
+      `Coordinates (${x}, ${y}) are out of bounds for level ${this.id} with dimensions ${this.width}x${this.height}`,
+    )
     return this.layout[y][x]
   }
 

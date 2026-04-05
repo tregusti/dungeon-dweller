@@ -1,11 +1,11 @@
-import { jest } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { Hero } from '../../entities/Hero.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
 import { Dungeon } from '../../levels/Dungeon.js'
-import { Level } from '../../levels/Level.js'
 import { Random, RandomGenerator } from '../../Random.js'
 import { expectToBe, expectToHaveProperty } from '../../test/expect.js'
+import { LevelBuilder } from '../../test/LevelBuilder.js'
 import { Cell, Size } from '../../types.js'
 import { EventBus } from '../core/main.js'
 import type { EventHandler, Events } from '../core/main.js'
@@ -13,27 +13,23 @@ import { CreateMonsterCommandHandler } from './CreateMonsterCommand.js'
 
 describe('CreateMonsterCommandHandler', () => {
   const createSUT = ({
-    dungeonSize = { width: 5, height: 5 },
-    heroCell = { x: 1, y: 1, levelId: '1' },
+    levelSize = { width: 5, height: 5 },
     levelId = '1',
+    heroCell = { x: 1, y: 1, levelId: '1' },
     random = new Random('test-seed'),
   }: {
-    dungeonSize?: Size
-    heroCell?: Cell
+    levelSize?: Size
     levelId?: string
+    heroCell?: Cell
     random?: RandomGenerator
   } = {}) => {
     const monsters = new MonsterCollection()
     const hero = new Hero(heroCell)
-    // TODO Add a LevelBuilder or something similar to make it easier to create
-    // levels for testing.
-    const level = new Level(
-      levelId,
-      Array.from({ length: dungeonSize.height }, () =>
-        Array(dungeonSize.width).fill(' '),
-      ),
-    )
-    const dungeon = new Dungeon(dungeonSize, hero, monsters, [level])
+    const level = LevelBuilder.create()
+      .withSize(levelSize)
+      .withId(levelId)
+      .build()
+    const dungeon = new Dungeon(hero, monsters, [level])
     const events = new EventBus<Events>()
     const subject = new CreateMonsterCommandHandler(
       dungeon,
@@ -74,7 +70,7 @@ describe('CreateMonsterCommandHandler', () => {
     })
     it('should emit the MonsterCreated event', async () => {
       const { subject, events, levelId } = createSUT({
-        dungeonSize: { width: 2, height: 1 },
+        levelSize: { width: 2, height: 1 },
       })
       const listener = jest.fn<EventHandler<'MonsterCreated'>>()
       events.subscribe('MonsterCreated', listener)
@@ -98,7 +94,7 @@ describe('CreateMonsterCommandHandler', () => {
   describe('when dungeon has no free coords', () => {
     it('should return dungeon-full and not create a monster', () => {
       const { subject, monsters, levelId } = createSUT({
-        dungeonSize: { width: 1, height: 1 },
+        levelSize: { width: 1, height: 1 },
         heroCell: { x: 0, y: 0, levelId: '1' },
       })
 

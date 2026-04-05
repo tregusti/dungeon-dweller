@@ -17,6 +17,14 @@ export class DungeonCreator {
     const level1 = levelCreator.create('1', size)
     const level2 = levelCreator.create('2', size)
 
-    return new Dungeon(size, this.hero, this.monsters, [level1, level2])
+    // Get start position for hero and place
+    // TODO: Get this from the level instead of hardcoding it here
+    const heroStart = {
+      x: 14,
+      y: 5,
+    }
+    this.hero.moveTo(heroStart.x, heroStart.y, level1.id)
+
+    return new Dungeon(this.hero, this.monsters, [level1, level2])
   }
 }

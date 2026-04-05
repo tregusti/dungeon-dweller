@@ -1,9 +1,12 @@
-import { jest } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
-import { Cell } from '../../types.js'
+import { Level } from '../../levels/Level.js'
+import { expectToHaveProperty } from '../../test/expect.js'
+import { LevelBuilder } from '../../test/LevelBuilder.js'
+import { Coords } from '../../types.js'
 import { EventBus } from '../core/EventBus.js'
 import { EventPayload, Events } from '../core/Events.js'
 import { MoveCreatureCollisionService } from '../services/MoveCreatureCollisionService.js'
@@ -11,17 +14,16 @@ import { MoveHeroCommandHandler, Movement } from './MoveHeroCommand.js'
 
 describe('MoveHeroCommandHandler', () => {
   const createSUT = ({
-    heroCell = { x: 5, y: 5, levelId: '1' },
-  }: { heroCell?: Cell } = {}) => {
-    const level = {
-      width: 10,
-      height: 10,
-      isInside: (x: number, y: number) => x >= 0 && y >= 0 && x < 10 && y < 10,
-    }
+    heroCoords = { x: 5, y: 5 },
+    level = LevelBuilder.create().build(),
+  }: {
+    heroCoords?: Coords
+    level?: Level
+  } = {}) => {
     const dungeon = {
       getLevel: jest.fn(() => level),
     } as any
-    const hero = new Hero(heroCell)
+    const hero = new Hero({ ...heroCoords, levelId: level.id })
     const monsters = new MonsterCollection()
     const events = new EventBus<Events>()
     const collision = new MoveCreatureCollisionService(dungeon, monsters, hero)
@@ -38,7 +40,7 @@ describe('MoveHeroCommandHandler', () => {
   describe('when move is successful', () => {
     it('should move the hero', () => {
       const { hero, subject } = createSUT({
-        heroCell: { x: 5, y: 5, levelId: '1' },
+        heroCoords: { x: 5, y: 5 },
       })
 
       subject.handle({ dx: 1, dy: 0 })
@@ -48,7 +50,7 @@ describe('MoveHeroCommandHandler', () => {
     })
     it('should emit the HeroMoved event', async () => {
       const { events, subject, hero } = createSUT({
-        heroCell: { x: 5, y: 5, levelId: '1' },
+        heroCoords: { x: 5, y: 5 },
       })
       const movedEvents: EventPayload<'HeroMoved'>[] = []
       events.subscribe('HeroMoved', (payload) => {
@@ -59,31 +61,47 @@ describe('MoveHeroCommandHandler', () => {
 
       expect(movedEvents).toHaveLength(1)
       const movedEvent = movedEvents.at(0)
-      expect(movedEvent).toHaveProperty('from', { x: 5, y: 5 })
-      expect(movedEvent).toHaveProperty('to', { x: 6, y: 5 })
+      expect(movedEvent).toHaveProperty('from', {
+        x: 5,
+        y: 5,
+        levelId: hero.levelId,
+      })
+      expect(movedEvent).toHaveProperty('to', {
+        x: 6,
+        y: 5,
+        levelId: hero.levelId,
+      })
       expect(movedEvent?.hero).toBe(hero)
     })
     it('should return success in the result', async () => {
-      const { subject } = createSUT({
-        heroCell: { x: 5, y: 5, levelId: '1' },
+      const { subject, hero } = createSUT({
+        heroCoords: { x: 5, y: 5 },
       })
 
       const result = await subject.handle({ dx: 1, dy: 0 })
 
       expect(result).toEqual({
         success: true,
-        from: { x: 5, y: 5 },
-        to: { x: 6, y: 5 },
+        from: { x: 5, y: 5, levelId: hero.levelId },
+        to: { x: 6, y: 5, levelId: hero.levelId },
       })
     })
   })
   describe('when monster is in the way', () => {
-    it('should not move the hero', async () => {
-      const { hero, monsters, subject } = createSUT({
-        heroCell: { x: 5, y: 5, levelId: '1' },
+    function arrange() {
+      const { hero, monsters, subject, events } = createSUT({
+        heroCoords: { x: 5, y: 5 },
       })
-      const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
+      const monster = Monster.create('orc', {
+        x: 6,
+        y: 5,
+        levelId: hero.levelId,
+      })
       monsters.add(monster)
+      return { hero, subject, monster, events }
+    }
+    it('should not move the hero', async () => {
+      const { hero, subject } = arrange()
 
       await subject.handle(Movement.Right)
 
@@ -91,45 +109,39 @@ describe('MoveHeroCommandHandler', () => {
       expect(hero.y).toBe(5)
     })
     it('should not emit the HeroMoved event', async () => {
-      // Arrange
-      const { monsters, events, subject } = createSUT({
-        heroCell: { x: 5, y: 5, levelId: '1' },
-      })
-      const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
-      monsters.add(monster)
+      const { events, subject } = arrange()
 
       const movedEvents: unknown[] = []
       events.subscribe('HeroMoved', (payload) => {
         movedEvents.push(payload)
       })
 
-      // Act
       await subject.handle(Movement.Right)
 
-      // Assert
       expect(movedEvents).toHaveLength(0)
     })
     it('should return the reason in the result', async () => {
-      const { monsters, subject } = createSUT({
-        heroCell: { x: 5, y: 5, levelId: '1' },
-      })
-      const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
-      monsters.add(monster)
+      const { subject, monster } = arrange()
 
       const result = await subject.handle(Movement.Right)
 
-      expect(result).toEqual({
-        success: false,
-        reason: 'monster',
-        monster,
-      })
+      expectToHaveProperty(result, 'success', false)
+      expectToHaveProperty(result, 'reason', 'blocked')
+      expectToHaveProperty(result, 'type', 'monster')
+      expectToHaveProperty(result, 'content', monster)
     })
   })
   describe('when wall is in the way', () => {
-    it('should not move the hero', async () => {
-      const { hero, subject } = createSUT({
-        heroCell: { x: 0, y: 0, levelId: '1' },
+    function arrange() {
+      const level = LevelBuilder.create().withTile(1, 0, 'wall:up down').build()
+      return createSUT({
+        level,
+        heroCoords: { x: 0, y: 0 },
       })
+    }
+
+    it('should not move the hero', async () => {
+      const { hero, subject } = arrange()
 
       await subject.handle(Movement.Left)
 
@@ -137,10 +149,7 @@ describe('MoveHeroCommandHandler', () => {
       expect(hero.y).toBe(0)
     })
     it('should not emit the HeroMoved event', async () => {
-      // Arrange
-      const { events, subject } = createSUT({
-        heroCell: { x: 0, y: 0, levelId: '1' },
-      })
+      const { subject, events } = arrange()
 
       const movedEvents: unknown[] = []
       events.subscribe('HeroMoved', (payload) => {
@@ -154,15 +163,19 @@ describe('MoveHeroCommandHandler', () => {
       expect(movedEvents).toHaveLength(0)
     })
     it('should return the reason in the result', async () => {
-      const { subject } = createSUT({
-        heroCell: { x: 0, y: 0, levelId: '1' },
-      })
+      const { subject } = arrange()
 
-      const result = await subject.handle(Movement.Left)
+      const result = await subject.handle(Movement.Right)
 
       expect(result).toEqual({
         success: false,
-        reason: 'wall',
+        reason: 'blocked',
+        type: 'tile',
+        content: expect.objectContaining({
+          char: '│',
+          x: 1,
+          y: 0,
+        }),
       })
     })
   })

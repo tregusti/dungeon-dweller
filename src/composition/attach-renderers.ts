@@ -5,6 +5,7 @@ import { EventBus, Events } from '../messaging/core/main.js'
 import { DungeonRenderer } from '../screen/DungeonRenderer.js'
 import { StatusRenderer } from '../screen/StatusRenderer.js'
 import { Terminal } from '../screen/Terminal.js'
+import { Viewport } from '../screen/Viewport.js'
 
 type AttachRenderersArgs = {
   terminal: Terminal
@@ -31,6 +32,12 @@ export function attachRenderers({
   })
   statusRenderer.attach()
 
+  const viewport = new Viewport(
+    Layout.dungeon.size.width,
+    Layout.dungeon.size.height,
+    Layout.dungeon.scrollMargin,
+  )
+
   const dungeonRenderer = new DungeonRenderer({
     bufferCompositor,
     terminal,
@@ -38,7 +45,7 @@ export function attachRenderers({
     dungeon,
     size: Layout.dungeon.size,
     coords: Layout.dungeon.coords,
-    scrollMargin: Layout.dungeon.scrollMargin,
+    viewport,
   })
   dungeonRenderer.attach()
 }

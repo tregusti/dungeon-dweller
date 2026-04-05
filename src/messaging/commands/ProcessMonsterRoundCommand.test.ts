@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'

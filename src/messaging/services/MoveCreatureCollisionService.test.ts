@@ -1,21 +1,28 @@
-import { jest } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Level } from '../../levels/Level.js'
+import { expectToHaveProperty } from '../../test/expect.js'
 import { MoveCreatureCollisionService } from './MoveCreatureCollisionService.js'
 
 describe('MoveCreatureCollisionService', () => {
-  const createSUT = () => {
-    const level = {
-      width: 10,
-      height: 10,
-      isInside: (x: number, y: number) => x >= 0 && y >= 0 && x < 10 && y < 10,
-    }
+  const defaultLayout = Array(5).fill('·····').join('\n')
+
+  const createSUT = ({
+    levelLayout = defaultLayout,
+    heroCoords = { x: 0, y: 0 },
+  } = {}) => {
+    const level = Level.fromLayout('1', levelLayout)
     const dungeon = {
       getLevel: jest.fn(() => level),
     } as any
-    const hero = new Hero({ x: 8, y: 5, levelId: '1' })
+    const hero = new Hero({
+      x: heroCoords.x,
+      y: heroCoords.y,
+      levelId: level.id,
+    })
     const monsters = new MonsterCollection()
     const subject = new MoveCreatureCollisionService(dungeon, monsters, hero)
 
@@ -29,30 +36,13 @@ describe('MoveCreatureCollisionService', () => {
   it('should evaluate move into empty space as a successful move', () => {
     const { subject } = createSUT()
     const result = subject.evaluate({
-      from: { x: 5, y: 5 },
+      from: { x: 1, y: 1 },
       dx: 1,
       dy: 0,
       levelId: '1',
     })
     expect(result).toEqual({
       success: true,
-    })
-  })
-
-  it('evaluate move into monster as unsuccessful and return monster', () => {
-    const { subject, monsters } = createSUT()
-    const monster = Monster.create('orc', { x: 6, y: 5, levelId: '1' })
-    monsters.add(monster)
-    const result = subject.evaluate({
-      from: { x: 5, y: 5 },
-      dx: 1,
-      dy: 0,
-      levelId: '1',
-    })
-    expect(result).toEqual({
-      success: false,
-      reason: 'monster',
-      monster,
     })
   })
 
@@ -66,23 +56,53 @@ describe('MoveCreatureCollisionService', () => {
     })
     expect(result).toEqual({
       success: false,
-      reason: 'wall',
+      reason: 'outside',
     })
   })
 
-  it('evaluate move into hero as unsuccessful and return reason hero with hero', () => {
-    const { hero, subject } = createSUT()
-    const result = subject.evaluate({
-      from: { x: 7, y: 5 },
-      dx: 1,
-      dy: 0,
-      levelId: '1',
+  describe('when blocked', () => {
+    it('evaluate move into a rock as unsuccessful', () => {
+      const levelLayout = `· \n··`
+      const { subject } = createSUT({ levelLayout })
+      const result = subject.evaluate({
+        from: { x: 0, y: 0 },
+        dx: 1,
+        dy: 0,
+        levelId: '1',
+      })
+      expectToHaveProperty(result, 'success', false)
+      expectToHaveProperty(result, 'reason', 'blocked')
+      expectToHaveProperty(result, 'type', 'tile')
+      expectToHaveProperty(result, 'content.type', 'rock')
     })
+    it('evaluate move into monster as unsuccessful', () => {
+      const { subject, monsters } = createSUT()
+      const monster = Monster.create('orc', { x: 2, y: 1, levelId: '1' })
+      monsters.add(monster)
+      const result = subject.evaluate({
+        from: { x: 1, y: 1 },
+        dx: 1,
+        dy: 0,
+        levelId: '1',
+      })
+      expectToHaveProperty(result, 'success', false)
+      expectToHaveProperty(result, 'reason', 'blocked')
+      expectToHaveProperty(result, 'type', 'monster')
+      expect(result.content).toBe(monster)
+    })
+    it('evaluate move into hero as unsuccessful', () => {
+      const { hero, subject } = createSUT({ heroCoords: { x: 1, y: 1 } })
+      const result = subject.evaluate({
+        from: { x: 1, y: 2 },
+        dx: 0,
+        dy: -1,
+        levelId: '1',
+      })
 
-    expect(result).toEqual({
-      success: false,
-      reason: 'hero',
-      hero,
+      expectToHaveProperty(result, 'success', false)
+      expectToHaveProperty(result, 'reason', 'blocked')
+      expectToHaveProperty(result, 'type', 'hero')
+      expect(result.content).toBe(hero)
     })
   })
 })

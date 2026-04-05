@@ -1,3 +1,5 @@
+import { describe, expect, it } from '@jest/globals'
+
 import { undent } from '../utils/text.js'
 import { Buffer, BufferEntry } from './Buffer.js'
 import { BufferCompositor } from './BufferCompositor.js'

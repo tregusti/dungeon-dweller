@@ -13,36 +13,28 @@ type CellContentMap = RenderableContentMap<{
   tile: Tile
 }>
 
-type CellContentType = keyof CellContentMap
+export type CellContent = Coords & TypeContentType
 
-export type CellContent = {
-  [K in CellContentType]: Readonly<
-    Coords & {
-      type: K
-      content: CellContentMap[K]
-    }
-  >
-}[CellContentType]
+export type TypeContentType<M extends CellContentMap = CellContentMap> = {
+  [K in keyof M]: Readonly<{
+    type: K
+    content: M[K]
+  }>
+}[keyof M]
 
 export class Dungeon {
-  readonly width: number
-  readonly height: number
   readonly levels: Level[] = []
 
   constructor(
-    size: Size,
     private hero: Hero,
     private monsters: MonsterCollection,
     levels: Level[] = [],
   ) {
-    this.width = size.width
-    this.height = size.height
     this.levels = levels
   }
 
   at(x: number, y: number, levelId: string = this.hero.levelId): CellContent[] {
-    const tileType = Tile.typeForChar(this.getLevel(levelId).at(x, y))
-    const tile = Tile.create({ x, y, levelId }, tileType)
+    const tile = this.getLevel(levelId).at(x, y)
     const contents: CellContent[] = [{ type: 'tile', content: tile, x, y }]
     if (
       this.hero.levelId === levelId &&

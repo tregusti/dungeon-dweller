@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { Hero } from '../../entities/Hero.js'
 import { CommandBus } from '../core/CommandBus.js'
@@ -40,8 +40,8 @@ describe('ProcessUntilHeroReadyCommandHandler', () => {
   it('repeats rounds until the hero has enough energy', async () => {
     const { hero, processMonsterRound, subject } = createSUT()
 
-    hero.move(1, 0)
-    hero.move(1, 0)
+    hero.moveBy(1, 0)
+    hero.moveBy(1, 0)
 
     await subject.handle()
 

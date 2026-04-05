@@ -1,24 +1,20 @@
-import { Level } from './Level.js'
+import { describe, expect, it } from '@jest/globals'
+
+import { LevelBuilder } from '../test/LevelBuilder.js'
 
 describe('Level', () => {
-  const createSUT = () =>
-    new Level('1', [
-      ['a', 'b', 'c'],
-      ['d', 'e', 'f'],
-    ])
-
   it('should report whether coordinates are inside level bounds', () => {
-    const level = createSUT()
+    const level = LevelBuilder.create().withSize(2, 2).build()
 
     expect(level.isInside(0, 0)).toBe(true)
-    expect(level.isInside(2, 1)).toBe(true)
+    expect(level.isInside(1, 1)).toBe(true)
     expect(level.isInside(-1, 0)).toBe(false)
     expect(level.isInside(3, 0)).toBe(false)
     expect(level.isInside(0, 2)).toBe(false)
   })
 
   it('should expose every coords in row-major order', () => {
-    const level = createSUT()
+    const level = LevelBuilder.create().withSize(3, 2).build()
 
     expect(Array.from(level.coords())).toEqual([
       { x: 0, y: 0 },

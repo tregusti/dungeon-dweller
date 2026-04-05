@@ -1,10 +1,11 @@
-import { jest } from '@jest/globals'
-
-import { assert } from 'ts-essentials'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { Level } from '../../levels/Level.js'
+import { expectToHaveProperty } from '../../test/expect.js'
+import { LevelBuilder } from '../../test/LevelBuilder.js'
 import { Cell } from '../../types.js'
 import { EventBus } from '../core/EventBus.js'
 import { EventPayload, Events } from '../core/Events.js'
@@ -14,16 +15,13 @@ import { MoveMonsterCommandHandler } from './MoveMonsterCommand.js'
 describe('MoveMonsterCommandHandler', () => {
   const createSUT = ({
     heroCell = { x: 5, y: 5, levelId: '1' },
+    level = LevelBuilder.create().build(),
     randomInts = [1, 0],
   }: {
     heroCell?: Cell
     randomInts?: number[]
+    level?: Level
   } = {}) => {
-    const level = {
-      width: 10,
-      height: 10,
-      isInside: (x: number, y: number) => x >= 0 && y >= 0 && x < 10 && y < 10,
-    }
     const dungeon = {
       getLevel: jest.fn(() => level),
     } as any
@@ -117,9 +115,10 @@ describe('MoveMonsterCommandHandler', () => {
 
     const result = await subject.handle({ monster })
 
-    assert(result.success === false)
-    assert(result.reason === 'hero')
-    assert(result.hero === hero)
+    expectToHaveProperty(result, 'success', false)
+    expectToHaveProperty(result, 'reason', 'blocked')
+    expectToHaveProperty(result, 'type', 'hero')
+    expectToHaveProperty(result, 'content', hero)
     expect(monster).toHaveProperty('x', 5)
     expect(monster).toHaveProperty('y', 5)
   })
