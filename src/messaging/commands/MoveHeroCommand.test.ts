@@ -6,6 +6,7 @@ import { MonsterCollection } from '../../entities/MonsterCollection.js'
 import { Level } from '../../levels/Level.js'
 import { expectToHaveProperty } from '../../test/expect.js'
 import { LevelBuilder } from '../../test/LevelBuilder.js'
+import { MonsterBuilder } from '../../test/MonsterBuilder.js'
 import { Coords } from '../../types.js'
 import { EventBus } from '../core/EventBus.js'
 import { EventPayload, Events } from '../core/Events.js'
@@ -92,11 +93,7 @@ describe('MoveHeroCommandHandler', () => {
       const { hero, monsters, subject, events } = createSUT({
         heroCoords: { x: 5, y: 5 },
       })
-      const monster = Monster.create('orc', {
-        x: 6,
-        y: 5,
-        levelId: hero.levelId,
-      })
+      const monster = MonsterBuilder.create().withCoords({ x: 6, y: 5 }).build()
       monsters.add(monster)
       return { hero, subject, monster, events }
     }

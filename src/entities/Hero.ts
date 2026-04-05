@@ -24,8 +24,8 @@ export class Hero extends Creature {
     })
     // For hero, energy starts at full so they can act immediately
     this._energy = this.speed
-    this.char = '@'
-    this.description = 'You, the intrepid adventurer.'
+    this._char = '@'
+    this._description = 'You, the intrepid adventurer.'
   }
 
   giveEnergy() {
@@ -41,18 +41,18 @@ export class Hero extends Creature {
     const from = { x: this.x, y: this.y, levelId: this.levelId }
 
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
-      this.x = args[0]
-      this.y = args[1]
+      this._x = args[0]
+      this._y = args[1]
     } else if (typeof args[0] === 'object') {
-      this.x = args[0].x
-      this.y = args[0].y
+      this._x = args[0].x
+      this._y = args[0].y
       if ('levelId' in args[0]) {
-        this.levelId = args[0].levelId
+        this._levelId = args[0].levelId
       }
     }
 
     if (typeof args[2] === 'string') {
-      this.levelId = args[2]
+      this._levelId = args[2]
     }
 
     this._energy -= this.speed
@@ -66,8 +66,8 @@ export class Hero extends Creature {
 
   moveBy(dx: number, dy: number): MoveResult {
     const from = { x: this.x, y: this.y, levelId: this.levelId }
-    this.x += dx
-    this.y += dy
+    this._x += dx
+    this._y += dy
 
     this._energy -= this.speed
     this._turns++

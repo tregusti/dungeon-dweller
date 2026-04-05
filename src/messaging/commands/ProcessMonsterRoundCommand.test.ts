@@ -3,6 +3,7 @@ import { describe, expect, it, jest } from '@jest/globals'
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { MonsterBuilder } from '../../test/MonsterBuilder.js'
 import { Coords } from '../../types.js'
 import { CommandBus } from '../core/CommandBus.js'
 import { Commands } from '../core/Commands.js'
@@ -49,10 +50,8 @@ describe('ProcessMonsterRoundCommandHandler', () => {
 
   it('processes monsters until they can no longer act', async () => {
     const { monsters, moveMonster, subject } = createSUT()
-    const fastMonster = Monster.create('orc', { x: 1, y: 1, levelId: '1' })
-    fastMonster.speed = 25
-    const normalMonster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
-    normalMonster.speed = 12
+    const fastMonster = MonsterBuilder.create().withSpeed(25).build()
+    const normalMonster = MonsterBuilder.create().withSpeed(12).build()
 
     monsters.add(normalMonster)
     monsters.add(fastMonster)
@@ -70,8 +69,7 @@ describe('ProcessMonsterRoundCommandHandler', () => {
 
   it('skips monsters that do not have enough energy to act', async () => {
     const { monsters, moveMonster, subject } = createSUT()
-    const monster = Monster.create('orc', { x: 1, y: 1, levelId: '1' })
-    monster.speed = 5
+    const monster = MonsterBuilder.create().withSpeed(5).build()
     monsters.add(monster)
 
     const result = await subject.handle()

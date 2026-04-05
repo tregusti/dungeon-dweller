@@ -5,6 +5,7 @@ import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
 import { Level } from '../../levels/Level.js'
 import { expectToHaveProperty } from '../../test/expect.js'
+import { MonsterBuilder } from '../../test/MonsterBuilder.js'
 import { MoveCreatureCollisionService } from './MoveCreatureCollisionService.js'
 
 describe('MoveCreatureCollisionService', () => {
@@ -77,7 +78,7 @@ describe('MoveCreatureCollisionService', () => {
     })
     it('evaluate move into monster as unsuccessful', () => {
       const { subject, monsters } = createSUT()
-      const monster = Monster.create('orc', { x: 2, y: 1, levelId: '1' })
+      const monster = MonsterBuilder.create().withCoords(2, 1).build()
       monsters.add(monster)
       const result = subject.evaluate({
         from: { x: 1, y: 1 },

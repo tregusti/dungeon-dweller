@@ -1,10 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals'
 
-import { BufferEntry } from '../buffer/Buffer.js'
 import { BufferCompositor } from '../buffer/BufferCompositor.js'
-import { colorize } from '../Color.js'
 import { Hero } from '../entities/Hero.js'
-import { Monster } from '../entities/Monster.js'
 import { MonsterCollection } from '../entities/MonsterCollection.js'
 import { Tile, TileDefinitions } from '../entities/Tile.js'
 import { Layout } from '../Layout.js'
@@ -12,6 +9,7 @@ import { Dungeon } from '../levels/Dungeon.js'
 import { Level } from '../levels/Level.js'
 import { EventBus, Events } from '../messaging/core/main.js'
 import { LevelBuilder } from '../test/LevelBuilder.js'
+import { MonsterBuilder } from '../test/MonsterBuilder.js'
 import { Coords, Size } from '../types.js'
 import { DungeonRenderer } from './DungeonRenderer.js'
 import { Viewport } from './Viewport.js'
@@ -141,9 +139,8 @@ describe('DungeonRenderer', () => {
         expect(terminal.writeAt).toHaveBeenCalledWith(5, 5, hero.value)
       })
       it('should render a monster to the terminal', async () => {
-        const { subject, eventBus, hero, monsters, level, terminal } =
-          createSUT()
-        const monster = Monster.create('elf', { x: 1, y: 0, levelId: level.id })
+        const { subject, eventBus, hero, monsters, terminal } = createSUT()
+        const monster = MonsterBuilder.create().withCoords(1, 0).build()
         monsters.add(monster)
         subject.attach()
 

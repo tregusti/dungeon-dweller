@@ -28,8 +28,8 @@ export class Monster extends Creature {
   }
   move(dx: number, dy: number): { from: Coords; to: Coords } {
     const from = { x: this.x, y: this.y }
-    this.x += dx
-    this.y += dy
+    this._x += dx
+    this._y += dy
 
     this._energy -= 10
 

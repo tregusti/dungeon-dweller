@@ -1,5 +1,4 @@
-import { colorize } from '../Color.js'
-import { Tile, TileDefinitions } from '../entities/Tile.js'
+import { Tile } from '../entities/Tile.js'
 import { assert, Coords } from '../types.js'
 
 export class Level {

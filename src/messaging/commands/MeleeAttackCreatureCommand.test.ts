@@ -4,6 +4,7 @@ import { Debug } from '../../Debug.js'
 import { Hero } from '../../entities/Hero.js'
 import { Monster } from '../../entities/Monster.js'
 import { MonsterCollection } from '../../entities/MonsterCollection.js'
+import { MonsterBuilder } from '../../test/MonsterBuilder.js'
 import { EventBus } from '../core/EventBus.js'
 import { EventPayload, Events } from '../core/Events.js'
 import { MeleeAttackCreatureCommandHandler } from './MeleeAttackCreatureCommand.js'
@@ -29,7 +30,7 @@ describe('MeleeAttackCreatureCommandHandler', () => {
     it('kills and removes the target monster', () => {
       const { subject, monsters, events } = createSUT()
       const hero = new Hero({ x: 1, y: 1, levelId: '1' })
-      const target = Monster.create('orc', { x: 2, y: 1, levelId: '1' })
+      const target = MonsterBuilder.create().withCoords({ x: 2, y: 1 }).build()
       monsters.add(target)
 
       jest.spyOn(Debug, 'write').mockImplementation(() => {})
@@ -64,7 +65,7 @@ describe('MeleeAttackCreatureCommandHandler', () => {
     it('does not remove monsters and emits debug output', () => {
       const { subject, monsters } = createSUT()
       const hero = new Hero({ x: 1, y: 1, levelId: '1' })
-      const monster = Monster.create('orc', { x: 2, y: 1, levelId: '1' })
+      const monster = MonsterBuilder.create().build()
       monsters.add(monster)
 
       const debug = jest.spyOn(Debug, 'write').mockImplementation(() => {})

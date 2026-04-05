@@ -35,9 +35,7 @@ export class SwitchLevelCommandHandler {
       levelId: this.hero.levelId,
     }
 
-    this.hero.x = to.x
-    this.hero.y = to.y
-    this.hero.levelId = levelId
+    this.hero.moveTo(to.x, to.y, levelId)
 
     const toCell: Cell = { x: to.x, y: to.y, levelId }
 

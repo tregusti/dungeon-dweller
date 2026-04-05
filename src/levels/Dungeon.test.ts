@@ -7,6 +7,7 @@ import { Monster } from '../entities/Monster.js'
 import { MonsterCollection } from '../entities/MonsterCollection.js'
 import { Tile } from '../entities/Tile.js'
 import { LevelBuilder } from '../test/LevelBuilder.js'
+import { MonsterBuilder } from '../test/MonsterBuilder.js'
 import { Cell, Size } from '../types.js'
 import { Dungeon } from './Dungeon.js'
 import { Level } from './Level.js'
@@ -61,7 +62,7 @@ describe('Dungeon', () => {
       })
       it('should return the monster', () => {
         const { dungeon, monsters } = createSUT()
-        const monster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
+        const monster = MonsterBuilder.create().withCoords(2, 2).build()
         monsters.add(monster)
 
         const list = dungeon.at(2, 2)
@@ -74,7 +75,7 @@ describe('Dungeon', () => {
         const { dungeon, monsters } = createSUT({
           heroCell: { x: 2, y: 2, levelId: '2' },
         })
-        const monster = Monster.create('orc', { x: 1, y: 1, levelId: '2' })
+        const monster = MonsterBuilder.create().withLevelId('2').build()
         monsters.add(monster)
 
         expect(dungeon.at(2, 2, '1')).not.toContain(monster)
@@ -97,7 +98,7 @@ describe('Dungeon', () => {
     })
     it('should return false if monster is on the cell', () => {
       const { dungeon, monsters } = createSUT()
-      const monster = Monster.create('orc', { x: 2, y: 2, levelId: '1' })
+      const monster = MonsterBuilder.create().withCoords(2, 2).build()
       monsters.add(monster)
 
       expect(dungeon.isOccupied(2, 2)).toBe(true)
@@ -127,8 +128,8 @@ describe('Dungeon', () => {
         heroCell: { ...AA, levelId: '1' },
         size: { width: 2, height: 2 },
       })
-      monsters.add(Monster.create('orc', { ...CC, levelId: '1' }))
-      monsters.add(Monster.create('orc', { ...DD, levelId: '1' }))
+      monsters.add(MonsterBuilder.create().withCoords(CC).build())
+      monsters.add(MonsterBuilder.create().withCoords(DD).build())
 
       const result = dungeon.getFreeCoords()
       expect(result).toHaveLength(1)
@@ -140,7 +141,9 @@ describe('Dungeon', () => {
         heroCell: { ...AA, levelId: '2' },
         size: { width: 2, height: 2 },
       })
-      monsters.add(Monster.create('orc', { ...CC, levelId: '2' }))
+      monsters.add(
+        MonsterBuilder.create().withCoords(CC).withLevelId('2').build(),
+      )
 
       const result = dungeon.getFreeCoords('1')
 

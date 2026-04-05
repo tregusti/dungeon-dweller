@@ -6,6 +6,7 @@ import { MonsterCollection } from '../../entities/MonsterCollection.js'
 import { Level } from '../../levels/Level.js'
 import { expectToHaveProperty } from '../../test/expect.js'
 import { LevelBuilder } from '../../test/LevelBuilder.js'
+import { MonsterBuilder } from '../../test/MonsterBuilder.js'
 import { Cell } from '../../types.js'
 import { EventBus } from '../core/EventBus.js'
 import { EventPayload, Events } from '../core/Events.js'
@@ -59,7 +60,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 7, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
+    const monster = MonsterBuilder.create().withCoords(5, 5).build()
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -76,7 +77,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 7, y: 5, levelId: '1' },
       randomInts: [100, 0],
     })
-    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
+    const monster = MonsterBuilder.create().withCoords(5, 5).build()
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -93,7 +94,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 2, y: 0, levelId: '1' },
       randomInts: [100, 2, 1, 0],
     })
-    const monster = Monster.create('orc', { x: 0, y: 0, levelId: '1' })
+    const monster = MonsterBuilder.create().withCoords(0, 0).build()
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -110,7 +111,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 6, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
+    const monster = MonsterBuilder.create().withCoords(5, 5).build()
     monsters.add(monster)
 
     const result = await subject.handle({ monster })
@@ -128,7 +129,7 @@ describe('MoveMonsterCommandHandler', () => {
       heroCell: { x: 7, y: 5, levelId: '1' },
       randomInts: [1, 0],
     })
-    const monster = Monster.create('orc', { x: 5, y: 5, levelId: '1' })
+    const monster = MonsterBuilder.create().withCoords({ x: 5, y: 5 }).build()
     monsters.add(monster)
 
     const movedEvents: EventPayload<'MonsterMoved'>[] = []
